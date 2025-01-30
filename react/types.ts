@@ -4,3 +4,7 @@ export type ReactElement = {
     props: Props;
     children: any[];
 };
+
+export type TCleanupCallback = () => void;
+export type TEffectCallback = () => TCleanupCallback | void;
+export type TDependencyList = readonly unknown[];

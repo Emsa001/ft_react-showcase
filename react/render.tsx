@@ -1,6 +1,10 @@
-import { ReactElement } from "./types";
-import React, { resetHooks } from "./index";
+import React from "./index";
 import App from "../src/app";
+
+import { resetHooks } from "./hooks"
+import { debounce } from "./utils";
+
+import { ReactElement } from "./types";
 
 export const render = (el: ReactElement | string, container: HTMLElement): void => {
     let domEl: HTMLElement | Text;
@@ -33,15 +37,15 @@ export const render = (el: ReactElement | string, container: HTMLElement): void 
 const container = document.getElementById("root") as HTMLElement;
 
 
-const reRender = () => {
+
+
+const reRender = debounce(() => {
     console.log('reRender-ing :)');
-    
     resetHooks();
     
     container.innerHTML = "";
     render(<App />, container);
-};
-
+}, 1);
 
 reRender();
 
