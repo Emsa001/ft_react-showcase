@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function Test(){
+export default function Beqa(){
     return (
         <div styles={{backgroundColor:"red"}}>
             Beqa is nerd

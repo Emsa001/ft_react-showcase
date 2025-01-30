@@ -11,7 +11,7 @@ const App = (): ReactElement => {
     }
 
     useEffect(() => {
-        setNumber2((prev) => prev + 1);
+        setNumber2((prev) => prev * 2);
         console.log("Number 2 has been reset to 0");
     }, [number]);
 
@@ -23,7 +23,6 @@ const App = (): ReactElement => {
             <p>Hi there! !</p>
             <button onClick={() => setNumber(number + 1)}>Increment Number</button>
             <button onClick={() => setNumber2(number2 + 1)}>Increment Number 2</button>
-
             <button ref={ref} onClick={handleClick}>Click me!</button>
         </div>
     );

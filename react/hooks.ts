@@ -17,7 +17,6 @@ function useState(initialValue) {
         const newValueToSet = typeof newValue === "function" ? newValue(value) : newValue;
         if (!Object.is(hookStates[currentIndex], newValueToSet)) {
             hookStates[currentIndex] = newValueToSet;
-            console.log(hookStates)
             reRender();
         }
     };

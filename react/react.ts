@@ -11,6 +11,8 @@ const React = {
             children,
         };
 
+        console.log(el)
+
         return el;
     },
 };

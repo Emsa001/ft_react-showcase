@@ -16,7 +16,8 @@
     "baseUrl": ".",
     "paths": {
       "react": ["react"],
-      "@/*": ["src/*"]
+      "@/*": ["src/*"],
+      "!/*": ["src/app/*"]
     }
   },
   "include": ["src/**/*", "react"],

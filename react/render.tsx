@@ -1,10 +1,22 @@
 import React from "./index";
-import App from "../src/app";
 
 import { resetHooks } from "./hooks"
 import { debounce } from "./utils";
 
 import { ReactElement } from "./types";
+import routes from "../src/routes";
+
+const setProps = (domEl: HTMLElement, el: any, prop: string) => {
+    
+    switch(prop){
+        case "ref":
+            el.props[prop].current = domEl;
+            break;
+        default:
+            (domEl as any)[prop.toLowerCase()] = el.props[prop];
+    }
+
+}
 
 export const render = (el: ReactElement | string, container: HTMLElement): void => {
     let domEl: HTMLElement | Text;
@@ -21,7 +33,7 @@ export const render = (el: ReactElement | string, container: HTMLElement): void 
     let elProps = el.props ? Object.keys(el.props) : null;
     if (elProps && elProps.length > 0) {
         elProps.forEach((prop) => {
-            (domEl as any)[prop.toLowerCase()] = el.props[prop];
+            setProps(domEl, el, prop);
         });
     }
     // 3. Handle creating the Children.
@@ -37,16 +49,18 @@ export const render = (el: ReactElement | string, container: HTMLElement): void 
 const container = document.getElementById("root") as HTMLElement;
 
 
-
-
-const reRender = debounce(() => {
+const reRender = debounce(async () => {
     console.log('reRender-ing :)');
     resetHooks();
     
     container.innerHTML = "";
-    render(<App />, container);
+    
+
+    const page = routes.find((route) => route.path === window.location.pathname);
+    render((await page.module()).default(), container);
 }, 1);
 
 reRender();
+
 
 export { reRender };
