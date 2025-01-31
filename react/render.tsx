@@ -61,10 +61,12 @@ export const render = (el: ReactElement | string, container: HTMLElement): void 
         });
     }
 
-    container.appendChild(domEl);
+    container.appendChild(domEl);    
 };
 
 const container = document.getElementById("root") as HTMLElement;
+
+export const isMount = (el: HTMLElement) => el.innerHTML === "";
 
 const reRender = debounce(async () => {
     console.log('reRender-ing :)');

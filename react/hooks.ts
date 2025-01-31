@@ -1,4 +1,4 @@
-import { reRender } from "./render";
+import { isMount, reRender } from "./render";
 import { TDependencyList, TEffectCallback } from "./types";
 
 let hookStates: any[] = [];
@@ -39,25 +39,27 @@ const checkDependenciesChanged = (prevDeps: TDependencyList, deps: TDependencyLi
     });
 };
 
-const useEffect = (callback: TEffectCallback, deps?: TDependencyList): void => {
+const useEffect = async (callback: TEffectCallback, deps?: TDependencyList): Promise<void> => {
+    await Promise.resolve();
+
     const prevDeps = useRef(deps);
     const isFirstRender = useRef(true);
-
-    if (isFirstRender.current) {
-        isFirstRender.current = false;
-        callback();
-        return;
-    }
-
+    
+        if (isFirstRender.current) {
+            isFirstRender.current = false;
+            callback();
+            return;
+        }
+        
     if (!deps) {
         callback();
         return;
     }
-
+    
     if (checkDependenciesChanged(prevDeps.current!, deps)) {
         callback();
     }
-
+    
     prevDeps.current = deps;
 };
 

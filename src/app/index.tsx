@@ -4,9 +4,15 @@ import TestPage from "./test";
 import TestPage2 from "./test2";
 
 const App = (): ReactElement => {
+    const ref = useRef(null);
+
+    useEffect(() => {
+        console.log(ref);
+    },[])
+
     return (
         <TestProvider>
-            <b>hello</b>
+            <b ref={ref}>hello</b>
             <TestPage />
             <TestPage2 />
         </TestProvider>
