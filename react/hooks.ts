@@ -4,17 +4,17 @@ import { TDependencyList, TEffectCallback } from "./types";
 let hookStates: any[] = [];
 let hookIndex = 0;
 
-function useState(initialValue) {
+function useState<T>(initialValue: T) {
     const currentIndex = hookIndex;
 
     if (hookStates[currentIndex] === undefined) {
         hookStates[currentIndex] = initialValue;
     }
 
-    const value = hookStates[currentIndex];
+    const value = hookStates[currentIndex] as T;
 
-    const setState = (newValue: any) => {
-        const newValueToSet = typeof newValue === "function" ? newValue(value) : newValue;
+    const setState = (newValue: T | ((prevValue: T) => T)) => {
+        const newValueToSet = typeof newValue === "function" ? (newValue as (prevValue: T) => T)(value) : newValue;
         if (!Object.is(hookStates[currentIndex], newValueToSet)) {
             hookStates[currentIndex] = newValueToSet;
             reRender();
@@ -22,10 +22,10 @@ function useState(initialValue) {
     };
 
     hookIndex++;
-    return [value, setState];
+    return [value, setState] as [T, typeof setState];
 }
 
-const useRef = (initialValue: any) => {
+function useRef<T>(initialValue: T) {
     return useState({ current: initialValue })[0];
 };
 
@@ -61,8 +61,12 @@ const useEffect = (callback: TEffectCallback, deps?: TDependencyList): void => {
     prevDeps.current = deps;
 };
 
+const useContext = (context: any) => {
+    return context._currentValue;
+}
+
 export const resetHooks = () => {
     hookIndex = 0;
 };
 
-export { useState, useEffect, useRef };
+export { useState, useEffect, useRef, useContext };
