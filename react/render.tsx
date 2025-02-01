@@ -3,6 +3,8 @@ import { debounce } from "./utils";
 import { ReactElement } from "./types";
 import routes from "../src/routes";
 
+let currentFocusedElement: HTMLElement | null = null;
+
 const setProps = (domEl: HTMLElement, el: any, prop: string) => {
     switch (prop) {
         case "ref":
@@ -11,31 +13,28 @@ const setProps = (domEl: HTMLElement, el: any, prop: string) => {
         case "className":
             domEl.className = el.props[prop];
             break;
+        case "onChange":
+            domEl.addEventListener("input", el.props[prop]);
+            break;
         default:
-            if (prop.startsWith("on") && typeof el.props[prop] === "function") {
-                domEl.addEventListener(prop.substring(2).toLowerCase(), el.props[prop]);
-            } else {
-                (domEl as any)[prop.toLowerCase()] = el.props[prop];
-            }
+            (domEl as any)[prop.toLowerCase()] = el.props[prop];
     }
 };
 
-// Recursive render function
 export const render = (el: ReactElement | string, container: HTMLElement): void => {
-    
     if (Array.isArray(el)) {
-        el.forEach(child => render(child, container));
+        el.forEach((child) => render(child, container));
         return;
     }
 
     let domEl: HTMLElement | Text;
-    
+
     if (typeof el === "string" || typeof el === "number") {
         domEl = document.createTextNode(el.toString());
         container.appendChild(domEl);
         return;
     }
-    
+
     if (typeof el.tag === "function") {
         // Function component, pass the children to the component
         const children = el.children;
@@ -61,7 +60,7 @@ export const render = (el: ReactElement | string, container: HTMLElement): void 
         });
     }
 
-    container.appendChild(domEl);    
+    container.appendChild(domEl);
 };
 
 const container = document.getElementById("root") as HTMLElement;
@@ -69,14 +68,75 @@ const container = document.getElementById("root") as HTMLElement;
 export const isMount = (el: HTMLElement) => el.innerHTML === "";
 
 const reRender = debounce(async () => {
-    console.log('reRender-ing :)');
+    currentFocusedElement = document.activeElement as HTMLElement;
+    console.log("reRender-ing :)");
     resetHooks();
-    
+
+    // Capture the state of all attributes and values of all elements
+    // const elementStates: { [key: string]: { [attr: string]: string; value?: string } } = {};
+    // container.querySelectorAll("*").forEach((element) => {
+    //     const attributes: { [attr: string]: string } = {};
+
+    //     // Copy only the visible attributes
+    //     Array.from(element.attributes).forEach((attr) => {
+    //         attributes[attr.name] = attr.value;
+    //     });
+
+    //     // Copy specific properties if needed
+    //     if (element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement || element instanceof HTMLSelectElement) {
+    //         const propertiesToCopy = ["value"];
+    //         if (element instanceof HTMLInputElement && (element.type === "checkbox" || element.type === "radio")) {
+    //             propertiesToCopy.push("checked");
+    //         }
+    //         propertiesToCopy.forEach((prop) => {
+    //             if (prop in element) {
+    //                 attributes[prop] = (element as any)[prop];
+    //             }
+    //         });
+    //     }
+
+    //     // Copy only explicitly set styles
+    //     const computedStyles = window.getComputedStyle(element);
+    //     const inlineStyles = (element as HTMLElement).style;
+    //     const styles: { [style: string]: string } = {};
+    //     for (let i = 0; i < inlineStyles.length; i++) {
+    //         const styleName = inlineStyles[i];
+    //         styles[styleName] = computedStyles.getPropertyValue(styleName);
+    //     }
+    //     if(Object.keys(styles).length > 0)
+    //         attributes["styles"] = JSON.stringify(styles);
+
+    //     elementStates[element.id] = attributes;
+    // });
+
     container.innerHTML = "";
-    
+
     const page = routes.find((route) => route.path === window.location.pathname) || routes.find((route) => route.path === "404");
     render((await page.module()).default(), container);
-}, 1);
+
+    // Restore the state of all attributes and values of all elements
+    // Object.keys(elementStates).forEach((id) => {
+    //     if (!id) return;
+    //     const element = document.getElementById(id);
+    //     if (element) {
+    //         const attributes = elementStates[id];
+    //         Object.keys(attributes).forEach((attr) => {
+    //             if (attr === "value") {
+    //                 (element as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement).value = attributes[attr];
+    //             } else {
+    //                 element.setAttribute(attr, attributes[attr]);
+    //             }
+    //         });
+    //     }
+    // });
+
+    if (currentFocusedElement) {
+        const newFocusedElement = document.getElementById(currentFocusedElement.id);
+        if (newFocusedElement) {
+            newFocusedElement.focus();
+        }
+    }
+}, 0);
 
 reRender();
 

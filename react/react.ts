@@ -1,3 +1,5 @@
+import { useEffect, useRef, useState } from "./hooks";
+import { reRender } from "./render";
 import { Props, ReactElement } from "./types";
 
 const React = {
@@ -31,6 +33,14 @@ const React = {
     useContext<T>(context: { _currentValue: T }): T {
         return context._currentValue;
     },
+
+    setTitle: (newTitle: string) => {
+        document.title = newTitle;
+    },
+
+    useEffect: <T>(initialState: T) => useState(initialState),
+    useState: async (callback: () => void, deps?: any[]): Promise<void> => useEffect(callback, deps),
+    useRef: <T>(initialValue: T) => useRef(initialValue),
 };
 
 export default React;

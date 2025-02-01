@@ -1,4 +1,4 @@
-import { isMount, reRender } from "./render";
+import { reRender } from "./render";
 import { TDependencyList, TEffectCallback } from "./types";
 
 let hookStates: any[] = [];
@@ -44,22 +44,38 @@ const useEffect = async (callback: TEffectCallback, deps?: TDependencyList): Pro
 
     const prevDeps = useRef(deps);
     const isFirstRender = useRef(true);
-    
-        if (isFirstRender.current) {
-            isFirstRender.current = false;
-            callback();
-            return;
+    const cleanupRef = useRef<(() => void) | undefined>(undefined);
+
+    if (isFirstRender.current) {
+        isFirstRender.current = false;
+        const cleanup = callback();
+        if (typeof cleanup === 'function') {
+            cleanupRef.current = cleanup;
         }
-        
-    if (!deps) {
-        callback();
         return;
     }
-    
-    if (checkDependenciesChanged(prevDeps.current!, deps)) {
-        callback();
+
+    if (!deps) {
+        if (cleanupRef.current) {
+            cleanupRef.current();
+        }
+        const cleanup = callback();
+        if (typeof cleanup === 'function') {
+            cleanupRef.current = cleanup;
+        }
+        return;
     }
-    
+
+    if (checkDependenciesChanged(prevDeps.current!, deps)) {
+        if (cleanupRef.current) {
+            cleanupRef.current();
+        }
+        const cleanup = callback();
+        if (typeof cleanup === 'function') {
+            cleanupRef.current = cleanup;
+        }
+    }
+
     prevDeps.current = deps;
 };
 

@@ -21,7 +21,6 @@ const TestProvider: FC<{ children?: any }> = ({ children }) => {
 export const useTest = () => {
     const context = useContext(TestContext);
 
-    console.log(TestContext)
     if (TestContext._calledByProvider === false) {
         throw new Error("useTest must be used within a TestProvider");
     }
