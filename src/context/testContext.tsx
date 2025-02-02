@@ -15,7 +15,11 @@ const TestProvider: FC<{ children?: any }> = ({ children }) => {
     const [number, setNumber] = useState<number>(1);
     const [name, setName] = useState<string>("Emanuel");
 
-    return <TestContext.Provider value={{ number, setNumber, name, setName }}>{children}</TestContext.Provider>;
+    return (
+        <TestContext.Provider value={{ number, setNumber, name, setName }}>
+            {children}
+        </TestContext.Provider>
+    );
 };
 
 export const useTest = () => {
@@ -24,7 +28,7 @@ export const useTest = () => {
     if (TestContext._calledByProvider === false) {
         throw new Error("useTest must be used within a TestProvider");
     }
-    
+
     return context;
 };
 

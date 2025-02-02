@@ -1,32 +1,27 @@
 import TestProvider from "../context/testContext";
-import React, { ReactElement, useState, useEffect, useRef } from "react";
-import TestPage from "./test";
-import TestPage2 from "./test2";
+import React, { ReactElement, useEffect, useState } from "react";
 
 const App = (): ReactElement => {
-    const [inputValue, setInputValue] = useState("");
-    const [inputValue2, setInputValue2] = useState("");
+    const [inputValue, setInputValue] = useState("1");
+    const [inputValue2, setInputValue2] = useState("2");
+    const [inputValue3, setInputValue3] = useState("3");
+    const [count, setCount] = useState(0);
 
-    const handleChange = (event) => {
-        React.setTitle(event.target.value);
-        setInputValue(event.target.value);
-    };
+    useEffect(() => {
+        setTimeout(() => {
+            setCount(213);
+        }, 1000);
+    }, []);
 
     return (
-        <TestProvider>
-            <p>{inputValue}</p>
-            <p>{inputValue2}</p>
-
-            <input id="1" type="text" value={inputValue} onChange={handleChange} />
-            <input id="2" type="text" value={inputValue2} onChange={(e) => setInputValue2(e.target.value)} />
-
-            <select id="3">
-                <option>1</option>
-                <option>2</option>
-                <option>3</option>
-                <option>4</option>
-            </select>
-        </TestProvider>
+        <div>
+            <p>Hello</p>
+            <div>
+                <p>{inputValue}</p>
+                <button onClick={() => setCount((prev) => prev + 1)}>Increment {count}</button>
+                <button onClick={() => setCount((prev) => prev + 1)}>Increment {count}</button>
+            </div>
+        </div>
     );
 };
 
