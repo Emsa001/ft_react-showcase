@@ -112,8 +112,6 @@ const update = (
             Object.keys(newEl.props).forEach((prop) => {
                 setProps(dom, newEl, prop);
             });
-
-            mount(newEl, previous.dom, "replace");
         }
         
         newEl.dom = previous.dom;
@@ -162,10 +160,8 @@ export const render = (el: ReactElement | ReactElement[] | string, container: HT
 let previous: ReactElement = null;
 
 const container = document.getElementById("root") as HTMLElement;
-let currentFocusedElement: HTMLElement | null = null;
 
 export const reRender = debounce(async () => {
-    currentFocusedElement = document.activeElement as HTMLElement;
     console.log("reRender-ing :)");
 
     resetHooks();
@@ -177,11 +173,9 @@ export const reRender = debounce(async () => {
 
     previous = newVDOM;
 
-    if (currentFocusedElement) {
-        const newFocusedElement = document.getElementById(currentFocusedElement.id);
-        if (newFocusedElement)
-            newFocusedElement.focus();
-    }
+
 }, 0);
 
 reRender();
+
+export const isMounted = () => previous !== null;

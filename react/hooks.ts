@@ -63,6 +63,7 @@ const useEffect = async (callback: TEffectCallback, deps?: TDependencyList): Pro
         if (typeof cleanup === 'function') {
             cleanupRef.current = cleanup;
         }
+
         return;
     }
 
