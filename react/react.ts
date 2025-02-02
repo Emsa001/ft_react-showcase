@@ -11,6 +11,7 @@ const React = {
             tag,
             props,
             children,
+            dom : null,
         };
 
         return el;
@@ -24,7 +25,6 @@ const React = {
             Provider: ({ value, children }: { value?: T; children?: any }) => {
                 context._currentValue = value !== undefined ? value : context._defaultValue;
                 context._calledByProvider = true;
-                // return { tag: "div", props: {}, children };
                 return children;
             },
         };

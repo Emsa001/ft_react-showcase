@@ -4,6 +4,7 @@ export type ReactElement = {
     tag: string | ((props: Props, ...children: any[]) => ReactElement);
     props: Props;
     children: any[];
+    dom: HTMLElement | null;
 };
 
 export type TCleanupCallback = () => void;
