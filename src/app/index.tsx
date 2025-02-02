@@ -14,8 +14,8 @@ const App = (): ReactElement => {
     };
 
     return (
-        <div>
-            <h1>Together {inputValue} {inputValue2} {count}</h1>
+        <TestProvider>
+            {/* <h1>Together {inputValue} {inputValue2} {count}</h1>
             <div>
                 <p id="1">{inputValue}</p>
                 <input id="1" type="text" value={inputValue} onChange={handleChange} />
@@ -25,8 +25,9 @@ const App = (): ReactElement => {
                 <input id="2" type="text" value={inputValue2} onChange={(e) => setInputValue2(e.target.value)} />
             </div>
 
-            <button onClick={() => setCount((prev) => prev + 1)}>{count}</button>
-        </div>
+            <button onClick={() => setCount((prev) => prev + 1)}>{count}</button> */}
+            <TestPage />
+        </TestProvider>
     );
 };
 

@@ -3,6 +3,8 @@ import { resetHooks } from "./hooks";
 import { ReactElement } from "./types";
 import { debounce } from "./utils";
 
+let previous: ReactElement = null;
+
 // Mount function (first-time rendering)
 const mount = (el: ReactElement | string, container: HTMLElement, mode: string = "append"): void => {
     if (Array.isArray(el)) {
@@ -19,7 +21,7 @@ const mount = (el: ReactElement | string, container: HTMLElement, mode: string =
     }
     
     if (typeof el.tag === "function") {
-        const component = el.tag({ ...el.props, children: el.children });
+        const component = el.tag({ ...el.props, children: el.children, dom: el.dom });
         mount(component, container);
         return;
     }
@@ -48,7 +50,7 @@ const mount = (el: ReactElement | string, container: HTMLElement, mode: string =
 // Update function
 const update = (
     newEl: ReactElement | ReactElement[] | string,
-    previous: ReactElement,
+    previous: ReactElement | ReactElement[] | string,
 ): void => {
     if (!container) {
         console.error("Container is undefined or null!");
@@ -74,17 +76,38 @@ const update = (
         return;
     }
 
+    if (typeof previous === "string" || typeof previous === "number") {
+        mount(newEl, container, "replace");
+        return;
+    }
+
+    if (typeof newEl.tag === "function") {
+        // if (typeof previous.tag !== "function") {
+        //     console.log("Previous tag is not a function");
+        //     return;
+        // }
+        // const component = newEl.tag({ ...newEl.props, children: newEl.children, dom: null });
+        // const prev = previous.tag({ ...previous.props, children: previous.children, dom: previous.dom });
+
+
+        // console.log("Component", component);
+        // console.log("Previous", prev);
+        // update(component, prev);
+
+        /*
+         TODO: THIS SOLUTION IS SHIT AND SHOULD BE REWRITTEN
+        */
+        container.innerHTML = "";
+        mount(newEl, container, "replace");
+        return;
+    }
+
     if (newEl.children.length !== previous.children.length) {
         console.log("Children length mismatch");
         return;
     }
-
+    
     const updateDom = (newEl: ReactElement, previous: ReactElement, dom: HTMLElement = null, children: number = 0) => {
-        
-        if(typeof newEl === "function"){
-            mount(newEl, dom, "replace");
-            return;
-        }
         
         if(typeof newEl === "string" || typeof newEl === "number") {
             if(JSON.stringify(newEl) != JSON.stringify(previous))
@@ -102,11 +125,10 @@ const update = (
             for (let i = 0; i < newEl.children.length; i++) {
                 const newChild = newEl.children[i];
                 const previousChild = previous.children[i];
-                
                 updateDom(newChild, previousChild, previous.dom, i);
             }
         }
-        
+
         if(JSON.stringify(newEl.props) !== JSON.stringify(previous.props)) {
             console.log("Props mismatch");
             Object.keys(newEl.props).forEach((prop) => {
@@ -141,7 +163,7 @@ const setProps = (domEl: HTMLElement, el: any, prop: string) => {
 };
 
 // Render mounts and updates
-export const render = (el: ReactElement | ReactElement[] | string, container: HTMLElement): void => {
+export const render = (el: ReactElement, container: HTMLElement): void => {
     
     if (Array.isArray(el)) {
         el.forEach((child) => render(child, container));
@@ -155,9 +177,10 @@ export const render = (el: ReactElement | ReactElement[] | string, container: HT
         console.log("Updating...");
         update(el, previous);
     }
+
+    previous = el;
 };
 
-let previous: ReactElement = null;
 
 const container = document.getElementById("root") as HTMLElement;
 
@@ -170,9 +193,6 @@ export const reRender = debounce(async () => {
 
     const newVDOM = (await page.module()).default();
     render(newVDOM, container);
-
-    previous = newVDOM;
-
 
 }, 0);
 
