@@ -4,14 +4,18 @@ import { Props, ReactElement } from "./types";
 
 const React = {
     contexts: new Map(),
-    
-    createElement: (tag: string | ((props: Props, ...children: any[]) => ReactElement), props: Props, ...children: any[]): ReactElement => {
 
+    createElement: (
+        tag: string | ((props: Props | null, ...children: any[]) => ReactElement),
+        props: Props,
+        ...children: any[]
+    ): ReactElement => {
+        
         const el: ReactElement = {
             tag,
             props,
             children,
-            dom : null,
+            dom: null,
         };
 
         return el;
@@ -39,8 +43,9 @@ const React = {
         document.title = newTitle;
     },
 
-    useEffect: <T>(initialState: T) => useState(initialState),
-    useState: async (callback: () => void, deps?: any[]): Promise<void> => useEffect(callback, deps),
+    useState: <T>(initialState: T) => useState(initialState),
+    useEffect: async (callback: () => void, deps?: any[]): Promise<void> =>
+        useEffect(callback, deps),
     useRef: <T>(initialValue: T) => useRef(initialValue),
 };
 

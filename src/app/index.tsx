@@ -1,31 +1,18 @@
-import TestProvider from "../context/testContext";
-import React, { ReactElement, useState, useEffect, useRef } from "react";
-import TestPage from "./test";
-import TestPage2 from "./test2";
+import { ReactElement } from 'react';
+import React from 'react';
+import TestPage from './test';
+import TestProvider from '../context/testContext';
 
 const App = (): ReactElement => {
-    const [inputValue, setInputValue] = useState("");
-    const [inputValue2, setInputValue2] = useState("");
-    const [count, setCount] = useState(1);
-
-    const handleChange = (event) => {
-        React.setTitle(event.target.value);
-        setInputValue(event.target.value);
-    };
+    const [count, setCount] = React.useState<number>(0);
+    const [name, setName] = React.useState<string>("");
 
     return (
         <TestProvider>
-            {/* <h1>Together {inputValue} {inputValue2} {count}</h1>
-            <div>
-                <p id="1">{inputValue}</p>
-                <input id="1" type="text" value={inputValue} onChange={handleChange} />
-            </div>
-            <div>
-                <p id="2">{inputValue2}</p>
-                <input id="2" type="text" value={inputValue2} onChange={(e) => setInputValue2(e.target.value)} />
-            </div>
-
-            <button onClick={() => setCount((prev) => prev + 1)}>{count}</button> */}
+            <h1>Hello, {name}!</h1>
+            <p>Number: {count}</p>
+            <button onClick={() => setCount((prev) => prev + 1)}>Increment</button>
+            <input onChange={(e) => setName(e.target.value)} />
             <TestPage />
         </TestProvider>
     );

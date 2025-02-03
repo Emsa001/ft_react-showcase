@@ -5,3 +5,9 @@ export function debounce(func: (...args: any[]) => void, wait: number) {
         timeout = setTimeout(() => func(...args), wait);
     };
 }
+
+export function clearArray<T>(array: T[]) {
+    while (array.length > 0) {
+        array.pop();
+    }
+}

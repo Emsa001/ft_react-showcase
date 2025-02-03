@@ -1,9 +1,10 @@
 import routes from "../src/routes";
 import { resetHooks } from "./hooks";
 import { ReactElement } from "./types";
-import { debounce } from "./utils";
+import { clearArray, debounce } from "./utils";
 
 let previous: ReactElement = null;
+const components = []
 
 // Mount function (first-time rendering)
 const mount = (el: ReactElement | string, container: HTMLElement, mode: string = "append"): void => {
@@ -11,7 +12,7 @@ const mount = (el: ReactElement | string, container: HTMLElement, mode: string =
         el.forEach((child) => mount(child, container));
         return;
     }
-    
+
     let domEl: HTMLElement | Text;
 
     if (typeof el === "string" || typeof el === "number") {
@@ -19,27 +20,33 @@ const mount = (el: ReactElement | string, container: HTMLElement, mode: string =
         container.appendChild(domEl);
         return;
     }
-    
+
     if (typeof el.tag === "function") {
         const component = el.tag({ ...el.props, children: el.children, dom: el.dom });
+        
+        components.push({
+            name: el.tag.name,
+            component,
+        });
+
         mount(component, container);
         return;
     }
-    
+
     domEl = document.createElement(el.tag as string);
-    
+
     if (el.props) {
         Object.keys(el.props).forEach((prop) => {
             setProps(domEl, el, prop);
         });
     }
-    
+
     if (el.children && el.children.length > 0) {
         flattenChildren(el.children).forEach((child) => {
             mount(child, domEl as HTMLElement);
         });
     }
-    
+
     if (mode == "replace")
         container.replaceWith(domEl);
     else if(mode == "append")
@@ -56,18 +63,15 @@ const update = (
         console.error("Container is undefined or null!");
         return;
     }
-    
-    if (Array.isArray(newEl)) {
-        newEl.forEach((child) => {
-            update(child, previous);
-        });
-        return;
-    }
-    
-    if (Array.isArray(previous)) {
-        previous.forEach((child) => {
-            update(newEl, child);
-        });
+
+    if (Array.isArray(newEl) || Array.isArray(previous)) {
+        const flatNewEl = flattenChildren(newEl);
+        const flatPrevious = flattenChildren(previous);
+
+        for(let i = 0; i < flatNewEl.length; i++){
+            update(flatNewEl[i], flatPrevious[i]);
+        }
+        
         return;
     }
 
@@ -75,44 +79,53 @@ const update = (
         container.textContent = newEl;
         return;
     }
-
+    
     if (typeof previous === "string" || typeof previous === "number") {
         mount(newEl, container, "replace");
         return;
     }
 
+    
     if (typeof newEl.tag === "function") {
-        // if (typeof previous.tag !== "function") {
-        //     console.log("Previous tag is not a function");
-        //     return;
-        // }
-        // const component = newEl.tag({ ...newEl.props, children: newEl.children, dom: null });
-        // const prev = previous.tag({ ...previous.props, children: previous.children, dom: previous.dom });
-
-
-        // console.log("Component", component);
-        // console.log("Previous", prev);
-        // update(component, prev);
-
-        /*
-         TODO: THIS SOLUTION IS SHIT AND SHOULD BE REWRITTEN
-        */
-        container.innerHTML = "";
-        mount(newEl, container, "replace");
+        const name = newEl.tag.name;
+        const current = newEl.tag({ ...newEl.props, children: newEl.children, dom: null });
+        const component = components.find((component) => component.name === name);
+        
+        // console.log(current, component.component);
+        update(current, component.component);
+        
+        // container.innerHTML = "";
+        // mount(newEl, container, "replace");
         return;
     }
-
+    
     if (newEl.children.length !== previous.children.length) {
         console.log("Children length mismatch");
         return;
     }
-    
+
+    // console.log(newEl, previous);
+
     const updateDom = (newEl: ReactElement, previous: ReactElement, dom: HTMLElement = null, children: number = 0) => {
         
         if(typeof newEl === "string" || typeof newEl === "number") {
             if(JSON.stringify(newEl) != JSON.stringify(previous))
                 dom.childNodes[children].nodeValue = newEl;
             return;
+        }
+
+        if(typeof newEl.tag === "function"){
+            if (typeof previous.tag !== "function") {
+                console.log("Previous tag is not a function");
+                return;
+            }
+
+            const name = newEl.tag.name;
+            const component = components.find((component) => component.name === name);
+            const current = newEl.tag({ ...newEl.props, children: newEl.children, dom: null });
+            
+            updateDom(current, component.component);
+            return ;
         }
         
         if(newEl.props != null){
@@ -140,7 +153,8 @@ const update = (
     }
 
     updateDom(newEl, previous);
-};
+
+}
 
 const flattenChildren = (children: any): any[] => {
     return Array.isArray(children) ? children.flat(Infinity) : [children];
