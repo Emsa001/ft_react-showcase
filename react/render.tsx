@@ -104,7 +104,7 @@ const update = (
         return;
     }
 
-    // console.log(newEl, previous);
+    console.log(newEl, previous);
 
     const updateDom = (newEl: ReactElement, previous: ReactElement, dom: HTMLElement = null, children: number = 0) => {
         
@@ -142,12 +142,12 @@ const update = (
             }
         }
 
-        if(JSON.stringify(newEl.props) !== JSON.stringify(previous.props)) {
-            console.log("Props mismatch");
-            Object.keys(newEl.props).forEach((prop) => {
-                setProps(dom, newEl, prop);
-            });
-        }
+        // if(JSON.stringify(newEl.props) !== JSON.stringify(previous.props)) {
+        //     console.log("Props mismatch");
+        //     Object.keys(newEl.props).forEach((prop) => {
+        //         setProps(previous.dom, newEl, prop);
+        //     });
+        // }
         
         newEl.dom = previous.dom;
     }
