@@ -185,6 +185,7 @@ export const render = (el: ReactElement, container: HTMLElement): void => {
     }
 
     if (previous === null) {
+        clearArray(components);
         console.log("Mounting...", el);
         mount(el, container);
     } else {

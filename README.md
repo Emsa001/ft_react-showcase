@@ -16,8 +16,6 @@ The idea for this project came from my last project in my 42 coding school (ft_t
 
 - **Rendering**: 
   - `useEffect` has issues, such as `setInterval` inside `useEffect` not working correctly.
-- **Function components**: 
-  - Function components cause a re-render of the whole component instead of tracking individual changes.
 
 ## Installation
 
