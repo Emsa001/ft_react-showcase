@@ -1,10 +1,17 @@
 import routes from "../src/routes";
 import { resetHooks } from "./hooks";
 import { ReactElement } from "./types";
-import { clearArray, debounce } from "./utils";
+import { clearArray, debounce, flattenChildren } from "./utils";
 
 let previous: ReactElement = null;
 const components = []
+
+/*
+
+THIS IS DEFINITELY NOT THE FINAL VERSION OF THE RENDER FUNCTIONALITY
+THIS WILL BE REFACTORED AND IMPROVED IN THE FUTURE
+
+*/
 
 // Mount function (first-time rendering)
 const mount = (el: ReactElement | string, container: HTMLElement, mode: string = "append"): void => {
@@ -143,10 +150,6 @@ const update = (
     updateDom(newEl, previous);
 
 }
-
-const flattenChildren = (children: any): any[] => {
-    return Array.isArray(children) ? children.flat(Infinity) : [children];
-};
 
 const setProps = (domEl: HTMLElement, el: any, prop: string) => {
     switch (prop) {
