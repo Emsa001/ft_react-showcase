@@ -22,7 +22,7 @@ The idea for this project came from my last project in my 42 coding school (ft_t
 To get started with `ft_react`, clone the repository and install the dependencies:
 
 ```bash
-git clone https://github.com/yourusername/ft_react.git
+git clone https://github.com/emsa001/ft_react.git
 cd ft_react
 npm install
 ```
