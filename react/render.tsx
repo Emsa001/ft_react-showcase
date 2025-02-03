@@ -91,11 +91,7 @@ const update = (
         const current = newEl.tag({ ...newEl.props, children: newEl.children, dom: null });
         const component = components.find((component) => component.name === name);
         
-        // console.log(current, component.component);
         update(current, component.component);
-        
-        // container.innerHTML = "";
-        // mount(newEl, container, "replace");
         return;
     }
     
@@ -104,7 +100,6 @@ const update = (
         return;
     }
 
-    console.log(newEl, previous);
 
     const updateDom = (newEl: ReactElement, previous: ReactElement, dom: HTMLElement = null, children: number = 0) => {
         
@@ -141,13 +136,6 @@ const update = (
                 updateDom(newChild, previousChild, previous.dom, i);
             }
         }
-
-        // if(JSON.stringify(newEl.props) !== JSON.stringify(previous.props)) {
-        //     console.log("Props mismatch");
-        //     Object.keys(newEl.props).forEach((prop) => {
-        //         setProps(previous.dom, newEl, prop);
-        //     });
-        // }
         
         newEl.dom = previous.dom;
     }
