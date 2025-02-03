@@ -1,20 +1,20 @@
-import { ReactElement } from 'react';
-import React from 'react';
-import TestPage from './test';
-import TestProvider from '../context/testContext';
+import React, { useEffect } from 'react';
 
-const App = (): ReactElement => {
-    const [count, setCount] = React.useState<number>(0);
-    const [name, setName] = React.useState<string>("");
+const App = () => {
+    const [count, setCount] = React.useState(0);
+    const [name, setName] = React.useState("Anonymous");
+
+    useEffect(() => {
+        React.setTitle(`Hello, ${name}!`);
+    },[name]);
 
     return (
-        <TestProvider>
+        <div>
             <h1>Hello, {name}!</h1>
             <p>Number: {count}</p>
             <button onClick={() => setCount((prev) => prev + 1)}>Increment</button>
-            <input onChange={(e) => setName(e.target.value)} />
-            <TestPage />
-        </TestProvider>
+            <input value={name} onChange={(e) => setName(e.target.value)} />
+        </div>
     );
 };
 
