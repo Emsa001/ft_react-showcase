@@ -40,18 +40,22 @@ npm run dev
 Here is a basic example of how to use `ft_react`:
 
 ```tsx
-import React from './react';
+import React, { useEffect } from 'react';
 
-const App = (): ReactElement => {
+const App = () => {
     const [count, setCount] = React.useState(0);
-    const [name, setName] = React.useState("");
+    const [name, setName] = React.useState("Anonymous");
+
+    useEffect(() => {
+        React.setTitle(`Hello, ${name}!`);
+    },[name]);
 
     return (
         <div>
             <h1>Hello, {name}!</h1>
             <p>Number: {count}</p>
             <button onClick={() => setCount((prev) => prev + 1)}>Increment</button>
-            <input onChange={(e) => setName(e.target.value)} />
+            <input value={name} onChange={(e) => setName(e.target.value)} />
         </div>
     );
 };
