@@ -4,7 +4,7 @@ import { ReactElement } from "./types";
 import { clearArray, debounce, flattenChildren } from "./utils";
 
 let previous: ReactElement = null;
-const components = []
+const components = [];
 
 /*
 
@@ -14,7 +14,11 @@ THIS WILL BE REFACTORED AND IMPROVED IN THE FUTURE
 */
 
 // Mount function (first-time rendering)
-const mount = (el: ReactElement | string, container: HTMLElement, mode: string = "append"): void => {
+const mount = (
+    el: ReactElement | string,
+    container: HTMLElement,
+    mode: string = "append"
+): void => {
     if (Array.isArray(el)) {
         el.forEach((child) => mount(child, container));
         return;
@@ -30,7 +34,7 @@ const mount = (el: ReactElement | string, container: HTMLElement, mode: string =
 
     if (typeof el.tag === "function") {
         const component = el.tag({ ...el.props, children: el.children, dom: el.dom });
-        
+
         components.push({
             name: el.tag.name,
             component,
@@ -54,10 +58,8 @@ const mount = (el: ReactElement | string, container: HTMLElement, mode: string =
         });
     }
 
-    if (mode == "replace")
-        container.replaceWith(domEl);
-    else if(mode == "append")
-        container.appendChild(domEl);
+    if (mode == "replace") container.replaceWith(domEl);
+    else if (mode == "append") container.appendChild(domEl);
     el.dom = domEl;
 };
 
@@ -65,9 +67,11 @@ const mount = (el: ReactElement | string, container: HTMLElement, mode: string =
 const update = (
     newEl: ReactElement | ReactElement[] | string,
     previous: ReactElement | ReactElement[] | string,
+    dom: HTMLElement = container,
+    childIndex: number = 0
 ): void => {
     if (!container) {
-        console.error("Container is undefined or null!");
+        console.error("Root container is undefined or null!");
         return;
     }
 
@@ -75,81 +79,57 @@ const update = (
         const flatNewEl = flattenChildren(newEl);
         const flatPrevious = flattenChildren(previous);
 
-        for(let i = 0; i < flatNewEl.length; i++){
+        for (let i = 0; i < flatNewEl.length; i++)
             update(flatNewEl[i], flatPrevious[i]);
-        }
-        
+
         return;
+    }
+
+    if(typeof newEl != typeof previous){
+        console.error("Type mismatch");
+        return ;
     }
 
     if (typeof newEl === "string" || typeof newEl === "number") {
-        container.textContent = newEl;
-        return;
-    }
-    
-    if (typeof previous === "string" || typeof previous === "number") {
-        mount(newEl, container, "replace");
+        if (JSON.stringify(newEl) != JSON.stringify(previous)){
+            if(!dom || !dom.childNodes[childIndex]) return // TODO: remount the element;
+            dom.childNodes[childIndex].nodeValue = newEl;
+        }
         return;
     }
 
-    
+    previous = previous as ReactElement
+
     if (typeof newEl.tag === "function") {
         const name = newEl.tag.name;
         const current = newEl.tag({ ...newEl.props, children: newEl.children, dom: null });
         const component = components.find((component) => component.name === name);
-        
+
         update(current, component.component);
         return;
     }
-    
+
     if (newEl.children.length !== previous.children.length) {
         console.log("Children length mismatch");
         return;
     }
 
-
-    const updateDom = (newEl: ReactElement, previous: ReactElement, dom: HTMLElement = null, children: number = 0) => {
-        
-        if(typeof newEl === "string" || typeof newEl === "number") {
-            if(JSON.stringify(newEl) != JSON.stringify(previous))
-                dom.childNodes[children].nodeValue = newEl;
-            return;
-        }
-
-        if(typeof newEl.tag === "function"){
-            if (typeof previous.tag !== "function") {
-                console.log("Previous tag is not a function");
-                return;
-            }
-
-            const name = newEl.tag.name;
-            const component = components.find((component) => component.name === name);
-            const current = newEl.tag({ ...newEl.props, children: newEl.children, dom: null });
-            
-            updateDom(current, component.component);
-            return ;
-        }
-        
-        if(newEl.props != null){
-            Object.keys(newEl.props).forEach((prop) => {
-                setProps(previous.dom, newEl, prop);
-            });
-        }
-        
-        if(newEl.children.length > 0){
-            for (let i = 0; i < newEl.children.length; i++) {
-                const newChild = newEl.children[i];
-                const previousChild = previous.children[i];
-                updateDom(newChild, previousChild, previous.dom, i);
-            }
-        }
-        
-        newEl.dom = previous.dom;
+    if (newEl.props != null) {
+        Object.keys(newEl.props).forEach((prop) => {
+            setProps(previous.dom, newEl, prop);
+        });
     }
 
-    updateDom(newEl, previous);
+    if (newEl.children.length > 0) {
+        for (let i = 0; i < newEl.children.length; i++) {
+            const newChild = newEl.children[i];
+            const previousChild = previous.children[i];
+            update(newChild, previousChild, previous.dom, i);
+        }
+    }
 
-}
+    newEl.dom = previous.dom;
+};
 
 const setProps = (domEl: HTMLElement, el: any, prop: string) => {
     switch (prop) {
@@ -169,7 +149,6 @@ const setProps = (domEl: HTMLElement, el: any, prop: string) => {
 
 // Render mounts and updates
 export const render = (el: ReactElement, container: HTMLElement): void => {
-    
     if (Array.isArray(el)) {
         el.forEach((child) => render(child, container));
         return;
@@ -187,19 +166,17 @@ export const render = (el: ReactElement, container: HTMLElement): void => {
     previous = el;
 };
 
-
 const container = document.getElementById("root") as HTMLElement;
 
 export const reRender = debounce(async () => {
-    console.log("reRender-ing :)");
-
     resetHooks();
 
-    const page = routes.find((route) => route.path === window.location.pathname) || routes.find((route) => route.path === "404");
+    const page =
+        routes.find((route) => route.path === window.location.pathname) ||
+        routes.find((route) => route.path === "404");
 
     const newVDOM = (await page.module()).default();
     render(newVDOM, container);
-
 }, 0);
 
 reRender();
