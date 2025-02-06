@@ -3,8 +3,8 @@ import { resetHooks } from "./hooks";
 import { ReactElement } from "./types";
 import { clearArray, debounce, flattenChildren } from "./utils";
 
-let previous: ReactElement = null;
-const components = [];
+let previous: ReactElement;
+const components: { name: string; component: ReactElement }[] = [];
 
 /*
 
@@ -14,11 +14,7 @@ THIS WILL BE REFACTORED AND IMPROVED IN THE FUTURE
 */
 
 // Mount function (first-time rendering)
-const mount = (
-    el: ReactElement | string,
-    container: HTMLElement,
-    mode: string = "append"
-): void => {
+const mount = (el: ReactElement | string, container: HTMLElement, mode: string = "append"): void => {
     if (Array.isArray(el)) {
         el.forEach((child) => mount(child, container));
         return;
@@ -67,7 +63,7 @@ const mount = (
 const update = (
     newEl: ReactElement | ReactElement[] | string,
     previous: ReactElement | ReactElement[] | string,
-    dom: HTMLElement = container,
+    dom: HTMLElement | null = container,
     childIndex: number = 0
 ): void => {
     if (!container) {
@@ -79,31 +75,32 @@ const update = (
         const flatNewEl = flattenChildren(newEl);
         const flatPrevious = flattenChildren(previous);
 
-        for (let i = 0; i < flatNewEl.length; i++)
-            update(flatNewEl[i], flatPrevious[i]);
+        for (let i = 0; i < flatNewEl.length; i++) update(flatNewEl[i], flatPrevious[i]);
 
         return;
     }
 
-    if(typeof newEl != typeof previous){
+    if (typeof newEl != typeof previous) {
         console.error("Type mismatch");
-        return ;
+        return;
     }
 
     if (typeof newEl === "string" || typeof newEl === "number") {
-        if (JSON.stringify(newEl) != JSON.stringify(previous)){
-            if(!dom || !dom.childNodes[childIndex]) return // TODO: remount the element;
+        if (JSON.stringify(newEl) != JSON.stringify(previous)) {
+            if (!dom || !dom.childNodes[childIndex]) return; // TODO: remount the element;
             dom.childNodes[childIndex].nodeValue = newEl;
         }
         return;
     }
 
-    previous = previous as ReactElement
+    previous = previous as ReactElement;
 
     if (typeof newEl.tag === "function") {
         const name = newEl.tag.name;
         const current = newEl.tag({ ...newEl.props, children: newEl.children, dom: null });
         const component = components.find((component) => component.name === name);
+
+        if (!component) return console.error("Component not found");
 
         update(current, component.component);
         return;
@@ -116,6 +113,7 @@ const update = (
 
     if (newEl.props != null) {
         Object.keys(newEl.props).forEach((prop) => {
+            if (!previous.dom) return;
             setProps(previous.dom, newEl, prop);
         });
     }
@@ -154,7 +152,7 @@ export const render = (el: ReactElement, container: HTMLElement): void => {
         return;
     }
 
-    if (previous === null) {
+    if (!previous) {
         clearArray(components);
         console.log("Mounting...", el);
         mount(el, container);
@@ -171,11 +169,11 @@ const container = document.getElementById("root") as HTMLElement;
 export const reRender = debounce(async () => {
     resetHooks();
 
-    const page =
-        routes.find((route) => route.path === window.location.pathname) ||
-        routes.find((route) => route.path === "404");
+    const page = routes.find((route) => route.path === window.location.pathname) || routes.find((route) => route.path === "404");
 
-    const newVDOM = (await page.module()).default();
+    if (!page) return console.error("Page not found");
+
+    const newVDOM = (await page.module()).default() as unknown as ReactElement;
     render(newVDOM, container);
 }, 0);
 

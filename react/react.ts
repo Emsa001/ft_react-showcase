@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "./hooks";
-import { reRender } from "./render";
 import { Props, ReactElement } from "./types";
 
 const React = {

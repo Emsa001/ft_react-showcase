@@ -21,6 +21,7 @@
     "webpack-dev-server": "^5.2.0"
   },
   "dependencies": {
+    "@types/react": "^19.0.8",
     "html-webpack-plugin": "^5.6.3",
     "ts-loader": "^9.5.2"
   }

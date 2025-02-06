@@ -1,19 +1,23 @@
-import React, { useEffect } from 'react';
+import React from "react";
 
 const App = () => {
-    const [count, setCount] = React.useState(0);
+    const [count, setCount] = React.useState(12);
     const [name, setName] = React.useState("Anonymous");
 
-    useEffect(() => {
+    React.useEffect(() => {
         React.setTitle(`Hello, ${name}!`);
-    },[name]);
+    }, [name]);
 
     return (
         <div>
-            <h1>Hello, {name}!</h1>
-            <p>Number: {count}</p>
-            <button onClick={() => setCount((prev) => prev + 1)}>Increment</button>
-            <input value={name} onChange={(e) => setName(e.target.value)} />
+            <h1 style={{color: "red"}}>
+                Hello, {name}!
+            </h1>
+            <div>
+                <p>Number: {count}</p>
+                <button onClick={() => setCount((prev) => prev + 1)}>Increment</button>
+                <input value={name} onChange={(e) => setName(e.target.value)} />
+            </div>
         </div>
     );
 };
