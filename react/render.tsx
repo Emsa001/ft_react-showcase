@@ -131,6 +131,11 @@ const update = (
 
 const setProps = (domEl: HTMLElement, el: any, prop: string) => {
     switch (prop) {
+        case "style":
+            Object.keys(el.props[prop]).forEach((style) => {
+                (domEl.style as any)[style] = el.props[prop][style];
+            });
+            break;
         case "ref":
             el.props[prop].current = domEl;
             break;

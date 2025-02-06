@@ -10,7 +10,7 @@ const App = () => {
 
     return (
         <div>
-            <h1 style={{color: "red"}}>
+            <h1 style={{ color: "red" }}>
                 Hello, {name}!
             </h1>
             <div>
