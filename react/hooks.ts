@@ -15,10 +15,8 @@ function useState<T>(initialValue: T) {
 
     const setState = (newValue: T | ((prevValue: T) => T)) => {
         const newValueToSet = typeof newValue === "function" ? (newValue as (prevValue: T) => T)(value) : newValue;
-        if (!Object.is(hookStates[currentIndex], newValueToSet)) {
-            hookStates[currentIndex] = newValueToSet;
-            reRender();
-        }
+        hookStates[currentIndex] = newValueToSet;
+        reRender();
     };
 
     hookIndex++;

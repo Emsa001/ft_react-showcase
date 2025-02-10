@@ -3,7 +3,7 @@ import { resetHooks } from "./hooks";
 import { ReactElement } from "./types";
 import { clearArray, debounce, flattenChildren } from "./utils";
 
-let previous: ReactElement;
+let previousEl: ReactElement;
 const components: { name: string; component: ReactElement }[] = [];
 
 /*
@@ -14,9 +14,16 @@ THIS WILL BE REFACTORED AND IMPROVED IN THE FUTURE
 */
 
 // Mount function (first-time rendering)
-const mount = (el: ReactElement | string, container: HTMLElement, mode: string = "append"): void => {
+
+interface IMount {
+    el: ReactElement | ReactElement[] | string;
+    container: HTMLElement;
+    mode?: string;
+}
+
+const mount = ({ el, container, mode = "append" }: IMount & { mode?: "replace" | "append" }): void => {
     if (Array.isArray(el)) {
-        el.forEach((child) => mount(child, container));
+        el.forEach((child) => mount({ el: child, container }));
         return;
     }
 
@@ -36,7 +43,7 @@ const mount = (el: ReactElement | string, container: HTMLElement, mode: string =
             component,
         });
 
-        mount(component, container);
+        mount({ el: component, container });
         return;
     }
 
@@ -50,7 +57,7 @@ const mount = (el: ReactElement | string, container: HTMLElement, mode: string =
 
     if (el.children && el.children.length > 0) {
         flattenChildren(el.children).forEach((child) => {
-            mount(child, domEl as HTMLElement);
+            mount({ el: child, container: domEl as HTMLElement });
         });
     }
 
@@ -60,12 +67,15 @@ const mount = (el: ReactElement | string, container: HTMLElement, mode: string =
 };
 
 // Update function
-const update = (
-    newEl: ReactElement | ReactElement[] | string,
-    previous: ReactElement | ReactElement[] | string,
-    dom: HTMLElement | null = container,
-    childIndex: number = 0
-): void => {
+
+interface IUpdate {
+    newEl: ReactElement | ReactElement[] | string;
+    previous: ReactElement | ReactElement[] | string;
+    dom?: HTMLElement | null;
+    childIndex?: number;
+}
+
+const update = ({ newEl, previous, dom = null, childIndex = 0 }: IUpdate): void => {
     if (!container) {
         console.error("Root container is undefined or null!");
         return;
@@ -75,8 +85,24 @@ const update = (
         const flatNewEl = flattenChildren(newEl);
         const flatPrevious = flattenChildren(previous);
 
-        for (let i = 0; i < flatNewEl.length; i++) update(flatNewEl[i], flatPrevious[i]);
+        const bigger: number = flatNewEl.length > flatPrevious.length ? flatNewEl.length : flatPrevious.length;
 
+        let domEl = flatPrevious[0]?.dom?.parentElement || dom;
+
+        for (let i = 0; i < bigger; i++) update({ newEl: flatNewEl[i], previous: flatPrevious[i], dom: domEl });
+
+        return;
+    }
+
+    if (!newEl) {
+        if (typeof previous === "string" || typeof previous === "number") return;
+        previous?.dom?.remove();
+        return;
+    }
+
+    if (!previous) {
+        if (!dom) return;
+        mount({ el: newEl, container: dom, mode: "append" });
         return;
     }
 
@@ -102,7 +128,7 @@ const update = (
 
         if (!component) return console.error("Component not found");
 
-        update(current, component.component);
+        update({ newEl: current, previous: component.component });
         return;
     }
 
@@ -122,7 +148,7 @@ const update = (
         for (let i = 0; i < newEl.children.length; i++) {
             const newChild = newEl.children[i];
             const previousChild = previous.children[i];
-            update(newChild, previousChild, previous.dom, i);
+            update({ newEl: newChild, previous: previousChild, dom: previous.dom, childIndex: i });
         }
     }
 
@@ -157,16 +183,16 @@ export const render = (el: ReactElement, container: HTMLElement): void => {
         return;
     }
 
-    if (!previous) {
+    if (!previousEl) {
         clearArray(components);
-        console.log("Mounting...", el);
-        mount(el, container);
+        console.log("Mounting...");
+        mount({ el, container });
     } else {
         console.log("Updating...");
-        update(el, previous);
+        update({ newEl: el, previous: previousEl });
     }
 
-    previous = el;
+    previousEl = el;
 };
 
 const container = document.getElementById("root") as HTMLElement;
@@ -184,4 +210,4 @@ export const reRender = debounce(async () => {
 
 reRender();
 
-export const isMounted = () => previous !== null;
+export const isMounted = () => previousEl !== null;
