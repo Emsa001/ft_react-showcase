@@ -169,7 +169,13 @@ const setProps = (domEl: HTMLElement, el: any, prop: string) => {
             domEl.className = el.props[prop];
             break;
         case "onChange":
-            domEl.addEventListener("input", el.props[prop]);
+            const eventListener = el.props[prop];
+            const previousListener = (domEl as any)._onChangeListener;
+            if (previousListener) {
+                domEl.removeEventListener("input", previousListener);
+            }
+            domEl.addEventListener("input", eventListener);
+            (domEl as any)._onChangeListener = eventListener;
             break;
         default:
             (domEl as any)[prop.toLowerCase()] = el.props[prop];
