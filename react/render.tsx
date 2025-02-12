@@ -86,21 +86,20 @@ const update = ({ newEl, previous, dom = null, childIndex = 0 }: IUpdate): void 
         const flatPrevious = flattenChildren(previous);
 
         const bigger: number = flatNewEl.length > flatPrevious.length ? flatNewEl.length : flatPrevious.length;
-
         let domEl = flatPrevious[0]?.dom?.parentElement || dom;
 
-        for (let i = 0; i < bigger; i++) update({ newEl: flatNewEl[i], previous: flatPrevious[i], dom: domEl });
-
+        for (let i = 0; i < bigger; i++){
+            update({ newEl: flatNewEl[i], previous: flatPrevious[i], dom: domEl });
+        }
         return;
     }
 
-    if (!newEl) {
-        if (typeof previous === "string" || typeof previous === "number") return;
+    if (!newEl && (typeof previous != "string" && typeof previous != "number")) {
         previous?.dom?.remove();
         return;
     }
 
-    if (!previous) {
+    if (!previous && (typeof newEl != "string" && typeof newEl != "number")) {
         if (!dom) return;
         mount({ el: newEl, container: dom, mode: "append" });
         return;
@@ -112,8 +111,8 @@ const update = ({ newEl, previous, dom = null, childIndex = 0 }: IUpdate): void 
     }
 
     if (typeof newEl === "string" || typeof newEl === "number") {
+        if (!dom) return;
         if (JSON.stringify(newEl) != JSON.stringify(previous)) {
-            if (!dom || !dom.childNodes[childIndex]) return; // TODO: remount the element;
             dom.childNodes[childIndex].nodeValue = newEl;
         }
         return;
@@ -174,7 +173,7 @@ const setProps = (domEl: HTMLElement, el: any, prop: string) => {
             if (previousListener) {
                 domEl.removeEventListener("input", previousListener);
             }
-            domEl.addEventListener("input", eventListener);
+            domEl.addEventListener("input",  el.props[prop]);
             (domEl as any)._onChangeListener = eventListener;
             break;
         default:
