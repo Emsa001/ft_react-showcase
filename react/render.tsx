@@ -155,28 +155,34 @@ const update = ({ newEl, previous, dom = null, childIndex = 0 }: IUpdate): void 
 };
 
 const setProps = (domEl: HTMLElement, el: any, prop: string) => {
-    switch (prop) {
-        case "style":
-            Object.keys(el.props[prop]).forEach((style) => {
-                (domEl.style as any)[style] = el.props[prop][style];
-            });
-            break;
-        case "ref":
-            el.props[prop].current = domEl;
-            break;
-        case "onChange":
-            const eventListener = el.props[prop];
-            const previousListener = (domEl as any)._onChangeListener;
-            if (previousListener) {
-                domEl.removeEventListener("input", previousListener);
-            }
-            domEl.addEventListener("input",  el.props[prop]);
-            (domEl as any)._onChangeListener = eventListener;
-            break;
-        default:
-            (domEl as any)[prop] = el.props[prop];
+    if (prop === "children") return; // Ignore children since they are handled separately
+
+    if (prop === "style" && typeof el.props[prop] === "object") {
+        Object.assign(domEl.style, el.props[prop]);
+        return;
     }
-};
+
+    if (prop === "ref") {
+        el.props[prop].current = domEl;
+        return;
+    }
+
+    if (prop === "onChange" && domEl instanceof HTMLInputElement) {
+        domEl.removeEventListener("input", (domEl as any)._onChangeListener);
+        domEl.addEventListener("input", el.props[prop]);
+        (domEl as any)._onChangeListener = el.props[prop];
+        return;
+    }
+
+    if (prop.startsWith("on") && typeof el.props[prop] === "function") {
+        const eventName = prop.slice(2).toLowerCase();
+        domEl.removeEventListener(eventName, (domEl as any)[prop]);
+        domEl.addEventListener(eventName, el.props[prop]);
+        (domEl as any)[prop]
+    }
+
+    (domEl as any)[prop] = el.props[prop];
+}
 
 // Render mounts and updates
 export const render = (el: ReactElement, container: HTMLElement): void => {
