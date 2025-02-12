@@ -164,9 +164,6 @@ const setProps = (domEl: HTMLElement, el: any, prop: string) => {
         case "ref":
             el.props[prop].current = domEl;
             break;
-        case "className":
-            domEl.className = el.props[prop];
-            break;
         case "onChange":
             const eventListener = el.props[prop];
             const previousListener = (domEl as any)._onChangeListener;
@@ -177,7 +174,7 @@ const setProps = (domEl: HTMLElement, el: any, prop: string) => {
             (domEl as any)._onChangeListener = eventListener;
             break;
         default:
-            (domEl as any)[prop.toLowerCase()] = el.props[prop];
+            (domEl as any)[prop] = el.props[prop];
     }
 };
 
