@@ -21,19 +21,19 @@ module.exports = {
                 exclude: /node_modules/,
             },
             {
-                test: /\.css$/,
-                use: ["style-loader", "css-loader"],
+                test: /\.css$/i,
+                use: [`style-loader`, 'css-loader'],
                 exclude: /node_modules/,
-            },
+            }
         ],
     },
     plugins: [
         new HtmlWebpackPlugin({
-            template: "./src/index.html",
+            template: "./react/index.html",
         }),
         new CopyWebpackPlugin({
             patterns: [
-                { from: "src/global.css", to: "global.css" },
+                { from: "src/app/global.css", to: "global.css" },
             ],
         }),
     ],
@@ -44,6 +44,6 @@ module.exports = {
         hot: true,
         historyApiFallback: true,
         port: 3000,
-        watchFiles: ['src/global.css'],
+        watchFiles: ['src/app/global.css'],
     },
 };

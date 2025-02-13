@@ -212,10 +212,14 @@ export const reRender = debounce(async () => {
 
     if (!page) return console.error("Page not found");
 
-    const newVDOM = (await page.module()).default() as unknown as ReactElement;
-    render(newVDOM, container);
+    const newVDOM = (await page.module()).default();
+    // const root = (await import("../src/app/root")).default({ children: newVDOM });
+    
+    render(newVDOM as unknown as ReactElement, container);
 }, 0);
 
 reRender();
+
+console.log("here");
 
 export const isMounted = () => previousEl !== null;

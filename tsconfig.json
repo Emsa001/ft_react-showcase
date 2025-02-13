@@ -1,28 +1,22 @@
 {
-  "compilerOptions": {
-    "target": "es5",
-    "lib": ["dom", "es2019"],
-    "jsx": "react",
-    "module": "commonjs",
-    "strict": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "typeRoots": ["node_modules/@types", "./src/types"],
-    "types": ["react"],
-    "baseUrl": ".",
-    "paths": {
-      "react": ["react"],
-      "@/*": ["src/*"],
-      "!/*": ["src/app/*"]
-    }
-  },
-  "include": [
-    "src/**/*",
-    "react/**/*"
-  ],
-  "exclude": [
-    "node_modules", 
-    "dist"
-  ]
+    "compilerOptions": {
+        "target": "es5",
+        "lib": ["dom", "es2019"],
+        "jsx": "react",
+        "module": "commonjs",
+        "strict": true,
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "forceConsistentCasingInFileNames": true,
+        "typeRoots": ["node_modules/@types", "./src/types"],
+        "types": ["react"],
+        "baseUrl": ".",
+        "paths": {
+            "react": ["react"],
+            "@/*": ["src/*"],
+            "!/*": ["src/app/*"]
+        }
+    },
+    "include": ["src/**/*", "react/**/*"],
+    "exclude": ["node_modules", "dist"]
 }

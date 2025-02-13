@@ -1,10 +1,10 @@
 import React from "react";
 
-const App = () => {
+export default function Home() {
     const [count, setCount] = React.useState(12);
     const [name, setName] = React.useState("Anonymous");
     const [test, setTest] = React.useState([1, 2]);
-    const [test2, setTest2] = React.useState([1, 2,3,4,5]);
+    const [test2, setTest2] = React.useState([1, 2, 3, 4, 5]);
 
     React.useEffect(() => {
         React.setTitle(`Hello, ${name}!`);
@@ -27,7 +27,7 @@ const App = () => {
 
     return (
         <div>
-            <h1 style={{ color: "red" }}>Hello, {name}!</h1>
+            <h1 className="text-red-600">Hello, {name}!</h1>
             <div>
                 <p>Number: {count}</p>
                 <button onClick={() => setCount((prev) => prev + 1)}>Increment</button>
@@ -51,7 +51,7 @@ const App = () => {
 
             <div>
                 <div>
-                    <h1>Hello</h1>
+                    <h1>Helloo</h1>
                     <div style={{ backgroundColor: "green" }}>
                         {test2.map((e) => {
                             return <div>{e}</div>;
@@ -61,6 +61,4 @@ const App = () => {
             </div>
         </div>
     );
-};
-
-export default App;
+}
