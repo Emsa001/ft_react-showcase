@@ -1,6 +1,5 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
-const CopyWebpackPlugin = require("copy-webpack-plugin");
 
 module.exports = {
     mode: "development",
@@ -22,19 +21,14 @@ module.exports = {
             },
             {
                 test: /\.css$/i,
-                use: [`style-loader`, 'css-loader'],
+                use: [`style-loader`, 'css-loader', 'postcss-loader'],
                 exclude: /node_modules/,
-            }
+            }            
         ],
     },
     plugins: [
         new HtmlWebpackPlugin({
             template: "./react/index.html",
-        }),
-        new CopyWebpackPlugin({
-            patterns: [
-                { from: "src/app/global.css", to: "global.css" },
-            ],
         }),
     ],
     devServer: {
@@ -44,6 +38,5 @@ module.exports = {
         hot: true,
         historyApiFallback: true,
         port: 3000,
-        watchFiles: ['src/app/global.css'],
     },
 };

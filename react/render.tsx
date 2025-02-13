@@ -194,7 +194,7 @@ export const render = (el: ReactElement, container: HTMLElement): void => {
     if (!previousEl) {
         clearArray(components);
         console.log("Mounting...");
-        mount({ el, container });
+        mount({ el, container, mode: "replace" });
     } else {
         console.log("Updating...");
         update({ newEl: el, previous: previousEl });
@@ -203,7 +203,7 @@ export const render = (el: ReactElement, container: HTMLElement): void => {
     previousEl = el;
 };
 
-const container = document.getElementById("root") as HTMLElement;
+const container = document.body as HTMLElement;
 
 export const reRender = debounce(async () => {
     resetHooks();
@@ -212,14 +212,27 @@ export const reRender = debounce(async () => {
 
     if (!page) return console.error("Page not found");
 
-    const newVDOM = (await page.module()).default();
-    // const root = (await import("../src/app/root")).default({ children: newVDOM });
-    
-    render(newVDOM as unknown as ReactElement, container);
+    const newPageModule = await page.module();
+    const newVDOM = newPageModule.default();
+
+    const rootModule = await import("../src/app/root");
+    const root = rootModule.default({ children: newVDOM });
+
+    render(root as unknown as ReactElement, container);
 }, 0);
 
 reRender();
 
-console.log("here");
+if (module.hot) {
+    module.hot.accept("../src/routes", async () => {
+        console.log("[HMR] Routes updated");
+        const newRoutesModule = await import("../src/routes");
+        routes.length = 0;
+        routes.push(...newRoutesModule.default);
+        reRender();
+    });
 
-export const isMounted = () => previousEl !== null;
+    module.hot.accept("../src/app/global.css", () => {
+        console.log("[HMR] CSS Updated");
+    });
+}

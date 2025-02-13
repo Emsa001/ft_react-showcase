@@ -9,7 +9,7 @@
         "skipLibCheck": true,
         "forceConsistentCasingInFileNames": true,
         "typeRoots": ["node_modules/@types", "./src/types"],
-        "types": ["react"],
+        "types": ["react","node","webpack-env"],
         "baseUrl": ".",
         "paths": {
             "react": ["react"],

@@ -27,7 +27,7 @@ export default function Home() {
 
     return (
         <div>
-            <h1 className="text-red-600">Hello, {name}!</h1>
+            <h1 className="text-red-600 text-2xl">Hello, {name}!</h1>
             <div>
                 <p>Number: {count}</p>
                 <button onClick={() => setCount((prev) => prev + 1)}>Increment</button>
@@ -51,7 +51,7 @@ export default function Home() {
 
             <div>
                 <div>
-                    <h1>Helloo</h1>
+                    <h1>Hello</h1>
                     <div style={{ backgroundColor: "green" }}>
                         {test2.map((e) => {
                             return <div>{e}</div>;
