@@ -14,3 +14,22 @@ export type TDependencyList = readonly unknown[];
 export interface FC<P = {}> {
     (props: P & { children?: any }): ReactElement | null;
 }
+
+export interface IReactUpdate {
+    newEl: ReactElement | ReactElement[] | string;
+    previous: ReactElement | ReactElement[] | string;
+    dom?: HTMLElement | null;
+    childIndex?: number;
+}
+
+export interface IReactMount {
+    el: ReactElement | ReactElement[] | string;
+    container: HTMLElement;
+    mode?: "replace" | "append";
+}
+
+export interface IReactSetProps {
+    dom: HTMLElement;
+    el: ReactElement;
+    prop: string;
+}

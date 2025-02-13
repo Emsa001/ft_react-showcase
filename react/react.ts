@@ -1,8 +1,11 @@
 import { useEffect, useRef, useState } from "./hooks";
 import { Props, ReactElement } from "./types";
+import Renderer, { ReactRender } from "./render";
 
 const React = {
     contexts: new Map(),
+    render: Renderer,
+    reRender: () => ReactRender.reRender(),
 
     createElement: (
         tag: string | ((props: Props | null, ...children: any[]) => ReactElement),

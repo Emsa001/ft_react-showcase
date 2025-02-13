@@ -1,4 +1,4 @@
-import { reRender } from "./render";
+import React from "./react";
 import { TDependencyList, TEffectCallback } from "./types";
 
 let hookStates: any[] = [];
@@ -16,7 +16,7 @@ function useState<T>(initialValue: T) {
     const setState = (newValue: T | ((prevValue: T) => T)) => {
         const newValueToSet = typeof newValue === "function" ? (newValue as (prevValue: T) => T)(value) : newValue;
         hookStates[currentIndex] = newValueToSet;
-        reRender();
+        React.reRender();
     };
 
     hookIndex++;
