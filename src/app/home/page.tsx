@@ -10,7 +10,9 @@ export default function Home() {
             </h1>
             <img src={`public/meme${id}.jpg`} alt="ft_react meme" />
 
-            <a href="https://bit.ly/3BlS71b" target="_blank" className="mt-12 hover:underline">Read Documentation</a>
+            <a href="https://bit.ly/3BlS71b" target="_blank" className="mt-12 hover:underline">
+                Read Documentation
+            </a>
         </div>
     );
 }

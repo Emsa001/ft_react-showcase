@@ -33,3 +33,8 @@ export interface IReactSetProps {
     el: ReactElement;
     prop: string;
 }
+
+export interface ElementProps {
+    children?: React.ReactNode;
+    params?: Record<string, string | undefined>;
+}

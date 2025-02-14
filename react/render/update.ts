@@ -1,4 +1,4 @@
-import { IReactUpdate, ReactElement } from "../other/types";
+import { IReactUpdate } from "../other/types";
 import { flattenChildren } from "../other/utils";
 import { ReactRender } from ".";
 
@@ -8,6 +8,10 @@ ReactRender.prototype.update = function ({
     dom = null,
     childIndex = 0,
 }: IReactUpdate): void {
+    if(newEl === undefined || newEl === null){
+        return;
+    }
+
     if (!this.container) {
         console.error("Root container is undefined or null!");
         return;
@@ -51,21 +55,24 @@ ReactRender.prototype.update = function ({
         return;
     }
 
-    if(typeof previous === "string" || typeof previous === "number") {
-        return console.error("Previous is not an object");
-    }
 
     if (typeof newEl.tag === "function") {
         const name = newEl.tag.name;
         const current = newEl.tag({ ...newEl.props, children: newEl.children, dom: null });
         const component = this.components.find((component) => component.name === name);
 
-        if (!component) return console.error("Component not found");
+        if (!component) {
+            return console.error("Component not found");
+        }
 
         this.update({ newEl: current, previous: component.component });
         return;
     }
     
+    if(typeof previous === "string" || typeof previous === "number") {
+        return console.error("Previous is not an object");
+    }
+
     // Temporarily fix
     // TODO: Implement a better way to handle this
     if (newEl.children.length !== previous.children.length) {

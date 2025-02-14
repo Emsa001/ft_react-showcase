@@ -3,6 +3,10 @@ import { flattenChildren } from "../other/utils";
 import { IReactMount } from "react/other/types";
 
 ReactRender.prototype.mount = function ({ el, container, mode = "append" }: IReactMount): void {
+    if (el === undefined || el === null) {
+        return;
+    }
+    
     if (Array.isArray(el)) {
         el.forEach((child) => this.mount({ el: child, container }));
         return;
@@ -24,8 +28,7 @@ ReactRender.prototype.mount = function ({ el, container, mode = "append" }: IRea
             component,
         });
 
-        this.mount({ el: component, container });
-        return;
+        return this.mount({ el: component, container });
     }
 
     dom = document.createElement(el.tag as string);

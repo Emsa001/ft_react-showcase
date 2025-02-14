@@ -8,11 +8,15 @@ module.exports = {
     output: {
         filename: "bundle.js",
         path: path.resolve(__dirname, "dist"),
+        publicPath: "/",
     },
     resolve: {
+        alias: {
+            "react": path.resolve(__dirname, "react"),
+        },
         extensions: [".ts", ".tsx", ".js"],
-        modules: [path.resolve(__dirname, "react"), "node_modules"],
     },
+    
     module: {
         rules: [
             {
@@ -30,6 +34,7 @@ module.exports = {
     plugins: [
         new HtmlWebpackPlugin({
             template: "./react/index.html",
+            favicon: "./public/favicon.ico",
         }),
         new CopyWebpackPlugin({
             patterns: [

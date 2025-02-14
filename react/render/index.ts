@@ -1,7 +1,7 @@
-import { IReactMount, IReactSetProps, IReactUpdate, ReactElement } from "../other/types";
+import { ElementProps, IReactMount, IReactSetProps, IReactUpdate, ReactElement } from "../other/types";
 import { clearArray, debounce } from "../other/utils";
 import routes from "../../src/routes";
-import { setHookIndex } from "../hooks";
+import { resetHooks, setHookIndex } from "../hooks";
 
 export class ReactRender {
     container: HTMLElement;
@@ -33,23 +33,86 @@ export class ReactRender {
         this.previousEl = el;
     }
 
-    static reRender = debounce(async () => {
-        setHookIndex(0);
-        const page =
-            routes.find((route) => route.path === window.location.pathname) ||
-            routes.find((route) => route.path === "404");
-        if (!page) return console.error("Page not found");
+    cleanUp(): void {
+        this.previousEl = null;
+        this.components = [];
+        this.container.innerHTML = "";
+        resetHooks();
+    }
 
-        const pageModule = await page.module();
+    static matchRoute(path: string) {
+        const pathParts = path.split("/").filter(Boolean);
+    
+        for (let route of routes) {
+            const routeParts = route.path.split("/").filter(Boolean);
+    
+            const paramNames = routeParts
+                .filter((e) => e.startsWith(":"))
+                .map((e) => ({
+                    name: e.replace("?", "").slice(1),
+                    optional: e.endsWith("?"),
+                }));
+        
+            if (pathParts.length > routeParts.length) continue;
+    
+            let params: Record<string, string | undefined> = {};
+            let match = true;
+    
+            for (let i = 0; i < routeParts.length; i++) {
+                const routeSegment = routeParts[i];
+                const pathSegment = pathParts[i];
+    
+                if (routeSegment.startsWith(":")) {
+                    const { name, optional } = paramNames.find(p => p.name === routeSegment.replace(":", "").replace("?", ""))!;
+    
+                    if (!pathSegment && !optional) {
+                        match = false;
+                        break;
+                    }
+    
+                    params[name] = pathSegment || undefined;
+                } else if (routeSegment !== pathSegment) {
+                    match = false;
+                    break;
+                }
+            }
+    
+            if (match)
+                return { route, params };
+        }
+    
+        return { route: routes.find((r) => r.path === "/404"), params: {} };
+    }
+    
+    static getPage = async (): Promise<ReactElement | null> => {
+        const { route, params } = ReactRender.matchRoute(window.location.pathname);
+        if (!route) {
+            console.error("Page not found");
+            return null;
+        }
+
+        const pageModule = await route.module();
         const rootModule = await import("../../src/app/root");
 
+        const pageComponent = pageModule.default as (data:ElementProps) => React.ReactNode;
+
         const root: ReactElement = rootModule.default({
-            children: pageModule.default(),
+            children: pageComponent({ params }),
         }) as unknown as ReactElement;
+
+        return root;
+    }
+
+    static reRender = debounce(async (force:boolean = false) => {
+        setHookIndex(0);
+        
+        const root = await ReactRender.getPage();
+        if(!root) return;
 
         Render.start(root);
     }, 0);
 }
+
 
 if (module.hot) {
     module.hot.accept("../../src/routes", async () => {
@@ -59,6 +122,11 @@ if (module.hot) {
         ReactRender.reRender();
     });
 }
+
+window.addEventListener("popstate", async () => {
+    resetHooks();
+    ReactRender.reRender();
+});
 
 const Render = new ReactRender();
 export default Render;

@@ -12,7 +12,7 @@
         "types": ["react","node","webpack-env"],
         "baseUrl": ".",
         "paths": {
-            "react": ["react"],
+            "react/": ["react"],
             "@/*": ["src/*"],
             "!/*": ["src/app/*"]
         }
