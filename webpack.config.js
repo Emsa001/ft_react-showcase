@@ -1,5 +1,6 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const CopyWebpackPlugin = require("copy-webpack-plugin");
 
 module.exports = {
     mode: "development",
@@ -29,6 +30,11 @@ module.exports = {
     plugins: [
         new HtmlWebpackPlugin({
             template: "./react/index.html",
+        }),
+        new CopyWebpackPlugin({
+            patterns: [
+                { from: "public", to: "public" }, // Copies all files from public to dist/public
+            ],
         }),
     ],
     devServer: {

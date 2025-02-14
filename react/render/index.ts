@@ -35,7 +35,6 @@ export class ReactRender {
 
     static reRender = debounce(async () => {
         setHookIndex(0);
-
         const page =
             routes.find((route) => route.path === window.location.pathname) ||
             routes.find((route) => route.path === "404");
@@ -54,15 +53,10 @@ export class ReactRender {
 
 if (module.hot) {
     module.hot.accept("../../src/routes", async () => {
-        console.log("[HMR] Routes updated");
         const newRoutesModule = await import("../../src/routes");
         routes.length = 0;
         routes.push(...newRoutesModule.default);
         ReactRender.reRender();
-    });
-
-    module.hot.accept("../../src/app/global.css", () => {
-        console.log("[HMR] CSS Updated");
     });
 }
 

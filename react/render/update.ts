@@ -51,7 +51,9 @@ ReactRender.prototype.update = function ({
         return;
     }
 
-    previous = previous as ReactElement;
+    if(typeof previous === "string" || typeof previous === "number") {
+        return console.error("Previous is not an object");
+    }
 
     if (typeof newEl.tag === "function") {
         const name = newEl.tag.name;
@@ -63,12 +65,15 @@ ReactRender.prototype.update = function ({
         this.update({ newEl: current, previous: component.component });
         return;
     }
-
+    
+    // Temporarily fix
+    // TODO: Implement a better way to handle this
     if (newEl.children.length !== previous.children.length) {
-        console.log("Children length mismatch");
+        this.mount({ el: newEl, container: previous.dom || this.container, mode: "replace" });
         return;
     }
-
+    
+    
     if (newEl.props != null) {
         Object.keys(newEl.props).forEach((prop) => {
             if (!previous.dom) return;
@@ -88,6 +93,6 @@ ReactRender.prototype.update = function ({
             });
         }
     }
-
+    
     newEl.dom = previous.dom;
 };

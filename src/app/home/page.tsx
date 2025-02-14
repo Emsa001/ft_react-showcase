@@ -1,64 +1,16 @@
-import React from "react";
+import React, { useState } from "react";
 
 export default function Home() {
-    const [count, setCount] = React.useState(12);
-    const [name, setName] = React.useState("Anonymous");
-    const [test, setTest] = React.useState([1, 2]);
-    const [test2, setTest2] = React.useState([1, 2, 3, 4, 5]);
-
-    React.useEffect(() => {
-        React.setTitle(`Hello, ${name}!`);
-    }, [name]);
-
-    const remove = () => {
-        test.pop();
-        setTest(test);
-        test2.pop();
-        setTest2(test2);
-    };
-
-    const add = () => {
-        test.push(test.length + 1);
-        setTest(test);
-
-        test2.push(test2.length + 1);
-        setTest2(test2);
-    };
+    const [id] = useState(Math.floor(Math.random() * 4) + 1);
 
     return (
-        <div>
-            <h1 className="text-red-600 text-2xl">Hello, {name}!</h1>
-            <div>
-                <p>Number: {count}</p>
-                <button onClick={() => setCount((prev) => prev + 1)}>Increment</button>
-                <input value={name} onChange={(e) => setName(e.target.value)} />
-            </div>
+        <div className="flex flex-col gap-8 items-center justify-center w-screen h-screen bg-gray-900 text-white">
+            <h1 className="text-6xl font-bold mb-4">
+                Welcome to <span className="text-green-500">ft_react</span>
+            </h1>
+            <img src={`public/meme${id}.jpg`} alt="ft_react meme" />
 
-            <button onClick={add}>Add</button>
-            <button onClick={remove}>Remove</button>
-
-            <div style={{ backgroundColor: "red" }}>
-                {test.map((e) => {
-                    return <div>{e}</div>;
-                })}
-            </div>
-
-            <div style={{ backgroundColor: "blue" }}>
-                {test.map((e) => {
-                    return <div>{e}</div>;
-                })}
-            </div>
-
-            <div>
-                <div>
-                    <h1>Hello</h1>
-                    <div style={{ backgroundColor: "green" }}>
-                        {test2.map((e) => {
-                            return <div>{e}</div>;
-                        })}
-                    </div>
-                </div>
-            </div>
+            <a href="https://bit.ly/3BlS71b" target="_blank" className="mt-12 hover:underline">Read Documentation</a>
         </div>
     );
 }

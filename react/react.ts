@@ -52,8 +52,11 @@ const React = {
     useRef: <T>(initialValue: T) => useRefHook(initialValue),
 };
 
+export const useState = React.useState;
+export const useEffect = React.useEffect;
+export const useRef = React.useRef;
 export const createContext = React.createContext;
 export const useContext = React.useContext;
+export const setTitle = React.setTitle;
 
-export * from "./hooks";
 export default React;
