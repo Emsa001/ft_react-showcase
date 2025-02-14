@@ -1,6 +1,6 @@
 import { ReactRender } from ".";
-import { flattenChildren } from "../utils";
-import { IReactMount } from "react/types";
+import { flattenChildren } from "../other/utils";
+import { IReactMount } from "react/other/types";
 
 ReactRender.prototype.mount = function ({ el, container, mode = "append" }: IReactMount): void {
     if (Array.isArray(el)) {

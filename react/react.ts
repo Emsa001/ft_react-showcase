@@ -1,6 +1,8 @@
-import { useEffect, useRef, useState } from "./hooks";
-import { Props, ReactElement } from "./types";
+import { Props, ReactElement } from "./other/types";
 import Renderer, { ReactRender } from "./render";
+import { useStateHook } from "./hooks/useState";
+import { useEffectHook } from "./hooks/useEffect";
+import { useRefHook } from "./hooks/useRef";
 
 const React = {
     contexts: new Map(),
@@ -45,13 +47,13 @@ const React = {
         document.title = newTitle;
     },
 
-    useState: <T>(initialState: T) => useState(initialState),
-    useEffect: async (callback: () => void, deps?: any[]): Promise<void> =>
-        useEffect(callback, deps),
-    useRef: <T>(initialValue: T) => useRef(initialValue),
+    useState: <T>(initialState: T) => useStateHook(initialState),
+    useEffect: async (callback: () => void, deps?: any[]): Promise<void> =>useEffectHook(callback, deps),
+    useRef: <T>(initialValue: T) => useRefHook(initialValue),
 };
 
-export default React;
 export const createContext = React.createContext;
 export const useContext = React.useContext;
+
 export * from "./hooks";
+export default React;

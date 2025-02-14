@@ -1,4 +1,4 @@
-import { IReactSetProps } from "../types";
+import { IReactSetProps } from "../other/types";
 import { ReactRender } from ".";
 
 ReactRender.prototype.setProps = function ({ dom, el, prop }: IReactSetProps) {

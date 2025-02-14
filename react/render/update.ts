@@ -1,5 +1,5 @@
-import { IReactUpdate, ReactElement } from "../types";
-import { flattenChildren } from "../utils";
+import { IReactUpdate, ReactElement } from "../other/types";
+import { flattenChildren } from "../other/utils";
 import { ReactRender } from ".";
 
 ReactRender.prototype.update = function ({

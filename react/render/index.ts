@@ -1,7 +1,7 @@
-import { resetHooks } from "../hooks";
-import { IReactMount, IReactSetProps, IReactUpdate, ReactElement } from "../types";
-import { clearArray, debounce } from "../utils";
+import { IReactMount, IReactSetProps, IReactUpdate, ReactElement } from "../other/types";
+import { clearArray, debounce } from "../other/utils";
 import routes from "../../src/routes";
+import { setHookIndex } from "../hooks";
 
 export class ReactRender {
     container: HTMLElement;
@@ -34,7 +34,7 @@ export class ReactRender {
     }
 
     static reRender = debounce(async () => {
-        resetHooks();
+        setHookIndex(0);
 
         const page =
             routes.find((route) => route.path === window.location.pathname) ||
@@ -50,6 +50,20 @@ export class ReactRender {
 
         Render.start(root);
     }, 0);
+}
+
+if (module.hot) {
+    module.hot.accept("../../src/routes", async () => {
+        console.log("[HMR] Routes updated");
+        const newRoutesModule = await import("../../src/routes");
+        routes.length = 0;
+        routes.push(...newRoutesModule.default);
+        ReactRender.reRender();
+    });
+
+    module.hot.accept("../../src/app/global.css", () => {
+        console.log("[HMR] CSS Updated");
+    });
 }
 
 const Render = new ReactRender();
