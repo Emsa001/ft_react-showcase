@@ -107,6 +107,7 @@ export class ReactRender {
         setHookIndex(0);
         
         const root = await ReactRender.getPage();
+        console.log(root);
         if(!root) return;
 
         Render.start(root);
@@ -119,6 +120,7 @@ if (module.hot) {
         const newRoutesModule = await import("../../src/routes");
         routes.length = 0;
         routes.push(...newRoutesModule.default);
+
         ReactRender.reRender();
     });
 }
