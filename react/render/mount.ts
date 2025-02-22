@@ -23,6 +23,10 @@ ReactRender.prototype.mount = function ({ el, container, mode = "append" }: IRea
     if (typeof el.tag === "function") {
         const component = el.tag({ ...el.props, children: el.children, dom: el.dom });
 
+        if(this.components.find((c) => c.name === (el.tag as any).name)) {
+            this.components = this.components.filter((c) => c.name !== (el.tag as any).name);
+        }
+
         this.components.push({
             name: el.tag.name,
             component,

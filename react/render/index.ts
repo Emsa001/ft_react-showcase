@@ -27,7 +27,7 @@ export class ReactRender {
             this.mount({ el, container: this.container, mode: "replace" });
         } else {
             console.log("Updating...");
-            this.update({ newEl: el, previous: this.previousEl });
+            this.update({ newEl: el, previous: this.previousEl, parent: el });
         }
 
         this.previousEl = el;
@@ -107,7 +107,6 @@ export class ReactRender {
         setHookIndex(0);
         
         const root = await ReactRender.getPage();
-        console.log(root);
         if(!root) return;
 
         Render.start(root);

@@ -1,4 +1,4 @@
-import { IReactUpdate } from "../other/types";
+import { IReactUpdate, ReactElement } from "../other/types";
 import { flattenChildren } from "../other/utils";
 import { ReactRender } from ".";
 
@@ -8,86 +8,121 @@ import { ReactRender } from ".";
 
 */
 
+const isPrintable = (el: any) =>
+    typeof el === "string" || typeof el === "number";
+
 ReactRender.prototype.update = function ({
     newEl,
     previous,
+    parent,
     dom = null,
     childIndex = 0,
+    component,
 }: IReactUpdate): void {
-    if(newEl === undefined || newEl === null){
-        return;
-    }
-    
     if (!this.container) {
         console.error("Root container is undefined or null!");
         return;
     }
-    
+
+    if (typeof newEl === "string" || typeof newEl === "number") {
+        if (!isPrintable(previous)) return ;
+        if (newEl === previous) return ;
+
+        if(!dom){
+            console.error("Parent element is undefined or null!");
+            return;
+        }
+
+        if(childIndex >= dom.childNodes.length){
+            console.error("Child index is greater than the number of children");
+            return;
+        }
+
+        dom.childNodes[childIndex].textContent = String(newEl);
+
+        return;
+    }
+
     if (Array.isArray(newEl) || Array.isArray(previous)) {
         const flatNewEl = flattenChildren(newEl);
         const flatPrevious = flattenChildren(previous);
 
-        const bigger: number =
-        flatNewEl.length > flatPrevious.length ? flatNewEl.length : flatPrevious.length;
-        let domEl = flatPrevious[0]?.dom?.parentElement || dom;
+        const bigger =
+            flatNewEl.length > flatPrevious.length
+                ? flatNewEl.length
+                : flatPrevious.length;
+        const domEl = flatPrevious[0]?.dom?.parentElement || dom;
         
         for (let i = 0; i < bigger; i++) {
-            this.update({ newEl: flatNewEl[i], previous: flatPrevious[i], dom: domEl });
+            this.update({
+                newEl: flatNewEl[i],
+                previous: flatPrevious[i],
+                dom: domEl,
+                parent,
+                component: component?.component.children[i],
+            });
         }
         return;
     }
-    
-    if (!newEl && typeof previous != "string" && typeof previous != "number") {
-        previous?.dom?.remove();
-        return;
-    }
-    
-    if (!previous && typeof newEl != "string" && typeof newEl != "number") {
-        if (!dom) return;
-        this.mount({ el: newEl, container: dom, mode: "append" });
-        return;
-    }
-    
-    // Temporarily fix
-    if (typeof newEl != typeof previous) {
-        console.error("Type mismatch");
-        location.reload(); // << TODO: VERY BAD FIX
-        return;
-    }
-    
-    if (typeof newEl === "string" || typeof newEl === "number") {
 
-        if (!dom) return;
-        if (JSON.stringify(newEl) != JSON.stringify(previous)) {
-            dom.childNodes[childIndex].nodeValue = newEl;
-        }
-        return;
-    }
-    
-    if (typeof newEl.tag === "function") {
-        const name = newEl.tag.name;
-        const current = newEl.tag({ ...newEl.props, children: newEl.children, dom: null });
-        const component = this.components.find((component) => component.name === name);
-        
-        if (!component) {
-            return console.error("Component not found");
-        }
-        
-        this.update({ newEl: current, previous: component.component });
-        return;
-    }
-    
-    if(typeof previous === "string" || typeof previous === "number") {
-        return console.error("Previous is not an object");
-    }
-    
-    // Temporarily fix
-    if (newEl.children.length !== previous.children.length) {
-        location.reload(); // << TODO: VERY BAD FIX
+    if(!newEl){
+        console.error("New element is undefined or null!");
         return ;
     }
+
+    if (!previous) {
+        if (!dom) {
+            console.error("Previous element is undefined or null!");
+            return;
+        }
+
+        if(!parent){
+            console.error("Parent element is undefined or null!");
+            return;
+        }
+
+        // console.log(previous, parent);
+
+        this.mount({ el: newEl, container: dom });
+        // console.log(previous, parent);
+
+        return ;
+    }
+
+    if (typeof previous != typeof newEl) {
+        console.log("Element type mismatch!", newEl, previous);
+        return;
+    }
+
     
     
+    // at this point we are sure that newEl is a ReactElement
+    newEl = newEl as ReactElement;
+    previous = previous as ReactElement;
+    
+    // Handle Components
+    if (typeof newEl.tag === "function") {
+        const name = newEl.tag.name;
+
+        const current = newEl.tag({
+            ...newEl.props,
+        });
+
+        const comp = this.components.find(
+            (component) => component.name === name
+        );
+
+        if (!comp) {
+            return console.error("Component not found");
+        }
+
+        // console.log("current", current);
+        // console.log("previous", comp.component);
+        this.update({ newEl: current, previous: comp.component, parent, component: comp });
+        return;
+    }
+
+    // Update all props of the element
     if (newEl.props != null) {
         Object.keys(newEl.props).forEach((prop) => {
             if (!previous.dom) return;
@@ -95,30 +130,30 @@ ReactRender.prototype.update = function ({
         });
     }
 
-    if(previous.children.length > newEl.children.length){
-        console.log(newEl,previous)
-        return ;
-    }
-
+    // Update the children of the element
     if (newEl.children.length > 0) {
+        const domEl = previous.dom || dom;
         for (let i = 0; i < newEl.children.length; i++) {
-            const newChild = newEl.children[i];
-            let previousChild = previous.children[i];
-
-            if(previousChild === undefined){
-                this.mount({ el: newChild, container: previous.dom || dom || this.container, mode: "append" });
-                previousChild = newChild;
-                continue;
-            }
-
             this.update({
-                newEl: newChild,
-                previous: previousChild,
-                dom: previous.dom,
+                newEl: newEl.children[i],
+                previous: previous.children[i],
+                parent: newEl,
+                dom: domEl,
                 childIndex: i,
+                component,
             });
         }
     }
-    
+
+    // Save new dom
     newEl.dom = previous.dom;
+    if(component){
+        console.log(" ");
+        console.log("newEl", newEl);
+        console.log("previous", previous);
+        console.log("component", component);
+        console.log("parent", parent);
+        console.log("childIndex", childIndex);
+        console.log(" ");
+    }
 };
