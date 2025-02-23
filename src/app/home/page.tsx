@@ -1,9 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Test from "./Component";
 
 export default function Home() {
-    const [id] = useState(Math.floor(Math.random() * 4) + 1);
-    const [test, setTest] = useState(1);
+    const [test, setTest] = React.useState(1);
+    const [testArray, setTestArray] = React.useState([1, 2, 3, 4, 5]);
+
+    useEffect(() => {
+        testArray.push(test);
+    }, [test]);
 
     return (
         <div>

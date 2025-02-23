@@ -13,12 +13,14 @@ ReactRender.prototype.mount = function ({ el, container, mode = "append" }: IRea
     }
 
     let dom: HTMLElement | Text;
-
+    
     if (typeof el === "string" || typeof el === "number") {
         dom = document.createTextNode(el.toString());
         container.appendChild(dom);
         return;
     }
+    
+    if(typeof el === "boolean") return ;
 
     if (typeof el.tag === "function") {
         const component = el.tag({ ...el.props, children: el.children, dom: el.dom });
@@ -26,15 +28,15 @@ ReactRender.prototype.mount = function ({ el, container, mode = "append" }: IRea
         if(this.components.find((c) => c.name === (el.tag as any).name)) {
             this.components = this.components.filter((c) => c.name !== (el.tag as any).name);
         }
-
+        
         this.components.push({
             name: el.tag.name,
             component,
         });
-
+        
         return this.mount({ el: component, container });
     }
-
+    
     dom = document.createElement(el.tag as string);
 
     if (el.props) {
