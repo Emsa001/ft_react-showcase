@@ -23,9 +23,9 @@ ReactRender.prototype.update = function ({
         console.error("Root container is undefined or null!");
         return;
     }
-
+    
+    
     if (typeof newEl === "string" || typeof newEl === "number") {
-        if (!isPrintable(previous)) return ;
         if (newEl === previous) return ;
 
         if(!dom){
@@ -33,24 +33,29 @@ ReactRender.prototype.update = function ({
             return;
         }
 
+        if (!isPrintable(previous)) {
+            this.mount({
+                el: newEl,
+                container: dom,
+            })
+            return ;
+        }
+
         if(childIndex >= dom.childNodes.length){
             console.error("Child index is greater than the number of children");
             return;
         }
-
+        
         dom.childNodes[childIndex].textContent = String(newEl);
-
+        
         return;
     }
 
     if (Array.isArray(newEl) || Array.isArray(previous)) {
         const flatNewEl = flattenChildren(newEl);
         const flatPrevious = flattenChildren(previous);
-
-        const bigger =
-            flatNewEl.length > flatPrevious.length
-                ? flatNewEl.length
-                : flatPrevious.length;
+        
+        const bigger = Math.max(flatNewEl.length, flatPrevious.length);
         const domEl = flatPrevious[0]?.dom?.parentElement || dom;
         
         for (let i = 0; i < bigger; i++) {
@@ -64,9 +69,23 @@ ReactRender.prototype.update = function ({
         }
         return;
     }
-
+    
     if(!newEl){
-        console.error("New element is undefined or null!");
+        // console.error("New element is undefined or null!");
+        // console.log(newEl, previous, parent, dom, childIndex);
+        // if(!parent) return ;
+        // if(!parent.dom) return ;
+        // this.mount({ el: parent, container:parent.dom })
+        
+        if(!dom){
+            // TODO: handle this case
+            console.error("Updating: removing previous Element error: DOM is undefined");
+            return ;
+        }
+
+        console.log("here",dom.childNodes, childIndex);
+        if(dom.childNodes[childIndex])
+            (dom.childNodes[childIndex] as HTMLElement).remove();
         return ;
     }
 
@@ -93,8 +112,6 @@ ReactRender.prototype.update = function ({
         console.log("Element type mismatch!", newEl, previous);
         return;
     }
-
-    
     
     // at this point we are sure that newEl is a ReactElement
     newEl = newEl as ReactElement;
@@ -131,13 +148,15 @@ ReactRender.prototype.update = function ({
     }
 
     // Update the children of the element
-    if (newEl.children.length > 0) {
+
+    const childCounter = Math.max(newEl.children.length, previous.children.length);
+    if (childCounter > 0) {
         const domEl = previous.dom || dom;
-        for (let i = 0; i < newEl.children.length; i++) {
+        for (let i = 0; i < childCounter; i++) {
             this.update({
                 newEl: newEl.children[i],
                 previous: previous.children[i],
-                parent: newEl,
+                parent: previous, // TODO: is correct?
                 dom: domEl,
                 childIndex: i,
                 component,
@@ -147,13 +166,15 @@ ReactRender.prototype.update = function ({
 
     // Save new dom
     newEl.dom = previous.dom;
-    if(component){
+    if(component && component.name){
         console.log(" ");
         console.log("newEl", newEl);
         console.log("previous", previous);
-        console.log("component", component);
+        console.log("component", component.component);
         console.log("parent", parent);
         console.log("childIndex", childIndex);
-        console.log(" ");
+        
+        // component.component.children[childIndex] = newEl;
+        console.log(" ")
     }
 };

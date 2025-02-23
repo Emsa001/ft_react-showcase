@@ -13,14 +13,14 @@ export default function Test(){
         <div>
             <h1>Test Component</h1>
             <p>Hello</p>
-            <div>
+            {/* <div>
                 {testArray.map((item) => (
                     <p key={item}>{item}</p>
                 ))}
             </div>
             <p>Hello {test} World</p>
             <a></a>
-            <button onClick={() => setTest((prev) => prev + 1)}>Increment</button>
+            <button onClick={() => setTest((prev) => prev + 1)}>Increment</button> */}
         </div>
     )
 }
