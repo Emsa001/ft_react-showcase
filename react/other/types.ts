@@ -16,8 +16,8 @@ export interface FC<P = {}> {
 }
 
 export interface IReactUpdate {
-    newEl: ReactElement | ReactElement[] | string;
-    previous: ReactElement | ReactElement[] | string;
+    newEl: ReactElement;
+    previous: ReactElement;
     parent?: ReactElement;
     component?: { name: string; component: ReactElement };
     dom?: HTMLElement | null;

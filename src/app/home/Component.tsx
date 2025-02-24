@@ -1,20 +1,21 @@
-import React from "react"
-import { useEffect } from "react";
+import React from "react";
+import { useState } from "react";
 
 export default function Test(){
-    const [test, setTest] = React.useState(1);
-    const [testArray, setTestArray] = React.useState([1, 2, 3, 4, 5]);
-
-    useEffect(() => {
-        testArray.push(test);
-    },[test])
+    const [num, setNum] = useState([1,2,3,4]);
 
     return (
         <div>
-            {testArray.map((item) => (
-                <p key={item}>{item}</p>
-            ))}
-            <button onClick={() => setTest((prev) => prev + 1)}>Increment</button>
+            <div>
+                {num.map((e) => {
+                    return (
+                        <div key={e}>
+                            {e}
+                        </div>
+                    )
+                })}
+            </div>
+            <button onClick={() => setNum((prev) => [...prev, prev[prev.length - 1] + 1])}>Click Me</button>
         </div>
     )
 }

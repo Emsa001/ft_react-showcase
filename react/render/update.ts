@@ -1,4 +1,4 @@
-import { IReactUpdate, ReactElement } from "../other/types";
+import { IReactSetProps, IReactUpdate, ReactElement } from "../other/types";
 import { flattenChildren } from "../other/utils";
 import { ReactRender } from ".";
 
@@ -8,197 +8,129 @@ import { ReactRender } from ".";
 
 */
 
-const isPrintable = (el: any) =>
-    typeof el === "string" || typeof el === "number";
-
 ReactRender.prototype.update = function ({
     newEl,
     previous,
-    parent,
-    dom = null,
-    childIndex = 0,
-    component,
 }: IReactUpdate): void {
-    if (!this.container) {
-        console.error("Root container is undefined or null!");
-        return;
+    const newDom = document.createElement("div");
+    const previousDom = (previous as ReactElement).dom;
+    this.mount({ el: newEl, container: newDom });
+
+    if (!previousDom) return;
+
+    const newChildren = newDom.children[0].childNodes;
+    const previousChildren = previousDom.childNodes;
+
+    const updateProps = ({ dom, el, prop }: IReactSetProps) => {
+        this.setProps({ dom, el, prop });
+    };
+
+    let setComponent = (name:string, el:{ name: string; component: ReactElement, id:number }) => {
+        const component = this.components.find((e) => e.name == name)?.component;
+        if(component) {
+            let index = this.components.findIndex((e) => e.name == name);
+            this.components[index] = el;
+        }
+        console.log(this.components);
     }
 
-    if (typeof newEl === "string" || typeof newEl === "number") {
-        if (newEl === previous) return ;
+    const getComponents = () => this.components;
 
-        if(!dom){
-            console.error("Parent element is undefined or null!");
-            return;
-        }
-
-        if(typeof newEl === "number" && newEl === 0){
-            dom.childNodes[childIndex].textContent = "";
+    function updateChild(
+        newChild: NodeListOf<ChildNode>,
+        prevChild: NodeListOf<ChildNode>,
+        parent: HTMLElement,
+        newEl: ReactElement | ReactElement[],
+        prevEl: ReactElement | ReactElement[],
+        component?: {name:string, component:ReactElement, id:number}
+    ) {
+        const max = Math.max(newChild.length, prevChild.length);
+        
+        if(Array.isArray(newEl) || Array.isArray(prevEl)) {
             return ;
         }
 
-        if (!isPrintable(previous)) {
-            this.mount({
-                el: newEl,
-                container: dom,
-            })
-            return ;
-        }
 
-        if(childIndex >= dom.childNodes.length){
-            console.error("Child index is greater than the number of children");
-            return;
-        }
-        
-        dom.childNodes[childIndex].textContent = String(newEl);
-        
-        return;
-    }
-
-    if (Array.isArray(newEl) || Array.isArray(previous)) {
-        const flatNewEl = flattenChildren(newEl);
-        const flatPrevious = flattenChildren(previous);
-        
-        const bigger = Math.max(flatNewEl.length, flatPrevious.length);
-        const domEl = flatPrevious[0]?.dom?.parentElement || dom;
-        
-        for (let i = 0; i < bigger; i++) {
-            this.update({
-                newEl: flatNewEl[i],
-                previous: flatPrevious[i],
-                dom: domEl,
-                parent,
-                component: component?.component.children[i],
-            });
-        }
-        return;
-    }
+        for (let i = 0; i < max; i++) {
+            const newChildNode = newChild[i];
+            const prevChildNode = prevChild[i];
     
-    if(!newEl){
-        console.error("New element is undefined or null!");
-        // console.log(newEl, previous, parent, dom, childIndex);
-        // if(!parent) return ;
-        // if(!parent.dom) return ;
-        // this.mount({ el: parent, container:parent.dom })
-        
-        if(!dom){
-            // TODO: handle this case
-            console.error("Updating: removing previous Element error: DOM is undefined");
-            return ;
-        }
-
-        while(!dom.childNodes[childIndex] && childIndex > 0) childIndex--;
-
-        if(dom.childNodes[childIndex])
-            (dom.childNodes[childIndex] as HTMLElement).remove();
-        return ;
-    }
-
-    if (!previous) {
-        console.log("previous Element is undefined", newEl, previous);
-        if (!dom) {
-            console.error("Previous element is undefined or null!");
-            return;
-        }
-
-        if(!parent){
-            console.error("Parent element is undefined or null!");
-            return;
-        }
-
-
-        const newContainer = document.createElement(newEl.tag as string);
-
-        this.mount({ el: newEl, container: newContainer });
-
-        const before = dom.childNodes[childIndex];
-        dom.insertBefore(newContainer, before);
-
-        return ;
-    }
-
-    if (typeof previous != typeof newEl) {
-        console.log("type mismatch", previous, newEl);
-        if(!dom) return ;
-        
-        if(dom.childNodes[childIndex])
-            (dom.childNodes[childIndex] as HTMLElement).remove();
-        return;
-    }
-    
-    // at this point we are sure that newEl is a ReactElement
-    newEl = newEl as ReactElement;
-    previous = previous as ReactElement;
-    
-    // Handle Components
-    if (typeof newEl.tag === "function") {
-        const name = newEl.tag.name;
-
-        const current = newEl.tag({
-            ...newEl.props,
-        });
-
-        const comp = this.components.find(
-            (component) => component.name === name
-        );
-
-        if (!comp) {
-            return console.error("Component not found");
-        }
-
-        // console.log("current", current);
-        // console.log("previous", comp.component);
-        // this.update({ newEl: current, previous: comp.component, parent, component: comp });
-
-        // TODO: handle updating instead of remounting full component
-        if(comp.component.dom){
-            comp.component.dom.innerHTML = "";
+            if(!newEl || !prevEl) return;
             
-            this.mount({
-                el: current,
-                container: comp.component.dom
-            })
+            newEl = newEl as ReactElement;
+            prevEl = prevEl as ReactElement;
+            newEl.dom = prevEl.dom;
+
+            let newReactElement = newEl.children[i];
+            let prevReactElement = prevEl.children[i];
+            
+            // Removed child
+            if (!newChildNode) {
+                prevChildNode.remove();
+                return console.log("Remove Element", prevChildNode);
+            }
+
+            // New child
+            if (!prevChildNode) {
+                if(i == 0)
+                    parent.appendChild(newChildNode);
+                else
+                    prevChild[i - 1].after(newChildNode);
+                return console.log("New Element", newChildNode);
+            }
+
+            // Components
+            if(typeof newEl.tag === "function" && typeof prevEl.tag === "function") {
+                component = getComponents().find((e) => e.name == ((newEl as ReactElement).tag as any).name);
+
+                const prev = prevEl.tag({
+                    ...prevEl.props,
+                });
+                const current = component!.component;
+                
+                if(!current || !prev) return console.error("Component is not defined");
+                
+                newReactElement = current.children[i];
+                prevReactElement = prev.children[i];
+                
+            }
+
+            // Different tag
+            if(newReactElement && (newReactElement.tag != prevReactElement.tag)) {
+                prevChildNode.replaceWith(newChildNode);
+                return console.log("Replace Element", newChildNode);
+            } 
+
+            // Different props
+            if (newReactElement && (newReactElement.props != null && newReactElement.props != prevReactElement.props)) {
+                Object.keys(newReactElement.props).forEach((prop) => {
+                    updateProps({
+                        dom: prevChildNode as HTMLElement,
+                        el: newReactElement,
+                        prop,
+                    });
+                    prevReactElement.props = newReactElement.props;
+                });
+            }
+
+            if(typeof newReactElement === "string" || typeof newReactElement === "number") {
+                if (newReactElement != prevReactElement) {
+                    prevChildNode.textContent = newReactElement as string;
+                }
+            }
+
+            if (newChildNode.hasChildNodes() || prevChildNode.hasChildNodes()) {
+                updateChild(
+                    newChildNode.childNodes,
+                    prevChildNode.childNodes,
+                    prevChildNode as HTMLElement,
+                    newReactElement,
+                    prevReactElement,
+                    component
+                );
+            }
         }
-        return;
     }
 
-    // Update all props of the element
-    if (newEl.props != null) {
-        Object.keys(newEl.props).forEach((prop) => {
-            if (!previous.dom) return;
-            this.setProps({ dom: previous.dom, el: newEl, prop });
-        });
-    }
-
-    // Update the children of the element
-
-    const childCounter = Math.max(newEl.children.length, previous.children.length);
-    if (childCounter > 0) {
-        const domEl = previous.dom || dom;
-        for (let i = 0; i < childCounter; i++) {
-            this.update({
-                newEl: newEl.children[i],
-                previous: previous.children[i],
-                parent: previous, // TODO: is correct?
-                dom: domEl,
-                childIndex: i,
-                component,
-            });
-        }
-    }
-
-    // Save new dom
-    newEl.dom = previous.dom;
-    if(component && component.name){
-        
-        console.log(" ");
-        console.log("newEl", newEl);
-        console.log("previous", previous);
-        console.log("component", component.component);
-        console.log("parent", parent);
-        console.log("childIndex", childIndex);
-        
-        // component.component.children[childIndex] = newEl;
-        console.log(" ")
-    }
+    updateChild(newChildren, previousChildren, newDom, newEl, previous);
 };

@@ -32,6 +32,7 @@ ReactRender.prototype.mount = function ({ el, container, mode = "append" }: IRea
         this.components.push({
             name: el.tag.name,
             component,
+            id: 0,
         });
         
         return this.mount({ el: component, container });

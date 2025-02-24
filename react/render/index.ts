@@ -6,7 +6,7 @@ import { resetHooks, setHookIndex } from "../hooks";
 export class ReactRender {
     container: HTMLElement;
     previousEl: ReactElement | null;
-    components: { name: string; component: ReactElement }[];
+    components: { name: string; component: ReactElement, id:number }[];
 
     constructor() {
         this.container = document.body as HTMLElement;
@@ -29,8 +29,8 @@ export class ReactRender {
             console.log("Updating...");
             this.update({ newEl: el, previous: this.previousEl, parent: el });
         }
-
         this.previousEl = el;
+        
     }
 
     cleanUp(): void {
