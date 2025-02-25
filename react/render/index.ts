@@ -7,7 +7,7 @@ export class ReactRender {
     container: HTMLElement;
     previousEl: ReactElement | null;
     components: { name: string; component: ReactElement, id:number }[];
-
+    
     constructor() {
         this.container = document.body as HTMLElement;
         this.previousEl = null;
@@ -21,16 +21,34 @@ export class ReactRender {
     start(el: ReactElement): void {
         if (Array.isArray(el)) return el.forEach((child) => this.start(child));
 
+
         if (!this.previousEl) {
             clearArray(this.components);
             console.log("Mounting...");
             this.mount({ el, container: this.container, mode: "replace" });
         } else {
             console.log("Updating...");
-            this.update({ newEl: el, previous: this.previousEl, parent: el });
-        }
-        this.previousEl = el;
+
+            const newDom = document.createElement("div");
+            const previousDom = (this.previousEl as ReactElement).dom;
+            this.mount({ el: el, container: newDom });
         
+            if (!previousDom) return;
+        
+            const newChildren = newDom.children[0].childNodes[0] as HTMLElement;
+            const previousChildren = previousDom.childNodes[0] as HTMLElement;
+
+            el.dom = previousDom;
+
+            this.update({ 
+                newElement: newChildren,
+                prevElement: previousChildren,
+                newReactElement: el.children[0],
+                prevReactElement: (this.previousEl as ReactElement).children[0],
+            });
+        }
+        
+        this.previousEl = el;
     }
 
     cleanUp(): void {

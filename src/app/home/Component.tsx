@@ -1,21 +1,20 @@
 import React from "react";
 import { useState } from "react";
+import Test2 from "./Test2";
 
 export default function Test(){
     const [num, setNum] = useState([1,2,3,4]);
 
     return (
         <div>
-            <div>
-                {num.map((e) => {
-                    return (
-                        <div key={e}>
-                            {e}
-                        </div>
-                    )
-                })}
-            </div>
-            <button onClick={() => setNum((prev) => [...prev, prev[prev.length - 1] + 1])}>Click Me</button>
+            {num.map((e, index) => {
+                return (
+                    <div className="my-2 bg-blue-100" key={e}>
+                        <h1>My element</h1>
+                        <p>{e}</p>
+                    </div>
+                )
+            })}
         </div>
     )
 }
