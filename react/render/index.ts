@@ -6,6 +6,7 @@ import { resetHooks, setHookIndex } from "../hooks";
 export class ReactRender {
     container: HTMLElement;
     previousEl: ReactElement | null;
+
     components: { name: string; component: ReactElement, id:number }[];
     
     constructor() {
@@ -21,27 +22,22 @@ export class ReactRender {
     start(el: ReactElement): void {
         if (Array.isArray(el)) return el.forEach((child) => this.start(child));
 
-
         if (!this.previousEl) {
-            clearArray(this.components);
             console.log("Mounting...");
+            clearArray(this.components);
             this.mount({ el, container: this.container, mode: "replace" });
+            console.log(this.components);
         } else {
             console.log("Updating...");
 
-            const newDom = document.createElement("div");
             const previousDom = (this.previousEl as ReactElement).dom;
-            this.mount({ el: el, container: newDom });
-        
-            if (!previousDom) return;
-        
-            const newChildren = newDom.children[0].childNodes[0] as HTMLElement;
+            if(!previousDom) return ;
+            
             const previousChildren = previousDom.childNodes[0] as HTMLElement;
 
             el.dom = previousDom;
 
             this.update({ 
-                newElement: newChildren,
                 prevElement: previousChildren,
                 newReactElement: el.children[0],
                 prevReactElement: (this.previousEl as ReactElement).children[0],

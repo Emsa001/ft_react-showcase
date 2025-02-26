@@ -8,12 +8,13 @@ export default function Home(){
 
     return (
         <div className="my-4">
+            <p>Hello World</p>
             <Test />
-            
+{/*             
             <p>{num % 3 === 0 && "Num is % 3"}</p>
 
             <p>{num}</p>
-            <button onClick={() => setNum((prev) => prev + 1)}>Click Me</button>
+            <button onClick={() => setNum((prev) => prev + 1)}>Click Me</button> */}
         </div>
     )
 }

@@ -16,11 +16,12 @@ export interface FC<P = {}> {
 }
 
 export interface IReactUpdate {
-    newElement: HTMLElement | undefined,
     prevElement: HTMLElement | undefined,
     newReactElement: ReactElement | ReactElement[],
     prevReactElement: ReactElement | ReactElement[],
     childIndex?: number;
+    component?: ReactElement | ReactElement[];
+    keys?: Record<string, ReactElement>;
 }
 
 export interface IReactMount {

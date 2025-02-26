@@ -1,14 +1,15 @@
 import { ReactRender } from ".";
-import { flattenChildren } from "../other/utils";
+import { clearArray, flattenChildren } from "../other/utils";
 import { IReactMount } from "react/other/types";
 
 ReactRender.prototype.mount = function ({ el, container, mode = "append" }: IReactMount): void {
+
     if (el === undefined || el === null) {
         return;
     }
-    
+
     if (Array.isArray(el)) {
-        el.forEach((child) => this.mount({ el: child, container }));
+        el.map((child) => this.mount({ el: child, container }));
         return;
     }
 
@@ -23,9 +24,10 @@ ReactRender.prototype.mount = function ({ el, container, mode = "append" }: IRea
     if(typeof el === "boolean") return ;
 
     if (typeof el.tag === "function") {
-        const component = el.tag({ ...el.props, children: el.children, dom: el.dom });
+        let component = el.tag({ ...el.props, children: el.children, dom: el.dom });
+        const found = this.components.find((c) => c.name === (el.tag as any).name);
 
-        if(this.components.find((c) => c.name === (el.tag as any).name)) {
+        if(found) {
             this.components = this.components.filter((c) => c.name !== (el.tag as any).name);
         }
         
@@ -47,7 +49,7 @@ ReactRender.prototype.mount = function ({ el, container, mode = "append" }: IRea
     }
 
     if (el.children && el.children.length > 0) {
-        flattenChildren(el.children).forEach((child) => {
+        el.children.forEach((child) => {
             this.mount({ el: child, container: dom as HTMLElement });
         });
     }
