@@ -8,7 +8,7 @@ export default function Home(){
 
     return (
         <div className="my-4">
-            {/* <Test /> */}
+            <Test />
             
             <p>{num % 3 === 0 && "Num is % 3"}</p>
 

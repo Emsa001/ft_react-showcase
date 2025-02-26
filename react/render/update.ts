@@ -16,11 +16,11 @@ ReactRender.prototype.update = function ({
     childIndex = 0,
 }: IReactUpdate): void {
     console.log("\n");
-    console.log("New Child: ", newElement);
-    console.log("Prev Child: ", prevElement);
-    console.log("New React Element: ", newReactElement);
-    console.log("Prev React Element: ", prevReactElement);
-    console.log("\n");
+    // console.log("New Child: ", newElement);
+    // console.log("Prev Child: ", prevElement);
+    // console.log("New React Element: ", newReactElement);
+    // console.log("Prev React Element: ", prevReactElement);
+    // console.log("\n");
 
     if(Array.isArray(newReactElement) || Array.isArray(prevReactElement)){
         console.log(newReactElement, prevReactElement);
@@ -45,6 +45,7 @@ ReactRender.prototype.update = function ({
 
     // Prop update
     if (newReactElement.props != prevReactElement.props) {
+        if(!newReactElement.props) return;
         Object.keys(newReactElement.props).forEach((prop) => {
             this.setProps({
                 dom: prevElement as HTMLElement,
