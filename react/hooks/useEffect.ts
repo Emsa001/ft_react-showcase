@@ -1,4 +1,4 @@
-import { TDependencyList, TEffectCallback } from "react/other/types";
+import { TDependencyList, TEffectCallback } from "react/types";
 import { useRefHook } from "./useRef";
 
 const checkDependenciesChanged = (prevDeps: TDependencyList, deps: TDependencyList): boolean => {

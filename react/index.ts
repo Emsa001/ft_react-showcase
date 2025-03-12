@@ -7,7 +7,7 @@ import "./render/update";
 
 export * from './react';
 export * from './render';
-export * from './other/types';
+export * from './types';
 
 export default React;
 

@@ -1,4 +1,4 @@
-import { Props, ReactElement } from "./other/types";
+import { Props, ReactElement } from "./types";
 import Renderer, { ReactRender } from "./render";
 import { useStateHook } from "./hooks/useState";
 import { useEffectHook } from "./hooks/useEffect";
@@ -19,7 +19,7 @@ const React = {
             tag,
             props,
             children,
-            dom: null,
+            ref: null,
         };
 
         return el;

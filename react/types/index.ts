@@ -4,30 +4,31 @@ export type ReactElement = {
     tag: string | ((props: Props, ...children: any[]) => ReactElement);
     props: Props;
     children: any[];
-    dom: HTMLElement | null;
+    ref: HTMLElement | null;
 };
+
+export type ReactComponentTree = {
+    name: string;
+    instance: React.ReactNode;
+    parent: ReactComponentTree | null;
+    state: {
+        hookIndex: number;
+        hookStates: any[];
+    };
+}
 
 export type TCleanupCallback = () => void;
 export type TEffectCallback = () => TCleanupCallback | void;
 export type TDependencyList = readonly unknown[];
 
-export interface FC<P = {}> {
-    (props: P & { children?: any }): ReactElement | null;
-}
+// Update
 
 export interface IReactUpdate {
-    prevElement: HTMLElement | undefined,
-    newReactElement: ReactElement | ReactElement[],
-    prevReactElement: ReactElement | ReactElement[],
-    childIndex?: number;
-    component?: ReactElement | ReactElement[];
-    keys?: Record<string, ReactElement>;
 }
 
 export interface IReactMount {
-    el: ReactElement | ReactElement[] | string;
-    container: HTMLElement;
-    mode?: "replace" | "append";
+    component: ReactComponentTree;
+    container?: HTMLElement;
 }
 
 export interface IReactSetProps {
