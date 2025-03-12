@@ -1,32 +1,32 @@
 import { IReactSetProps } from "../types";
 import { ReactRender } from ".";
 
-ReactRender.prototype.setProps = function ({ dom, el, prop }: IReactSetProps) {
-    if (prop === "children") return;
+ReactRender.prototype.setProps = function ({ ref, key, value}: IReactSetProps): void {
+    if (key === "children") return;
 
-    if (prop === "style" && typeof el.props[prop] === "object") {
-        Object.assign(dom.style, el.props[prop]);
+    if (key === "style" && typeof value === "object") {
+        Object.assign(ref.style, value);
         return;
     }
 
-    if (prop === "ref") {
-        el.props[prop].current = dom;
+    if (key === "ref") {
+        value.current = ref;
         return;
     }
 
-    if (prop === "onChange" && dom instanceof HTMLInputElement) {
-        dom.removeEventListener("input", (dom as any)._onChangeListener);
-        dom.addEventListener("input", el.props[prop]);
-        (dom as any)._onChangeListener = el.props[prop];
+    if (key === "onChange" && ref instanceof HTMLInputElement) {
+        ref.removeEventListener("input", (ref as any)._onChangeListener);
+        ref.addEventListener("input", value);
+        (ref as any)._onChangeListener = value;
         return;
     }
 
-    if (prop.startsWith("on") && typeof el.props[prop] === "function") {
-        const eventName = prop.slice(2).toLowerCase();
-        dom.removeEventListener(eventName, (dom as any)[prop]);
-        dom.addEventListener(eventName, el.props[prop]);
-        (dom as any)[prop];
+    if (key.startsWith("on") && typeof value === "function") {
+        const eventName = key.slice(2).toLowerCase();
+        ref.removeEventListener(eventName, (ref as any)[key]);
+        ref.addEventListener(eventName, value);
+        (ref as any)[key];
     }
 
-    (dom as any)[prop] = el.props[prop];
+    (ref as any)[key] = value;
 };

@@ -1,4 +1,4 @@
-import { IReactMount } from "react/types";
+import { IReactMount, ReactNode } from "react/types";
 import { ReactRender } from ".";
 
 ReactRender.prototype.mountArray = function ({ component, container }: IReactMount): void {
@@ -17,10 +17,47 @@ ReactRender.prototype.mount = function ({ component, container }: IReactMount): 
     const instance = component.instance;
     const name = component.name;
 
+    if(!instance) return;
+
     // handle array of components
     this.mountArray({ component, container });
 
-    console.log(instance);
+    let newRef: HTMLElement | Text;
+
+    if (typeof instance === "string" || typeof instance === "number") {
+        newRef = document.createTextNode(instance.toString());
+        container.appendChild(newRef);
+        return;
+    }
+
+    if(typeof instance === "boolean") return ; // TODO: is correct?
+
+    if(typeof instance.tag === "function") {
+        console.log("Function component", instance.tag.name);
+        return ;
+    }
+
+    newRef = document.createElement(instance.tag as string);
+
+    if (instance.props) {
+        Object.keys(instance.props).forEach((prop) => {
+
+            const key = prop;
+            const value = instance.props[prop];
+
+            this.setProps({ ref: newRef, key, value });
+        });
+    }
+
+    if (instance.children && instance.children.length > 0) {
+        instance.children.forEach((child) => {
+            this.mount({ component: child, container: newRef as HTMLElement });
+        });
+    }
+
+    container.replaceWith(newRef);
+
+    console.log(instance, container);
 }
 
 // ReactRender.prototype.mount = function ({ el, container, mode = "append" }: IReactMount): void {

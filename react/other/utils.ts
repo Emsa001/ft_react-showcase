@@ -1,3 +1,5 @@
+import { ReactElement } from "react/types";
+
 export function debounce(func: (...args: any[]) => void, wait: number) {
     let timeout: NodeJS.Timeout;
     return (...args: any[]) => {

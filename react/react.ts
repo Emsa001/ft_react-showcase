@@ -1,4 +1,4 @@
-import { Props, ReactElement } from "./types";
+import { Props, ReactNode } from "./types";
 import Renderer, { ReactRender } from "./render";
 import { useStateHook } from "./hooks/useState";
 import { useEffectHook } from "./hooks/useEffect";
@@ -10,12 +10,12 @@ const React = {
     reRender: () => ReactRender.reRender(),
 
     createElement: (
-        tag: string | ((props: Props | null, ...children: any[]) => ReactElement),
+        tag: string | ((props: Props | null, ...children: any[]) => ReactNode),
         props: Props,
         ...children: any[]
-    ): ReactElement => {
+    ): ReactNode => {
         
-        const el: ReactElement = {
+        const el: ReactNode = {
             tag,
             props,
             children,

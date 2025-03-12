@@ -1,4 +1,4 @@
-import { IReactMount, IReactSetProps, IReactUpdate, ReactComponentTree, ReactElement } from "../types";
+import { IReactMount, IReactSetProps, IReactUpdate, ReactComponentTree } from "../types";
 import { clearArray, debounce } from "../other/utils";
 import { setHookIndex } from "../hooks";
 import { getPage } from "react/routes/page";

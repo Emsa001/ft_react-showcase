@@ -1,4 +1,4 @@
-import { ElementProps, ReactComponentTree, ReactElement } from "react/types";
+import { ElementProps, ReactComponentTree, ReactNode } from "react/types";
 import { matchRoute } from "./match";
 
 export async function getPage(): Promise<ReactComponentTree | null> {
@@ -19,7 +19,7 @@ export async function getPage(): Promise<ReactComponentTree | null> {
 
     const rootTree: ReactComponentTree = {
         name: rootModule.default.name.toLowerCase(),
-        instance: root,
+        instance: root as unknown as ReactNode,
         parent: null,
         state: {
             hookIndex: 0,

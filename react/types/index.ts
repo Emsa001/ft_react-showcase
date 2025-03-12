@@ -1,15 +1,17 @@
 export type Props = { [key: string]: any };
 
-export type ReactElement = {
-    tag: string | ((props: Props, ...children: any[]) => ReactElement);
+export type ReactNode = {
+    tag: string | ((props: Props, ...children: any[]) => ReactNode);
     props: Props;
     children: any[];
     ref: HTMLElement | null;
 };
 
+export type ReactElement = ReactNode | string | number | boolean | null;
+
 export type ReactComponentTree = {
     name: string;
-    instance: React.ReactNode;
+    instance: ReactElement;
     parent: ReactComponentTree | null;
     state: {
         hookIndex: number;
@@ -32,9 +34,9 @@ export interface IReactMount {
 }
 
 export interface IReactSetProps {
-    dom: HTMLElement;
-    el: ReactElement;
-    prop: string;
+    ref: HTMLElement;
+    key: string;
+    value: any;
 }
 
 export interface ElementProps {
