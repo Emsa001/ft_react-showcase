@@ -18,12 +18,13 @@ ReactRender.prototype.mount = function ({
     mode = "append",
 }: IReactMount): void {
     if (!container) container = this.container; // default container body
-    if (!instance) return;
 
     // handle array of components
     this.mountArray({ instance, container });
 
     let newRef: HTMLElement | Text;
+
+    if (typeof instance === "boolean") return; // TODO: is correct?
 
     if (typeof instance === "string" || typeof instance === "number") {
         newRef = document.createTextNode(instance.toString());
@@ -31,7 +32,7 @@ ReactRender.prototype.mount = function ({
         return;
     }
 
-    if (typeof instance === "boolean") return; // TODO: is correct?
+    if(!instance) return;
 
     if (typeof instance.tag === "function") {
         console.log("Function component", instance.tag.name);

@@ -1,4 +1,4 @@
-import { IReactMount, IReactSetProps, IReactUpdate, ReactComponentTree } from "../types";
+import { IReactMount, IReactSetProps, IReactUpdate, ReactComponentTree, ReactElement } from "../types";
 import { debounce } from "../other/utils";
 import { setHookIndex } from "../hooks";
 import { getPage } from "react/routes/page";
@@ -17,6 +17,7 @@ export class ReactRender {
     }
 
     update(data: IReactUpdate): void {}
+    updateLoop(previous: ReactElement, current: ReactElement, ref: HTMLElement): void {}
     
     mount(data: IReactMount): void {}
     mountArray(data: IReactMount): void {}

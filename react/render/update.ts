@@ -1,27 +1,91 @@
-import { IReactUpdate } from "react/types";
+import { IReactUpdate, ReactElement } from "react/types";
 import { ReactRender } from ".";
+import { ReactNode } from "react";
+
+ReactRender.prototype.updateLoop = function(previous: ReactElement, current: ReactElement, ref: HTMLElement): void {
+    // console.log("Previous: ", previous);
+    // console.log("Current: ", current);
+
+    if(previous === undefined || previous === null){
+        console.log("Previous is undefined");
+        return;
+    }
+
+    if(current === undefined || current === null){
+        console.log("Current is undefined");
+        return;
+    }
+
+    if(typeof previous != typeof current){
+        console.log("Different type");
+        return;
+    }
+
+    if(typeof previous === "string" || typeof previous === "number"){
+        console.log("String or number");
+
+        if(previous !== current){
+            ref.textContent = current.toString();
+        }
+
+        return;
+    }
+
+    if(typeof previous === "boolean" || typeof current === "boolean"){
+        console.log("Boolean");
+        return;
+    }
+
+    current = current as ReactNode;
+    previous = previous as ReactNode;
+
+    // Prop update
+    if (current.props != previous.props) {
+
+        if(!current.props) return;
+
+        Object.keys(current.props).forEach((prop) => {
+            const key = prop;
+            const value = current.props[prop];
+
+            this.setProps({ ref: previous.ref!, key, value });
+        });
+    }
+
+    const children = Math.max(previous.children.length, current.children.length);
+
+    for(let i = 0; i < children; i++){
+        const prevChild = previous.children[i];
+        const newChild = current.children[i];
+        const childRef = ref.children[i] ? ref.children[i] as HTMLElement : ref;
+
+        console.log("Prev Child: ", prevChild);
+        console.log("New Child: ", newChild);
+        console.log("Child Ref: ", childRef);
+
+        this.updateLoop(prevChild, newChild, childRef);
+    }
+
+}
 
 ReactRender.prototype.update = function ({
     component
 }: IReactUpdate): void {
 
-    const previous = component;
+    const previous = component.instance;
     const jsx = component.jsx;
     if(!jsx) return;
+    if(!previous) return;
 
-    console.log(jsx);
-    if(typeof jsx.tag == "function"){
+    if(typeof jsx.tag != "function") return ;
 
-        const current = jsx.tag({
-            ...jsx.props,
-            children: jsx.children,
-            dom: jsx.ref,
-        });
+    const current = jsx.tag({
+        ...jsx.props,
+        children: jsx.children,
+        dom: jsx.ref,
+    });
 
-        console.log("Previous: ", previous);
-        console.log("Current : ", current);
-    }
-
+    this.updateLoop(previous, current, (previous as ReactNode).ref!);
 }
 
 // ReactRender.prototype.update = function ({

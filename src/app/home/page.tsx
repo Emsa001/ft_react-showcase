@@ -14,6 +14,10 @@ export default function Home(){
             <button onClick={() => setNum((prev) => prev + 1)}>Click Me</button>
 
             <Test />
+            <Test />
+
+            <Test />
+
         </div>
     )
 }
