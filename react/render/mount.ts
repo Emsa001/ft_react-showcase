@@ -1,26 +1,27 @@
-import { IReactMount, ReactNode } from "react/types";
+import { IReactMount, ReactComponentTree, ReactNode } from "react/types";
 import { ReactRender } from ".";
 
-ReactRender.prototype.mountArray = function ({ component, container }: IReactMount): void {
-    const instance = component.instance;
-
+ReactRender.prototype.mountArray = function ({
+    instance,
+    container,
+}: IReactMount): void {
     if (Array.isArray(instance)) {
-        instance.map((child) => this.mount({ component: child, container }));
+        instance.map((child) => this.mount({ instance: child, container }));
         return;
     }
-}
+};
 
-
-ReactRender.prototype.mount = function ({ component, container }: IReactMount): void {
-    if(!container) container = this.container; // default container body
-
-    const instance = component.instance;
-    const name = component.name;
-
-    if(!instance) return;
+ReactRender.prototype.mount = function ({
+    component,
+    instance,
+    container,
+    mode = "append",
+}: IReactMount): void {
+    if (!container) container = this.container; // default container body
+    if (!instance) return;
 
     // handle array of components
-    this.mountArray({ component, container });
+    this.mountArray({ instance, container });
 
     let newRef: HTMLElement | Text;
 
@@ -30,18 +31,47 @@ ReactRender.prototype.mount = function ({ component, container }: IReactMount): 
         return;
     }
 
-    if(typeof instance === "boolean") return ; // TODO: is correct?
+    if (typeof instance === "boolean") return; // TODO: is correct?
 
-    if(typeof instance.tag === "function") {
+    if (typeof instance.tag === "function") {
         console.log("Function component", instance.tag.name);
-        return ;
+
+        const funcComponent: ReactComponentTree = {
+            name: instance.tag.name,
+            instance: null,
+            parent: component || null,
+            state: {
+                hookIndex: 0,
+                hookStates: [],
+            },
+            jsx: null,
+        };
+
+        this.components.set(instance.tag.name, funcComponent);
+
+        funcComponent.instance = instance.tag({
+            ...instance.props,
+            children: instance.children,
+            dom: instance.ref,
+        });
+
+        funcComponent.jsx = instance;
+
+        this.components.set(instance.tag.name, funcComponent);
+
+        this.mount({
+            component: funcComponent,
+            instance: funcComponent.instance,
+            container,
+        });
+
+        return;
     }
 
     newRef = document.createElement(instance.tag as string);
 
     if (instance.props) {
         Object.keys(instance.props).forEach((prop) => {
-
             const key = prop;
             const value = instance.props[prop];
 
@@ -51,14 +81,14 @@ ReactRender.prototype.mount = function ({ component, container }: IReactMount): 
 
     if (instance.children && instance.children.length > 0) {
         instance.children.forEach((child) => {
-            this.mount({ component: child, container: newRef as HTMLElement });
+            this.mount({ component, instance: child, container: newRef });
         });
     }
 
-    container.replaceWith(newRef);
-
-    console.log(instance, container);
-}
+    if (mode == "replace") container.replaceWith(newRef);
+    else if (mode == "append") container.appendChild(newRef);
+    instance.ref = newRef;
+};
 
 // ReactRender.prototype.mount = function ({ el, container, mode = "append" }: IReactMount): void {
 
@@ -72,13 +102,13 @@ ReactRender.prototype.mount = function ({ component, container }: IReactMount): 
 //     }
 
 //     let dom: HTMLElement | Text;
-    
+
 //     if (typeof el === "string" || typeof el === "number") {
 //         dom = document.createTextNode(el.toString());
 //         container.appendChild(dom);
 //         return;
 //     }
-    
+
 //     if(typeof el === "boolean") return ;
 
 //     if (typeof el.tag === "function") {
@@ -88,7 +118,7 @@ ReactRender.prototype.mount = function ({ component, container }: IReactMount): 
 //         if(found) {
 //             this.components = this.components.filter((c) => c.name !== (el.tag as any).name);
 //         }
-        
+
 //         this.components.push({
 //             name: el.tag.name,
 //             component,
@@ -97,7 +127,7 @@ ReactRender.prototype.mount = function ({ component, container }: IReactMount): 
 
 //         return this.mount({ el: component, container, mode });
 //     }
-    
+
 //     dom = document.createElement(el.tag as string);
 
 //     if (el.props) {

@@ -1,6 +1,28 @@
-// import { IReactSetProps, IReactUpdate, ReactElement } from "../types";
-// import { ReactRender } from ".";
+import { IReactUpdate } from "react/types";
+import { ReactRender } from ".";
 
+ReactRender.prototype.update = function ({
+    component
+}: IReactUpdate): void {
+
+    const previous = component;
+    const jsx = component.jsx;
+    if(!jsx) return;
+
+    console.log(jsx);
+    if(typeof jsx.tag == "function"){
+
+        const current = jsx.tag({
+            ...jsx.props,
+            children: jsx.children,
+            dom: jsx.ref,
+        });
+
+        console.log("Previous: ", previous);
+        console.log("Current : ", current);
+    }
+
+}
 
 // ReactRender.prototype.update = function ({
 //     prevElement,

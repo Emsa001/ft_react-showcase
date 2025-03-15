@@ -1,4 +1,4 @@
-import { Props, ReactNode } from "./types";
+import { Props, ReactComponentTree, ReactNode } from "./types";
 import Renderer, { ReactRender } from "./render";
 import { useStateHook } from "./hooks/useState";
 import { useEffectHook } from "./hooks/useEffect";
@@ -7,7 +7,7 @@ import { useRefHook } from "./hooks/useRef";
 const React = {
     contexts: new Map(),
     render: Renderer,
-    reRender: () => ReactRender.reRender(),
+    reRender: (component: ReactComponentTree | null) => ReactRender.reRender(component),
 
     createElement: (
         tag: string | ((props: Props | null, ...children: any[]) => ReactNode),

@@ -9,3 +9,4 @@ export default function Root({ children, params }: ElementProps) {
         </body>
     );
 }
+

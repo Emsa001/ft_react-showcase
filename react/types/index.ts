@@ -1,13 +1,14 @@
 export type Props = { [key: string]: any };
 
+export type ReactElement = ReactNode | string | number | boolean | null;
+
 export type ReactNode = {
     tag: string | ((props: Props, ...children: any[]) => ReactNode);
     props: Props;
-    children: any[];
+    children: ReactElement[];
     ref: HTMLElement | null;
 };
 
-export type ReactElement = ReactNode | string | number | boolean | null;
 
 export type ReactComponentTree = {
     name: string;
@@ -17,6 +18,7 @@ export type ReactComponentTree = {
         hookIndex: number;
         hookStates: any[];
     };
+    jsx: ReactNode | null;
 }
 
 export type TCleanupCallback = () => void;
@@ -26,11 +28,14 @@ export type TDependencyList = readonly unknown[];
 // Update
 
 export interface IReactUpdate {
+    component: ReactComponentTree;
 }
 
 export interface IReactMount {
-    component: ReactComponentTree;
+    component?: ReactComponentTree;
+    instance: ReactElement;
     container?: HTMLElement;
+    mode?: "append" | "replace";
 }
 
 export interface IReactSetProps {

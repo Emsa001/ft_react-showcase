@@ -11,4 +11,4 @@ export * from './types';
 
 export default React;
 
-ReactRender.reRender();
+ReactRender.reRender(null);
