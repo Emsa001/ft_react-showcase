@@ -1,4 +1,4 @@
-import { IReactMount, IReactSetProps, IReactUpdate, ReactComponentTree, ReactElement } from "../types";
+import { IReactMount, IReactSetProps, IReactUpdate, ReactComponentTree, ReactElement, ReactNode } from "../types";
 import { debounce } from "../other/utils";
 import { setHookIndex } from "../hooks";
 import { getPage } from "react/routes/page";
@@ -39,19 +39,23 @@ export class ReactRender {
         return Array.from(this.components.values()).pop() || null;
     }
 
+    printComponents(): void {
+        console.log(this.components);
+    }
+
     static reRender = debounce(async (component: ReactComponentTree | null) => {
         
         if(!Render.isMounted()){
             const root = await getPage();
             if(!root) return;
-
+            
             Render.mount({ component: root, instance: root.instance });
             Render.mounted = true;
         }else{
             if(!component){
                 return console.error("Component not found");
             }
-            
+
             component.state.hookIndex = 0;
             Render.addComponent(component.name, component);
             Render.update({

@@ -38,6 +38,8 @@ export async function getPage(): Promise<ReactComponentTree | null> {
 
     Render.addComponent(rootTree.name, rootTree);
 
+    // TODO: Fix root component, to include pageModule correctly
+
     return rootTree;
 }
 
