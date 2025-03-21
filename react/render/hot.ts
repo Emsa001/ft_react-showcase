@@ -8,11 +8,13 @@ if (module.hot) {
         routes.length = 0;
         routes.push(...newRoutesModule.default);
 
-        ReactRender.reRender();
+        console.log("hot update");
+        // ReactRender.reRender(newRoutesModule);
     });
 }
 
 window.addEventListener("popstate", async () => {
     resetHooks();
-    ReactRender.reRender();
+    // ReactRender.reRender();
+    console.log("popstate");
 });

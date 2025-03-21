@@ -21,6 +21,7 @@ export default function Test(){
     return (
         <div>
             <hr />
+            <div>AAAA</div>
             <p>count {count}</p>
             <p>only once {onlyOnce}</p>
             <h1>This is test Component</h1>

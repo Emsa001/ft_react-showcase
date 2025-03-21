@@ -4,10 +4,10 @@ import {
     IReactUpdate,
     ReactComponentTree,
     ReactElement,
-    ReactNode,
 } from "../types";
 import { debounce } from "../other/utils";
 import { getPage } from "react/routes/page";
+import "./hot";
 
 export class ReactRender {
     components: Map<string, ReactComponentTree>;
