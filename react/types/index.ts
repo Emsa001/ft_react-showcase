@@ -9,11 +9,10 @@ export type ReactNode = {
     ref: HTMLElement | null;
 };
 
-
 export type ReactComponentTree = {
     name: string;
     instance: ReactElement;
-    parent: ReactComponentTree | null;
+    keys: Map<string, ReactNode>;
     state: {
         hookIndex: number;
         hookStates: any[];

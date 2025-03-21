@@ -1,24 +1,36 @@
-import { IReactMount, IReactSetProps, IReactUpdate, ReactComponentTree, ReactElement, ReactNode } from "../types";
+import {
+    IReactMount,
+    IReactSetProps,
+    IReactUpdate,
+    ReactComponentTree,
+    ReactElement,
+    ReactNode,
+} from "../types";
 import { debounce } from "../other/utils";
-import { setHookIndex } from "../hooks";
 import { getPage } from "react/routes/page";
 
 export class ReactRender {
-
     components: Map<string, ReactComponentTree>;
+    lastComponent: ReactComponentTree | null;
 
     container: HTMLElement;
     mounted: boolean;
-    
+
     constructor() {
         this.container = document.body as HTMLElement;
         this.mounted = false;
         this.components = new Map();
+        this.lastComponent = null;
     }
 
     update(data: IReactUpdate): void {}
-    updateLoop(previous: ReactElement, current: ReactElement, ref: HTMLElement): void {}
-    
+    updateLoop(
+        previous: ReactElement,
+        current: ReactElement,
+        ref: HTMLElement,
+        index:number = 0
+    ): void {}
+
     mount(data: IReactMount): void {}
     mountArray(data: IReactMount): void {}
     isMounted(): boolean {
@@ -29,6 +41,7 @@ export class ReactRender {
 
     addComponent(name: string, component: ReactComponentTree): void {
         this.components.set(name, component);
+        this.lastComponent = component;
     }
 
     getComponent(name: string): ReactComponentTree | null {
@@ -36,7 +49,7 @@ export class ReactRender {
     }
 
     getLastComponent(): ReactComponentTree | null {
-        return Array.from(this.components.values()).pop() || null;
+        return this.lastComponent;
     }
 
     printComponents(): void {
@@ -44,25 +57,26 @@ export class ReactRender {
     }
 
     static reRender = debounce(async (component: ReactComponentTree | null) => {
-        
-        if(!Render.isMounted()){
+        // Render.printComponents();
+
+        if (!Render.isMounted()) {
             const root = await getPage();
-            if(!root) return;
-            
+            if (!root) return;
+
+            root.state.hookIndex = 0;
             Render.mount({ component: root, instance: root.instance });
             Render.mounted = true;
-        }else{
-            if(!component){
+        } else {
+            if (!component) {
                 return console.error("Component not found");
             }
 
             component.state.hookIndex = 0;
             Render.addComponent(component.name, component);
             Render.update({
-                component: component
+                component: component,
             });
         }
-
     }, 0);
 }
 

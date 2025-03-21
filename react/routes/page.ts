@@ -16,7 +16,7 @@ export async function getPage(): Promise<ReactComponentTree | null> {
     let rootTree: ReactComponentTree = {
         name: rootModule.default.name.toLowerCase(),
         instance: null,
-        parent: null,
+        keys: new Map(),
         state: {
             hookIndex: 0,
             hookStates: [],

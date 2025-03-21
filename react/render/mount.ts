@@ -2,11 +2,20 @@ import { IReactMount, ReactComponentTree, ReactNode } from "react/types";
 import { ReactRender } from ".";
 
 ReactRender.prototype.mountArray = function ({
+    component,
     instance,
     container,
 }: IReactMount): void {
     if (Array.isArray(instance)) {
-        instance.map((child) => this.mount({ instance: child, container }));
+
+        for(let i = 0; i < instance.length; i++){
+            const child = instance[i];
+            const key = instance[child]?.props?.key || i.toString();
+
+            component?.keys.set(key, child);
+            this.mount({ instance: child, container });
+        }
+
         return;
     }
 };
@@ -20,7 +29,7 @@ ReactRender.prototype.mount = function ({
     if (!container) container = this.container; // default container body
 
     // handle array of components
-    this.mountArray({ instance, container });
+    this.mountArray({ component, instance, container });
 
     let newRef: HTMLElement | Text;
 
@@ -40,7 +49,7 @@ ReactRender.prototype.mount = function ({
         const funcComponent: ReactComponentTree = {
             name: instance.tag.name,
             instance: null,
-            parent: component || null,
+            keys: new Map(),
             state: {
                 hookIndex: 0,
                 hookStates: [],
@@ -48,7 +57,7 @@ ReactRender.prototype.mount = function ({
             jsx: null,
         };
 
-        this.components.set(instance.tag.name, funcComponent);
+        this.addComponent(instance.tag.name, funcComponent);
 
         funcComponent.instance = instance.tag({
             ...instance.props,
@@ -56,9 +65,12 @@ ReactRender.prototype.mount = function ({
             dom: instance.ref,
         });
 
-        funcComponent.jsx = instance;
+        const updatedComponent = this.getLastComponent();
+        if(!updatedComponent) return;
 
-        this.components.set(instance.tag.name, funcComponent);
+        updatedComponent.jsx = instance;
+
+        this.addComponent(instance.tag.name, funcComponent);
 
         this.mount({
             component: funcComponent,
