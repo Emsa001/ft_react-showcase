@@ -16,7 +16,7 @@ export default function Test2(){
                 {Array.from({ length: num }).map((_, i) => (
                     // <div>{i} = {num}</div>
                     <div key={i}>
-                        <Test key={i}/>
+                        {/* <Test key={i}/> */}
                         hallo
                     </div>
                 ))}

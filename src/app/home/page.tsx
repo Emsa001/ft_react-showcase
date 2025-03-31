@@ -8,11 +8,13 @@ export default function Home(){
 
     return (
         <div className="my-4">
-            <p>Hello World</p>
+            <p>Hello Worldaaaa</p>
+            <p>{test}</p>
+            <button onClick={() => setTest(test + 1)}>Add</button>
+            <button onClick={() => setTest(test - 1)} className="ml-2">Subtract</button>
 
             <Test />
-            {/* <Test2 /> */}
-
+            <Test2 />
         </div>
     )
 }

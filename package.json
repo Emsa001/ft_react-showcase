@@ -4,7 +4,7 @@
     "description": "",
     "main": "src/app.js",
     "scripts": {
-        "dev": "webpack serve --mode development --open",
+        "dev": "webpack serve --open",
         "build": "webpack --mode production"
     },
     "author": "",

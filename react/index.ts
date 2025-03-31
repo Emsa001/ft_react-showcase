@@ -8,6 +8,7 @@ import "./render/update";
 export * from './react';
 export * from './render';
 export * from './types';
+export * from "./routes/component";
 
 export default React;
 
