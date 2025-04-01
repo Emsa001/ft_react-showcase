@@ -12,7 +12,7 @@ export function Router(props: RouterProps) {
 
     if (path !== src) return null;
 
-    return <div>{component}</div>;
+    return component;
 }
 
 export function BrowserRouter(props: { children: React.ReactNode }) {
@@ -27,7 +27,7 @@ export function BrowserRouter(props: { children: React.ReactNode }) {
             }
 
             if (child.props.default) {
-                defaultRoute = <div>{child.props.component}</div>;
+                defaultRoute = child.props.component;
             }
         }
     }

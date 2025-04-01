@@ -1,8 +1,9 @@
 import React from "react";
 import { useState } from "react";
 import Test from "./Component";
+import { useEffect } from "react";
 
-export default function Test2(){
+export default function Test2() {
     const [num, setNum] = useState(5);
     const [test, setTest] = useState("Test");
 
@@ -17,15 +18,19 @@ export default function Test2(){
                     // <div>{i} = {num}</div>
                     <div key={i}>
                         {/* <Test key={i}/> */}
-                        hallo
+                        hallo {i}
                     </div>
                 ))}
             </div>
             <div className="flex flex-col items-start gap-2 mt-4">
-                <button onClick={() => setNum((prev) => prev + 1)}>Click Me</button>
-                <button onClick={() => setNum((prev) => prev - 1)}>Remove</button>
+                <button onClick={() => setNum((prev) => prev + 1)}>
+                    Click Me
+                </button>
+                <button onClick={() => setNum((prev) => prev - 1)}>
+                    Remove
+                </button>
             </div>
             <hr />
         </div>
-    )
+    );
 }

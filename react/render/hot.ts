@@ -1,5 +1,13 @@
 import { resetHooks } from "react/hooks";
 import { ReactRender } from ".";
+
+/*
+
+TODO: Implement hot update for developer mode
+(is not important for production)
+
+*/
+
 // import routes from "../../src/routes";
 
 // if (module.hot) {
