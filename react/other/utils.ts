@@ -17,3 +17,4 @@ export function clearArray<T>(array: T[]) {
 export const flattenChildren = (children: any): any[] => {
     return Array.isArray(children) ? children.flat(Infinity) : [children];
 };
+

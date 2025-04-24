@@ -1,4 +1,4 @@
-import { IReactMount, ReactComponentTree, ReactNode } from "react/types";
+import { IReactMount, ReactComponentTree, ReactElement, ReactNode } from "react/types";
 import { ReactRender } from ".";
 
 ReactRender.prototype.mountArray = function ({
@@ -6,7 +6,10 @@ ReactRender.prototype.mountArray = function ({
     instance,
     container,
 }: IReactMount): void {
+
     if (Array.isArray(instance)) {
+
+        if (instance.length === 0) return;
 
         for(let i = 0; i < instance.length; i++){
             const child = instance[i];

@@ -1,7 +1,7 @@
 import { IReactUpdate, ReactComponentTree, ReactElement, ReactNode } from "react/types";
 import { ReactRender } from ".";
 
-let updatingComponent:ReactComponentTree | null = null;
+let updatingComponent: ReactComponentTree | null = null;
 
 ReactRender.prototype.updateLoop = function (
     previous: ReactElement,
@@ -9,12 +9,14 @@ ReactRender.prototype.updateLoop = function (
     ref: HTMLElement,
     index: number
 ): void {
-    if (!ref) return console.log("No reference");
-    if(!updatingComponent) return console.log("No updating component");
+
+    console.log("Update Loop", updatingComponent);
+
+    if (!updatingComponent) return console.log("No updating component");
 
     if (Array.isArray(current) && Array.isArray(previous)) {
         const parent = ref.parentElement;
-        if (!parent) return console.error("Parent is required for arrays");
+        if (!parent) console.error("Parent Element is recommended for arrays, please put the array inside a div");
 
         const childNum = Math.max(previous.length, current.length);
 
@@ -23,25 +25,27 @@ ReactRender.prototype.updateLoop = function (
 
             const key = element?.props?.key.toString() || i.toString();
             const previousKeyElement = updatingComponent.keys.get(key) || null;
-            const prevRef = previousKeyElement && previousKeyElement?.ref as HTMLElement || ref;
+            const prevRef = (previousKeyElement && (previousKeyElement?.ref as HTMLElement)) || ref;
 
-            if(!previousKeyElement){
+            if (!previousKeyElement) {
                 updatingComponent.keys.set(key, element);
             }
 
-            if(!element){
+            if (!element) {
                 updatingComponent.keys.delete(key);
             }
 
-            console.log(element, previousKeyElement, prevRef, index);
+            // console.log(element, previousKeyElement, prevRef, index);
             this.updateLoop(previousKeyElement, element, prevRef, index);
         }
 
         return;
     }
 
+    // if (!ref) return console.log("No reference", current);
+
     if (Array.isArray(current) || Array.isArray(previous)) {
-        console.log("Unexpected array");
+        // console.log("Unexpected array", current, previous);
         return;
     }
 
@@ -67,7 +71,7 @@ ReactRender.prototype.updateLoop = function (
 
     if (typeof previous === "string" || typeof previous === "number") {
         if (previous.toString() !== current.toString()) {
-            if(!ref.childNodes[index]) return;
+            if (!ref.childNodes[index]) return;
             ref.childNodes[index].textContent = current.toString();
         }
 
@@ -83,6 +87,17 @@ ReactRender.prototype.updateLoop = function (
     previous = previous as ReactNode;
 
     current.ref = ref;
+
+    if (typeof current.tag === "function") {
+        console.log("Function component", current.tag.name);
+
+        const component = this.getComponent(current.tag.name);
+        if (!component) return console.log("No component found", current.tag.name);
+        component!.jsx!.props = current.props;
+        this.update({ component });
+
+        return;
+    }
 
     // Prop update
     if (current.props != previous.props) {
@@ -128,8 +143,8 @@ ReactRender.prototype.update = function ({ component }: IReactUpdate): void {
 
     // console.log("Previous: ", previous);
     // console.log("Current: ", current);
+    // console.log("Component", component);
 
-    console.log(component);
     updatingComponent = component;
     this.updateLoop(previous, current, (previous as ReactNode).ref!);
 

@@ -1,20 +1,22 @@
+import { useUser } from "../../providers/user";
 import React, { useState } from "react";
-import Test from "./Component";
-import Test2 from "./Test2";
+import { Test } from "./test";
+import { useEffect } from "react";
 
 export default function Home(){
 
-    const [test, setTest] = useState(1);
+    const { user } = useUser();
+    const [count, setCount] = useState(0);
+
+    // useEffect(() => {
+    //     setCount((prev) => prev + 1);
+    // }, [])
 
     return (
         <div className="my-4">
-            <p>Hello Worldaaaa</p>
-            <p>{test}</p>
-            <button onClick={() => setTest(test + 1)}>Add</button>
-            <button onClick={() => setTest(test - 1)} className="ml-2">Subtract</button>
-
-            <Test />
-            <Test2 />
+            <p>{user}</p>
+            <button onClick={() => setCount((prev) => prev + 1)}>Add</button>
+            <Test count={count} />
         </div>
     )
 }

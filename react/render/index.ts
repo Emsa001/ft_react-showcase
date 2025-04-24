@@ -53,7 +53,9 @@ export class ReactRender {
     }
 
     printComponents(): void {
-        console.log(this.components);
+        console.log("============[ Components ]============");
+        this.components.forEach((component, name) => console.log(`${name}:`, component));
+        console.log("======================================");
     }
 
     static reRender = debounce(async (component: ReactComponentTree | null) => {
