@@ -1,10 +1,16 @@
+import { useUser } from "../../providers/user";
 import { count } from "console";
 import React from "react";
 
 const ExtraTest = ({count}:{count:number}) => {
+
+    const {user, setUser} = useUser();
+
     return (
         <div>
-            Count2: {count}
+            <p>Count2: {count}</p>
+            <p>User: {user}</p>
+            <button onClick={() => setUser("beqa")}>Update User</button>
         </div>
     )
 }

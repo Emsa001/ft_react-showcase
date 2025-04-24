@@ -12,6 +12,12 @@ export default function Home(){
     //     setCount((prev) => prev + 1);
     // }, [])
 
+    // TODO: Fix this, useEffect doesnt have newset values for states
+    useEffect(() => {
+        setCount(count + 1);
+        console.log("count, user", count, user);
+    }, [user])
+
     return (
         <div className="my-4">
             <p>{user}</p>
