@@ -59,6 +59,8 @@ ReactRender.prototype.updateLoop = function (
         // if(parent)
         //     this.mount({ instance: current, container: parent, mode: "append" });
         // else
+        console.log("Parent is null", current, ref);
+        
         this.mount({ instance: current, container: ref.parentElement!, mode: "append" });
         console.log("Previous is null", current, ref);
         return;
@@ -71,8 +73,9 @@ ReactRender.prototype.updateLoop = function (
     }
 
     if (typeof previous != typeof current) {
-        console.log("Different type");
-        // console.log("Previous: ", previous);
+        // console.log("Different type");
+
+        console.log("Previous: ", previous);
 
         // return;
     }
@@ -97,22 +100,37 @@ ReactRender.prototype.updateLoop = function (
 
     current.ref = ref;
 
+    
+    if (typeof current.tag === "function") {
+        let component = this.getComponent(current.tag.name);
+        if (!component) {
+
+            console.log("ref", ref);
+            console.log("Previous: ", previous);
+            console.log("Current: ", current);
+
+            const newComp = current.tag({
+                ...current.props,
+                children: current.children,
+                dom: current.ref,
+            });
+
+            this.mount({ instance: newComp, container: ref, mode: "replace" });
+            return ;
+        }
+        component!.jsx!.props = current.props;
+        
+        this.update({ component });
+        
+        return;
+    }
+    
     if(previous.tag != current.tag) {
+
         this.mount({ instance: current, container: ref, mode: "replace" });
         return;
     }
-
-    if (typeof current.tag === "function") {
-        // console.log("Function component", current.tag.name);
-
-        const component = this.getComponent(current.tag.name);
-        if (!component) return console.log("No component found", current.tag.name);
-        component!.jsx!.props = current.props;
-        this.update({ component });
-
-        return;
-    }
-
+    
     // Prop update
     if (current.props != previous.props) {
         if (!current.props) return;
@@ -155,9 +173,6 @@ ReactRender.prototype.update = function ({ component }: IReactUpdate): void {
         dom: jsx.ref,
     });
 
-    // console.log("Previous: ", previous);
-    // console.log("Current: ", current);
-    // console.log("Component", component);
 
     updatingComponent = component;
     this.updateLoop(previous, current, (previous as ReactNode).ref!);
