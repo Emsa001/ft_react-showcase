@@ -72,8 +72,11 @@ ReactRender.prototype.updateLoop = function (
 
     if (typeof previous != typeof current) {
         console.log("Different type");
-        return;
+        // console.log("Previous: ", previous);
+
+        // return;
     }
+    
 
     if (typeof previous === "string" || typeof previous === "number") {
         if (previous.toString() !== current.toString()) {
@@ -93,6 +96,11 @@ ReactRender.prototype.updateLoop = function (
     previous = previous as ReactNode;
 
     current.ref = ref;
+
+    if(previous.tag != current.tag) {
+        this.mount({ instance: current, container: ref, mode: "replace" });
+        return;
+    }
 
     if (typeof current.tag === "function") {
         // console.log("Function component", current.tag.name);

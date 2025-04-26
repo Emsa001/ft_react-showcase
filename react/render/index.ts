@@ -7,7 +7,7 @@ import {
 } from "../types";
 import { debounce } from "../other/utils";
 import { getPage } from "react/routes/page";
-import "./hot"
+// import "./hot"
 
 export class ReactRender {
     components: Map<string, ReactComponentTree>;
@@ -59,7 +59,7 @@ export class ReactRender {
     }
 
     static reRender = debounce(async (component: ReactComponentTree | null) => {
-        Render.printComponents();
+        // Render.printComponents();
 
         if (!Render.isMounted()) {
             const root = await getPage();

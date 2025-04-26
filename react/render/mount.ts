@@ -47,7 +47,7 @@ ReactRender.prototype.mount = function ({
     if(!instance) return;
 
     if (typeof instance.tag === "function") {
-        console.log("Function component", instance.tag.name);
+        // console.log("Function component", instance.tag.name);
 
         const funcComponent: ReactComponentTree = {
             name: instance.tag.name,
