@@ -11,7 +11,7 @@ export interface IHook {
 export interface IReactComponent {
     name: string;
     isMounted: boolean;
-    state: Map<number, IHook>;
+    state: IHook[];
     hookIndex: number;
     vNode: IReactVNode | null;
     jsx: IReactVNode | null;

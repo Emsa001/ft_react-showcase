@@ -1,6 +1,6 @@
 // global.d.ts
 
-type IReactElement = string | number | boolean | null | undefined | IReactVNode;
+type IReactElement = string | number | boolean | null | undefined | IReactVNode | Array<IReactElement>;
 
 interface IReactVNode {
     tag: string | ComponentFunction;

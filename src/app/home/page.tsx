@@ -8,7 +8,6 @@ const Test3 = () => {
     );
 };
 
-
 const Test = () => {
     return (
         <div id="test1" className="my-4 2">
@@ -38,33 +37,23 @@ const Test2 = () => {
 
 export default function Home() {
     const [count, setCount] = useState(12);
-    const [data, setData] = useState(0);
-    const [names, setNames] = useState(["John", "Doe"]);
+    const [data, setData] = useState(1);
 
-    const handleClick= async () => {
+    const handleClick = async () => {
         setCount((prev) => prev + 1);
         setCount((prev) => prev + 1);
         setCount((prev) => prev + 1);
+    };
+
+    const addData = () => {;
+        setData((prev) => prev + 1);
+        console.log("data: ",data);
     }
 
     return (
-        <div id="home" className="my-4">
-            <p>Hello World {count}</p>
-            <button onClick={handleClick}>Increment</button>
-            <hr />
+        <div className="p-2">
             <p>Data: {data}</p>
-            <button onClick={() => setData((prev) => prev + 1)}>Increment</button>
-
-            <hr />
-            {names.map((name, index) => (
-                <div key={index} className="my-4">
-                    <p>{name}</p>
-                    <button onClick={() => setNames((prev) => prev.filter((_, i) => i !== index))}>Remove</button>
-                </div>
-            ))}
-            <button onClick={() => setNames((prev) => [...prev, `Name ${prev.length + 1}`])}>Add Name</button>
-
-            <Test2 />
+            <button onClick={addData}>Increment</button>
         </div>
     );
 }

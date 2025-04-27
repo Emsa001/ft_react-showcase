@@ -34,7 +34,7 @@ class FtReact {
             name: element.tag.name,
             isMounted: false,
             isUpdating: false,
-            state: new Map(),
+            state: [],
             hookIndex: 0,
             vNode: null,
             jsx: element,

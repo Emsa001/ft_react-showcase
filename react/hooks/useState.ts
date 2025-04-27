@@ -21,24 +21,26 @@ function scheduleUpdate(component: IReactComponent) {
     Promise.resolve().then(() => {
         console.log("Scheduling update for component:", component.name);
 
+        // Process the queued state updates
         component.state.forEach((hook) => {
             processQueue(hook);
-            // console.log("Processed hook:", hook);
         });
 
         component.isUpdating = false;
 
-        // Re-render the component
+        // Re-render the component with the updated state
         React.vDomManager.currentComponent = component;
-        component.hookIndex = 0
+        component.hookIndex = 0;
         const newVNode = component.jsx?.tag(component.jsx.props, ...component.jsx.children);
-        React.vDomManager.currentComponent = null; 
+        React.vDomManager.currentComponent = null;
 
         if (newVNode && component.vNode) {
-            // component.vNode = newVNode;
             React.vDomManager.update(component.vNode, newVNode, component.vNode.ref!, 0, component.name);
-            // component.onUpdate();
+            component.vNode = newVNode;
+            console.log(component);
         }
+
+        React.vDomManager.components.set(component.name, component);
     });
 }
 
@@ -50,8 +52,7 @@ export function useStateHook<T>(initialState: T): [T, (value: T | ((prevState: T
         throw new Error("useState must be called within a component");
     }
 
-    const hookKey = component.hookIndex;
-    let hook = component.state.get(hookKey);
+    let hook = component.state[component.hookIndex];
 
     if (!hook) {
         hook = {
@@ -59,8 +60,10 @@ export function useStateHook<T>(initialState: T): [T, (value: T | ((prevState: T
             queue: [],
             type: 'state'
         };
-        component.state.set(hookKey, hook);
+
+        component.state.push(hook);
     }
+
 
     component.hookIndex++;
 
@@ -73,9 +76,16 @@ export function useStateHook<T>(initialState: T): [T, (value: T | ((prevState: T
         });
 
         if (!component.isUpdating) {
-            scheduleUpdate(component);
+            scheduleUpdate(component); // Schedule the re-render
         }
+
+        console.log("State updated for component:", component.name, "New value:", hook!.memoizedState);
     };
 
-    return [hook.memoizedState, setState];
+    // Directly return the memoized state, no need for a getter function
+    if (hook!.queue.length > 0) {
+        processQueue(hook!);  // Apply any pending state updates
+    }
+
+    return [hook.memoizedState, setState] as [T, (value: T | ((prevState: T) => T)) => void];
 }
