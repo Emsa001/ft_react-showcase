@@ -1,49 +1,38 @@
-export type Props = { [key: string]: any };
+export type IProps = { [key: string]: any };
+export type ComponentFunction = (props: IProps, ...children: IReactVNode[]) => IReactVNode;
 
-export type ReactElement = ReactNode | string | number | boolean | null;
+export type HookType = 'state' | 'effect' | 'memo' | 'ref';
+export interface IHook {
+    memoizedState: any;                 // stored value
+    queue: Array<Function>;             // for useState: pending state updates
+    type: HookType;                     // type of the hook
+}
 
-export type ReactNode = {
-    tag: string | ((props: Props, ...children: any[]) => ReactNode);
-    props: Props;
-    children: ReactElement[];
-    ref: HTMLElement | null;
-};
-
-export type ReactComponentTree = {
+export interface IReactComponent {
     name: string;
-    instance: ReactElement;
-    keys: Map<string, ReactNode>;
-    state: {
-        hookIndex: number;
-        hookStates: any[];
-    };
-    jsx: ReactNode | null;
+    isMounted: boolean;
+    state: Map<number, IHook>;
+    hookIndex: number;
+    vNode: IReactVNode | null;
+    jsx: IReactVNode | null;
+
+    isUpdating: boolean;
+
+    // Lifecycle methods
+    onMount(): void;
+    onUnmount(): void;
+    onUpdate(): void;
 }
 
-export type TCleanupCallback = () => void;
-export type TEffectCallback = () => TCleanupCallback | void;
-export type TDependencyList = readonly unknown[];
+export interface IVDomManager {
+    rootDom: HTMLElement | null;
 
-// Update
+    components: Map<string, IReactComponent>;
+    currentComponent: IReactComponent | null;
 
-export interface IReactUpdate {
-    component: ReactComponentTree;
-}
+    // Mount new app
+    mount(element: IReactComponent, container: HTMLElement): void;
 
-export interface IReactMount {
-    component?: ReactComponentTree;
-    instance: ReactElement;
-    container?: HTMLElement;
-    mode?: "append" | "replace";
-}
-
-export interface IReactSetProps {
-    ref: HTMLElement;
-    key: string;
-    value: any;
-}
-
-export interface ElementProps {
-    children?: React.ReactNode;
-    params?: Record<string, string | undefined>;
+    // Rerender the component
+    update(oldNode: IReactElement, newVNode: IReactElement, ref: HTMLElement, index:number, name: string): void;
 }

@@ -4,7 +4,7 @@ const CopyWebpackPlugin = require("copy-webpack-plugin");
 
 module.exports = {
     mode: "development",
-    entry: "./react/index.ts",
+    entry: "./src/app/root.tsx",
     output: {
         filename: "bundle.js",
         path: path.resolve(__dirname, "dist"),
@@ -15,6 +15,7 @@ module.exports = {
             "react": path.resolve(__dirname, "react"),
         },
         extensions: [".ts", ".tsx", ".js"],
+        modules: [path.resolve(__dirname, "react/types"), "node_modules"], // Add custom types directory
     },
     
     module: {

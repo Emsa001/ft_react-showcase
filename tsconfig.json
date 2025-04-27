@@ -3,21 +3,26 @@
         "target": "es5",
         "lib": ["dom", "es2019"],
         "jsx": "react",
+        "allowSyntheticDefaultImports": true,
         "module": "ESNext",
         "moduleResolution": "Node",
         "strict": true,
         "esModuleInterop": true,
         "skipLibCheck": true,
         "forceConsistentCasingInFileNames": true,
-        "typeRoots": ["node_modules/@types", "./src/types"],
-        "types": ["react","node","webpack-env"],
+        "typeRoots": ["./react/types", "./node_modules/@types"], // Ensure custom types are prioritized
+        "types": ["node", "webpack-env"],
         "baseUrl": ".",
         "paths": {
-            "react/": ["react"],
+            "react/*": ["react/*"],
             "@/*": ["src/*"],
             "!/*": ["src/app/*"]
-        }
+        },
     },
-    "include": ["src/**/*", "react/**/*"],
+    "include": [
+        "src/**/*",
+        "react/**/*", 
+        "react/types/global.d.ts" // Ensure this file is explicitly included
+    ],
     "exclude": ["node_modules", "dist"]
 }
