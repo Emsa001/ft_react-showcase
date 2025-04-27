@@ -38,6 +38,7 @@ const Test2 = () => {
 export default function Home() {
     const [count, setCount] = useState(12);
     const [data, setData] = useState(1);
+    const [names, setNames] = useState(["John", "Doe", "Jane"]);
 
     const handleClick = async () => {
         setCount((prev) => prev + 1);
@@ -45,15 +46,54 @@ export default function Home() {
         setCount((prev) => prev + 1);
     };
 
-    const addData = () => {;
+    const readData = () => {
+        console.log(data);
+    };
+
+    const addData = () => {
         setData((prev) => prev + 1);
-        console.log("data: ",data);
+    };
+
+    const addNames = () => {
+        setNames((prev) => [...prev, "Emanuel", "Beqa"]);
+    };
+
+    const shuffleNames = () => {
+        setNames((prev) => {
+            const shuffled = [...prev].sort(() => Math.random() - 0.5);
+            return shuffled;
+        });
     }
+
+    const removeName = (index: number) => {
+        setNames((prev) => {
+            const newNames = [...prev];
+            newNames.splice(index, 1);
+            return newNames;
+        });
+    }
+
 
     return (
         <div className="p-2">
             <p>Data: {data}</p>
+            {data > 5 && <p>Hello World</p>}
             <button onClick={addData}>Increment</button>
+            <button onClick={readData}>Read Data</button>
+
+            <hr />
+            <div>
+                {names.map((name, index) => (
+                    <div key={index} className="my-4">
+                        <p>{name}</p>
+                        <button onClick={() => removeName(index)}>Remove</button>
+                    </div>
+                ))}
+            </div>
+            <hr />
+            <button onClick={addNames}>Add Name</button>
+            <br />
+            <button onClick={shuffleNames}>Shuffle Names</button>
         </div>
     );
 }

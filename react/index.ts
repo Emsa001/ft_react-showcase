@@ -34,8 +34,10 @@ class FtReact {
             name: element.tag.name,
             isMounted: false,
             isUpdating: false,
-            state: [],
+            
+            states: [],
             hookIndex: 0,
+
             vNode: null,
             jsx: element,
             onMount() {
@@ -58,7 +60,7 @@ class FtReact {
 
         component.vNode = element.tag(element.props, ...element.children);
     
-        this.vDomManager.currentComponent = null; // reset after
+        this.vDomManager.currentComponent = null;
         return component;
     }
 

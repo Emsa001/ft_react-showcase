@@ -8,7 +8,6 @@ interface IReactVNode {
     children: IReactVNode[];
     ref: HTMLElement | null;
     key: string | null;
-    __ownerComponentName?: string; // Optional property to track the owner component
 }
 
 declare function h(

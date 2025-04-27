@@ -10,7 +10,7 @@
         "esModuleInterop": true,
         "skipLibCheck": true,
         "forceConsistentCasingInFileNames": true,
-        "typeRoots": ["./react/types", "./node_modules/@types"], // Ensure custom types are prioritized
+        "typeRoots": ["./react/types", "./node_modules/@types"],
         "types": ["node", "webpack-env"],
         "baseUrl": ".",
         "paths": {
@@ -22,7 +22,7 @@
     "include": [
         "src/**/*",
         "react/**/*", 
-        "react/types/global.d.ts" // Ensure this file is explicitly included
+        "react/types/global.d.ts"
     ],
     "exclude": ["node_modules", "dist"]
 }

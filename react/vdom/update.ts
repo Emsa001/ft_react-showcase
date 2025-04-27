@@ -8,66 +8,6 @@ type ArrayAction = {
     ref?: HTMLElement | null;
 };
 
-function handleArray(oldNode: IReactVNode[], newNode: IReactVNode[]): ArrayAction[] {
-    const oldKeyMap = new Map<string, { vnode: IReactVNode; index: number }>();
-    const newKeyMap = new Map<string, { vnode: IReactVNode; index: number }>();
-
-    // Build maps
-    for (let i = 0; i < oldNode.length; i++) {
-        const oldChild = oldNode[i];
-        if (oldChild?.key != null) {
-            oldKeyMap.set(oldChild.key, { vnode: oldChild, index: i });
-        }
-    }
-
-    for (let i = 0; i < newNode.length; i++) {
-        const newChild = newNode[i];
-        if (newChild?.key != null) {
-            newKeyMap.set(newChild.key, { vnode: newChild, index: i });
-        }
-    }
-
-    const actions: ArrayAction[] = [];
-
-    // Detect removes
-    for (const [key, { vnode, index }] of Array.from(oldKeyMap)) {
-        if (!newKeyMap.has(key)) {
-            actions.push({
-                action: "remove",
-                element: vnode,
-                fromIndex: index,
-                ref: vnode.ref ?? null,
-            });
-        }
-    }
-
-    // Detect adds and moves
-    for (let i = 0; i < newNode.length; i++) {
-        const newChild = newNode[i];
-        if (newChild?.key != null) {
-            const old = oldKeyMap.get(newChild.key);
-            if (!old) {
-                // New node
-                actions.push({
-                    action: "add",
-                    element: newChild,
-                    toIndex: i,
-                });
-            } else {
-                actions.push({
-                    action: "update",
-                    element: newChild,
-                    fromIndex: i,
-                    toIndex: i,
-                    ref: newChild.ref ?? null,
-                });
-            }
-        }
-    }
-
-    return actions;
-}
-
 export function update(
     this: VDomManagerImpl,
     oldNode: IReactElement,
@@ -78,19 +18,35 @@ export function update(
 ): void {
     if (oldNode === newVNode) return; 
 
+    if (Array.isArray(oldNode) && Array.isArray(newVNode)) {
+        // remove full array
+        for (const child of oldNode as IReactVNode[]) {
+            child.ref?.remove();
+        }
+
+        // create new array
+        for (const child of newVNode as IReactVNode[]) {
+            this.createDom({ vnode: child, parent: ref, name });
+        }
+    
+        return;
+    }  
+
     if (oldNode === null || typeof oldNode === "undefined") {
-        console.log(ref);
-        this.createDom({ vnode: newVNode, parent: ref, mode: "after", name });
+        console.log("Creating new node", newVNode);
+        this.createDom({ vnode: newVNode, parent: ref, mode: "append", name });
         return;
     }
 
     if (newVNode === null || typeof newVNode === "undefined") {
+        console.log("Removing node", oldNode);
         ref.remove();
         return;
     }
 
     if (typeof oldNode === "string" || typeof oldNode === "number") {
         if (oldNode.toString() !== newVNode.toString()) {
+            console.log("Updating text node", oldNode, newVNode);
             ref.childNodes[index].textContent = newVNode.toString();
         }
         return;
@@ -104,7 +60,7 @@ export function update(
     if (typeof oldNode != typeof newVNode) {
         console.log("Type mismatch");
         ref.remove();
-        // this.createDom(newVNode, ref, name);
+        this.createDom({ vnode: newVNode, parent: ref, mode: "append", name });
         return;
     }
 
@@ -112,6 +68,11 @@ export function update(
     newVNode = newVNode as IReactVNode;
 
     newVNode.ref = ref;
+
+    // Set props
+    for (const [key, value] of Object.entries(newVNode.props)) {
+        this.setProps({ ref: ref, key, value });
+    }
 
     // Check for children
     if (Array.isArray(oldNode.children) && Array.isArray(newVNode.children)) {

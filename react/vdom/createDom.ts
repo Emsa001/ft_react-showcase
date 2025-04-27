@@ -32,11 +32,14 @@ export function createDom(
     if (typeof vnode.tag === "function") {
         const component = React.createComponentInstance(vnode);
         this.components.set(component.name, component);
+        
         this.currentComponent = component;
         component.vNode = vnode.tag(vnode.props, ...vnode.children);
         this.currentComponent = null;
+
         component.isMounted = true;
         component.onMount();
+
         return this.createDom({ vnode: component.vNode, parent, name: component.name });
     }
 
@@ -59,8 +62,6 @@ export function createDom(
         parent.insertBefore(dom, parent.firstChild);
     } else if (mode === "after") {
         parent.after(dom);
-    } else if (mode === "create-only") {
-        // 🛑 Do nothing: don't attach it anywhere yet
     } else {
         parent.appendChild(dom);
     }
