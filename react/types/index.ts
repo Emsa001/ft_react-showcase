@@ -20,9 +20,11 @@ export interface IReactComponent {
 
     isUpdating: boolean;
 
+    queueFunctions: Set<() => void>;
+
     // Lifecycle methods
     onMount(): void;
-    onUnmount(): void;
+    onUnMount(): void;
     onUpdate(): void;
 }
 
@@ -32,17 +34,4 @@ export interface IVDomManager {
     components: Map<string, IReactComponent>;
     currentComponent: IReactComponent | null;
 
-    // Mount new app
-    mount(element: IReactComponent, container: HTMLElement): void;
-
-    // Rerender the component
-    // update(oldNode: IReactElement, newVNode: IReactElement, ref: HTMLElement, index:number, name: string): void;
-    update: (args: {
-        oldNode: IReactVNode;
-        newVNode: IReactVNode;
-        ref: HTMLElement | null;
-        parent: HTMLElement | null;
-        index: number;
-        name: string;
-    }) => void;
 }

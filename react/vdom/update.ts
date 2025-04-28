@@ -1,13 +1,5 @@
 import { VDomManagerImpl } from "./manager";
 
-type ArrayAction = {
-    action: "add" | "remove" | "move" | "update";
-    element: IReactVNode;
-    fromIndex?: number;
-    toIndex?: number;
-    ref?: HTMLElement | null;
-};
-
 interface IUpdateProps {
     oldNode: IReactElement;
     newVNode: IReactElement;
@@ -16,6 +8,8 @@ interface IUpdateProps {
     index: number;
     name: string;
 }
+
+export let componentsInUse: string[] = [];
 
 export function update(this: VDomManagerImpl, { oldNode, newVNode, ref, parent, index, name }: IUpdateProps) {
     // console.log("update", oldNode, newVNode, ref);
@@ -40,7 +34,7 @@ export function update(this: VDomManagerImpl, { oldNode, newVNode, ref, parent, 
 
         // create new array
         for (const child of newVNode as IReactVNode[]) {
-            this.createDom({ vnode: child, parent: parent!, name });
+            this.mount({ vnode: child, parent: parent!, name });
         }
 
         return;
@@ -52,11 +46,16 @@ export function update(this: VDomManagerImpl, { oldNode, newVNode, ref, parent, 
             return;
         }
         // console.log("Creating new node", newVNode);
-        this.createDom({ vnode: newVNode, parent: parent, mode: "append", name });
+        this.mount({ vnode: newVNode, parent: parent, mode: "append", name });
         return;
     }
 
     if (newVNode === null || typeof newVNode === "undefined") {
+
+        if(typeof oldNode === "object" && !Array.isArray(oldNode) && typeof oldNode.tag === "function"){
+            this.components.get(oldNode.tag.name)?.onUnMount();
+        }
+
         // console.log("Removing node", oldNode, ref);
         if(typeof oldNode === "object" && !Array.isArray(oldNode)){
             ref!.remove();
@@ -68,7 +67,11 @@ export function update(this: VDomManagerImpl, { oldNode, newVNode, ref, parent, 
 
     if (typeof oldNode === "boolean" || typeof newVNode === "boolean") {
         if (newVNode === false) {
-            if (oldNode) this.createDom({ vnode: newVNode, parent: ref!, mode: "replace", name });
+            if (oldNode) this.mount({ vnode: newVNode, parent: ref!, mode: "replace", name });
+
+            if(typeof oldNode === "object" && !Array.isArray(oldNode) && typeof oldNode.tag === "function"){
+                this.components.get(oldNode.tag.name)?.onUnMount();
+            }
             return;
         }
     }
@@ -93,9 +96,9 @@ export function update(this: VDomManagerImpl, { oldNode, newVNode, ref, parent, 
         const previousChild = parent.childNodes[index - 1] as HTMLElement || parent.lastChild
 
         if (oldNode === false) {
-            this.createDom({ vnode: newVNode, parent: previousChild, mode: "after", name });
+            this.mount({ vnode: newVNode, parent: previousChild, mode: "after", name });
         } else {
-            this.createDom({ vnode: newVNode, parent: ref!, mode: "replace", name });
+            this.mount({ vnode: newVNode, parent: ref!, mode: "replace", name });
         }
         return;
     }
@@ -106,7 +109,7 @@ export function update(this: VDomManagerImpl, { oldNode, newVNode, ref, parent, 
     if (oldNode.tag !== newVNode.tag) {
         // console.log("[ Tag difference ]", oldNode, newVNode);
 
-        this.createDom({ vnode: newVNode, parent: ref!, mode: "replace", name });
+        this.mount({ vnode: newVNode, parent: ref!, mode: "replace", name });
         return;
     }
     
@@ -114,13 +117,10 @@ export function update(this: VDomManagerImpl, { oldNode, newVNode, ref, parent, 
         if(JSON.stringify(oldNode.props) == JSON.stringify(newVNode.props)) return ;
         
         // console.log("[ Function difference ]", oldNode, newVNode);
-        // this.createDom({ vnode: newVNode, parent: ref!, mode: "replace", name });
+        // this.mount({ vnode: newVNode, parent: ref!, mode: "replace", name });
 
         const component = oldNode;
         const newComponent = newVNode.tag(newVNode.props, ...newVNode.children);
-        
-        console.log("New Component:", newComponent);
-        console.log("Old Component:", component);
 
         this.components.set(newComponent.tag.name, newComponent);
 
@@ -177,4 +177,5 @@ export function update(this: VDomManagerImpl, { oldNode, newVNode, ref, parent, 
             });
         }
     }
+
 }

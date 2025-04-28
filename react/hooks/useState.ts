@@ -19,7 +19,7 @@ function scheduleUpdate(component: IReactComponent) {
     component.isUpdating = true;
 
     Promise.resolve().then(() => {
-        console.log("Scheduling update for component:", component.name);
+        // console.log("Scheduling update for component:", component.name);
 
         // Process the queued state updates
         component.states.forEach((hook) => {
@@ -33,9 +33,8 @@ function scheduleUpdate(component: IReactComponent) {
         component.hookIndex = 0;
         const newVNode = component.jsx?.tag(component.jsx.props, ...component.jsx.children);
         React.vDomManager.currentComponent = null;
-
-        console.log("New VNode:", newVNode);
-        console.log("Old VNode:", component.vNode);
+        // console.log("New VNode:", newVNode);
+        // console.log("Old VNode:", component.vNode);
         if (newVNode && component.vNode) {
             React.vDomManager.update({
                 oldNode: component.vNode,
@@ -47,7 +46,9 @@ function scheduleUpdate(component: IReactComponent) {
             });
             component.vNode = newVNode;
         }
+        
     });
+
 }
 
 // useState implementation

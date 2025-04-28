@@ -1,5 +1,5 @@
 import { IVDomManager, IReactComponent } from "../types";
-import { createDom } from "./createDom";
+import { mount } from "./mount";
 import { update } from "./update";
 import { removeProp, setProps } from "./props";
 
@@ -8,15 +8,8 @@ export class VDomManagerImpl implements IVDomManager {
     components: Map<string, IReactComponent> = new Map();
     currentComponent: IReactComponent | null = null;
 
-    mount(component: IReactComponent, container: HTMLElement): void {
-        console.log(this.components);
-        this.rootDom = this.createDom({ vnode: component.vNode, parent: container, name: component.name });
-        container.appendChild(this.rootDom);
-        console.log(this.components);
-    }
-
     update = update;
-    createDom = createDom;
+    mount = mount;
     setProps = setProps;
     removeProp = removeProp
 }

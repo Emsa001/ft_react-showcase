@@ -25,7 +25,7 @@ function addToDom(dom: HTMLElement | Text, parent: HTMLElement, mode: mode){
     }
 }
 
-export function createDom(
+export function mount(
     this: VDomManagerImpl,
     { vnode, parent, mode = "append", name }: ICreateDomProps
 ): HTMLElement {
@@ -35,7 +35,7 @@ export function createDom(
 
     if (Array.isArray(vnode)) {
         for (const child of vnode) {
-            this.createDom({ vnode: child, parent, name });
+            this.mount({ vnode: child, parent, name });
         }
         return parent;
     }
@@ -60,13 +60,13 @@ export function createDom(
         
         this.currentComponent = component;
         component.vNode = vnode.tag(vnode.props, ...vnode.children);
-        this.currentComponent = null;
-
+        
         component.isMounted = true;
         component.onMount();
-
-        console.log("Creating component", component.name, component.vNode);
-        return this.createDom({ vnode: component.vNode, parent, name: component.name, mode });
+        
+        this.currentComponent = null;
+        // console.log("Creating component", component.name, component.vNode);
+        return this.mount({ vnode: component.vNode, parent, name: component.name, mode });
     }
 
     const dom = document.createElement(vnode.tag);
@@ -79,7 +79,7 @@ export function createDom(
     
     // Create children recursively
     for (const child of vnode.children) {
-        this.createDom({ vnode: child, parent: dom, name });
+        this.mount({ vnode: child, parent: dom, name });
     }
 
     addToDom(dom, parent, mode);
