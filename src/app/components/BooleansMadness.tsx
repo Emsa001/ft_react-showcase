@@ -40,7 +40,7 @@ function DetailSection({ visible, info }: DetailSectionProps) {
 
 // Main Component
 
-export function BooleansMadnessLevels(): JSX.Element {
+export function BooleansMadnessLevels() {
     const levels = ["simple", "arrays", "booleans", "nested", "chaos"] as const;
     const [levelIndex, setLevelIndex] = useState<number>(0);
 
@@ -117,6 +117,7 @@ export function BooleansMadnessLevels(): JSX.Element {
                     <p>Count: {count}</p>
                     <button onClick={increment}>Increment & Toggle Details</button>
                     {showDetails ? <div>Details are Visible ✅</div> : <div>Details are Hidden ❌</div>}
+                    <DetailSection visible={showDetails} info={items} />
                 </div>
             )}
 
@@ -174,9 +175,11 @@ export function BooleansMadnessLevels(): JSX.Element {
                     </ul>
 
                     {/* Cards */}
-                    {cards.map((card, idx) => (
-                        <MiniCard key={idx} title={card.title} description={card.description} />
-                    ))}
+                    <div>
+                        {cards.map((card, idx) => (
+                            <MiniCard key={idx} title={card.title} description={card.description} />
+                        ))}
+                    </div>
 
                     {/* Details */}
                     <DetailSection visible={showDetails} info={items} />
