@@ -8,17 +8,31 @@ type ArrayAction = {
     ref?: HTMLElement | null;
 };
 
-export function update(
-    this: VDomManagerImpl,
+interface IUpdateProps {
     oldNode: IReactElement,
     newVNode: IReactElement,
     ref: HTMLElement,
     index: number,
     name: string
-): void {
+}
+
+export function update(this: VDomManagerImpl, {
+    oldNode,
+    newVNode,
+    ref,
+    index,
+    name
+}: IUpdateProps) {
     if (oldNode === newVNode) return; 
 
     if (Array.isArray(oldNode) && Array.isArray(newVNode)) {
+        /* 
+            TODO: Handle array diffing
+            - Compare the two arrays and find the differences
+            - Create a list of actions (add, remove, move, update)
+            - Apply the actions to the DOM
+        */
+
         // remove full array
         for (const child of oldNode as IReactVNode[]) {
             child.ref?.remove();
@@ -30,7 +44,7 @@ export function update(
         }
     
         return;
-    }  
+    }
 
     if (oldNode === null || typeof oldNode === "undefined") {
         console.log("Creating new node", newVNode);
@@ -53,13 +67,22 @@ export function update(
     }
 
     if (typeof oldNode === "boolean" || typeof newVNode === "boolean") {
-        console.log("Boolean");
-        return;
+        if(newVNode === false){
+            console.log("Removing boolean node", oldNode);
+            ref.remove();
+            return ;
+        }
+        
+
     }
 
     if (typeof oldNode != typeof newVNode) {
-        console.log("Type mismatch");
-        ref.remove();
+        console.log("Type mismatch", ref);
+        if(typeof oldNode === "object"){
+            console.log("Removing old node", oldNode);
+            ref.remove();
+        }
+        // ref.remove();
         this.createDom({ vnode: newVNode, parent: ref, mode: "append", name });
         return;
     }
@@ -78,7 +101,14 @@ export function update(
     if (Array.isArray(oldNode.children) && Array.isArray(newVNode.children)) {
         for (let i = 0; i < Math.max(oldNode.children.length, newVNode.children.length); i++) {
             const childRef = oldNode.children[i]?.ref || newVNode.children[i]?.ref || ref;
-            this.update(oldNode.children[i], newVNode.children[i], childRef, i, name);
+            // this.update(oldNode.children[i], newVNode.children[i], childRef, i, name);
+            this.update({
+                oldNode: oldNode.children[i],
+                newVNode: newVNode.children[i],
+                ref: childRef,
+                index: i,
+                name
+            });
         }
     }
 }

@@ -37,7 +37,13 @@ function scheduleUpdate(component: IReactComponent) {
         console.log("New VNode:", newVNode);
         console.log("Old VNode:", component.vNode);
         if (newVNode && component.vNode) {
-            React.vDomManager.update(component.vNode, newVNode, component.vNode.ref!, 0, component.name);
+            React.vDomManager.update({
+                oldNode: component.vNode,
+                newVNode,
+                ref: component.vNode.ref!,
+                index: 0,
+                name: component.name
+            });
             component.vNode = newVNode;
         }
     });

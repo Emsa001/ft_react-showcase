@@ -23,7 +23,18 @@ export function createDom(
         return parent;
     }
 
-    if (typeof vnode === "string" || typeof vnode === "number" || typeof vnode === "boolean") {
+    if(typeof vnode === "boolean"){
+        if(vnode === false){
+            return parent;
+        }
+        if(vnode === true){
+            const textNode = document.createTextNode("true");
+            parent.appendChild(textNode);
+            return parent;
+        }
+    }
+
+    if (typeof vnode === "string" || typeof vnode === "number") {
         const textNode = document.createTextNode(vnode.toString());
         parent.appendChild(textNode);
         return parent;

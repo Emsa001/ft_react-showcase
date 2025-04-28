@@ -36,5 +36,12 @@ export interface IVDomManager {
     mount(element: IReactComponent, container: HTMLElement): void;
 
     // Rerender the component
-    update(oldNode: IReactElement, newVNode: IReactElement, ref: HTMLElement, index:number, name: string): void;
+    // update(oldNode: IReactElement, newVNode: IReactElement, ref: HTMLElement, index:number, name: string): void;
+    update: (args: {
+        oldNode: IReactVNode;
+        newVNode: IReactVNode;
+        ref: HTMLElement;
+        index: number;
+        name: string;
+    }) => void;
 }
