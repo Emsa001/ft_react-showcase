@@ -116,21 +116,27 @@ export function update(this: VDomManagerImpl, { oldNode, newVNode, ref, parent, 
         // console.log("[ Function difference ]", oldNode, newVNode);
         // this.createDom({ vnode: newVNode, parent: ref!, mode: "replace", name });
 
-        const component = this.components.get(oldNode.tag.name);
+        const component = oldNode;
         const newComponent = newVNode.tag(newVNode.props, ...newVNode.children);
+        
+        console.log("New Component:", newComponent);
+        console.log("Old Component:", component);
+
         this.components.set(newComponent.tag.name, newComponent);
 
         this.update({
-            oldNode: component?.vNode,
+            oldNode: oldNode,
             newVNode: newComponent,
             ref: ref,
-            parent: parent,
+            parent: ref?.parentElement!,
             index: 0,
-            name: component?.name || "",
+            name: newComponent?.name || "",
         })
         
+        
         if (component) {
-            component.vNode = newComponent;
+            const saved = this.components.get(component.tag.name);
+            if(saved) saved.vNode = newComponent;
         }
         
         return ;
