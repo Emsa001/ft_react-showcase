@@ -1,11 +1,28 @@
 import React from "react";
 import { VDomManagerImpl } from "./manager";
 
+type mode = "append" | "replace" | "before" | "after" | "create-only";
+
 interface ICreateDomProps {
     vnode: IReactElement;
     parent: HTMLElement;
-    mode?: "append" | "replace" | "before" | "after" | "create-only";
+    mode?: mode;
     name: string;
+}
+
+function addToDom(dom: HTMLElement | Text, parent: HTMLElement, mode: mode){
+
+    // console.log("addToDom", dom, parent, mode);
+
+    if (mode === "replace") {
+        parent.replaceWith(dom);
+    } else if (mode === "before") {
+        parent.insertBefore(dom, parent.firstChild);
+    } else if (mode === "after") {
+        parent.after(dom);
+    } else {
+        parent.appendChild(dom);
+    }
 }
 
 export function createDom(
@@ -22,21 +39,18 @@ export function createDom(
         }
         return parent;
     }
-
-    if(typeof vnode === "boolean"){
-        if(vnode === false){
-            return parent;
-        }
-        if(vnode === true){
-            const textNode = document.createTextNode("true");
-            parent.appendChild(textNode);
-            return parent;
-        }
-    }
-
+    
     if (typeof vnode === "string" || typeof vnode === "number") {
-        const textNode = document.createTextNode(vnode.toString());
-        parent.appendChild(textNode);
+        const textNode = document.createTextNode(vnode.toString())
+        addToDom(textNode, parent, mode);
+        
+        return parent;
+    }
+    
+    if(typeof vnode === "boolean"){        
+        if(vnode === false){
+            parent.remove();
+        }
         return parent;
     }
 
@@ -51,7 +65,8 @@ export function createDom(
         component.isMounted = true;
         component.onMount();
 
-        return this.createDom({ vnode: component.vNode, parent, name: component.name });
+        console.log("Creating component", component.name, component.vNode);
+        return this.createDom({ vnode: component.vNode, parent, name: component.name, mode });
     }
 
     const dom = document.createElement(vnode.tag);
@@ -66,16 +81,8 @@ export function createDom(
     for (const child of vnode.children) {
         this.createDom({ vnode: child, parent: dom, name });
     }
-    
-    if (mode === "replace") {
-        parent.replaceChild(dom, parent);
-    } else if (mode === "before") {
-        parent.insertBefore(dom, parent.firstChild);
-    } else if (mode === "after") {
-        parent.after(dom);
-    } else {
-        parent.appendChild(dom);
-    }
+
+    addToDom(dom, parent, mode);
     return dom;
     
 }

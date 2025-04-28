@@ -10,6 +10,11 @@ interface IReactVNode {
     key: string | null;
 }
 
+interface IProps {
+    key?: string | number | null; // Add key here
+    [propName: string]: any; // Allow other props
+}
+
 declare function h(
     tag: string | ComponentFunction,
     props: IProps,
@@ -17,13 +22,20 @@ declare function h(
 ): IReactVNode;
 
 declare namespace JSX {
+    type Element = IReactVNode;
+
+    interface ElementAttributesProperty {
+        props: {}; // tells TypeScript to look inside "props" for props validation
+    }
+
+    interface IntrinsicAttributes {
+        key?: string | number; // <- key is allowed on *any* element!
+    }
+
     type IntrinsicElements = {
         [K in keyof HTMLElementTagNameMap]: IProps;
     } & {
-        // Custom component example
+        // Custom components
         MyComponent: IProps;
     };
-
-    // Add the return type for JSX elements
-    interface Element extends IReactVNode {}
 }

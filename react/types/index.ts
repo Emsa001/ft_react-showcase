@@ -40,7 +40,8 @@ export interface IVDomManager {
     update: (args: {
         oldNode: IReactVNode;
         newVNode: IReactVNode;
-        ref: HTMLElement;
+        ref: HTMLElement | null;
+        parent: HTMLElement | null;
         index: number;
         name: string;
     }) => void;

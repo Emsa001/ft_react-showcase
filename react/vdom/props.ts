@@ -32,3 +32,25 @@ export function setProps(this: VDomManagerImpl, { ref, key, value }: { ref: HTML
 
     (ref as any)[key] = value;
 }
+
+export function removeProp(this: VDomManagerImpl, { ref, key }: { ref: HTMLElement; key: string }): void {
+    if (key === "style") {
+        ref.removeAttribute("style");
+        return;
+    }
+
+    if (key.startsWith("on") && typeof (ref as any)[key] === "function") {
+        const eventName = key.slice(2).toLowerCase();
+        ref.removeEventListener(eventName, (ref as any)[key]);
+        delete (ref as any)[key];
+        return;
+    }
+
+    if (key === "children") return;
+    if(key === "className"){
+        ref.removeAttribute("class");
+        return;
+    }
+
+    delete (ref as any)[key];
+}

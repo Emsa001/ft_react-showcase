@@ -1,7 +1,7 @@
 import { IVDomManager, IReactComponent } from "../types";
 import { createDom } from "./createDom";
 import { update } from "./update";
-import { setProps } from "./setProps";
+import { removeProp, setProps } from "./props";
 
 export class VDomManagerImpl implements IVDomManager {
     rootDom: HTMLElement | null = null;
@@ -18,4 +18,5 @@ export class VDomManagerImpl implements IVDomManager {
     update = update;
     createDom = createDom;
     setProps = setProps;
+    removeProp = removeProp
 }

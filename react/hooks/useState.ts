@@ -41,6 +41,7 @@ function scheduleUpdate(component: IReactComponent) {
                 oldNode: component.vNode,
                 newVNode,
                 ref: component.vNode.ref!,
+                parent: component.vNode.ref!.parentElement,
                 index: 0,
                 name: component.name
             });
@@ -83,9 +84,7 @@ export function useStateHook<T>(initialState: T): [T, (value: T | ((prevState: T
         // Only schedule the update once
         if (!component.isUpdating) {
             scheduleUpdate(component); // This triggers the re-render and state processing
-        }
-        
-        console.log("State update scheduled for component:", component.name, "with new value:", hook.memoizedState);
+        }        
     };
     
     // Do not process state updates immediately in the current render cycle!
