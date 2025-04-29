@@ -1,21 +1,22 @@
-const path = require("path");
-const HtmlWebpackPlugin = require("html-webpack-plugin");
-const CopyWebpackPlugin = require("copy-webpack-plugin");
+import path from "path";
+import HtmlWebpackPlugin from "html-webpack-plugin";
+import CopyWebpackPlugin from "copy-webpack-plugin";
 
-module.exports = {
+export default {
     mode: "development",
-    entry: "./src/app/root.tsx",
+    entry: "./react/index.ts",
+
     output: {
         filename: "bundle.js",
-        path: path.resolve(__dirname, "dist"),
+        path: path.resolve(path.dirname(new URL(import.meta.url).pathname), "dist"),
         publicPath: "/",
     },
     resolve: {
         alias: {
-            "react": path.resolve(__dirname, "react"),
+            "react": path.resolve(path.dirname(new URL(import.meta.url).pathname), "react"),
         },
         extensions: [".ts", ".tsx", ".js"],
-        modules: [path.resolve(__dirname, "react/types"), "node_modules"], // Add custom types directory
+        modules: [path.resolve(path.dirname(new URL(import.meta.url).pathname), "react/types"), "node_modules"], // Add custom types directory
     },
     
     module: {
@@ -45,7 +46,7 @@ module.exports = {
     ],
     devServer: {
         static: {
-            directory: path.join(__dirname, "dist"),
+            directory: path.join(path.dirname(new URL(import.meta.url).pathname), "dist"),
         },
         hot: true,
         liveReload: true,

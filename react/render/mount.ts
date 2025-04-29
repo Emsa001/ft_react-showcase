@@ -58,10 +58,27 @@ export function mount(
 
         // Check if the component is already mounted
         if (this.components.has(vnode.type.name)) {
-            const component = this.components.get(vnode.type.name);
-            if (component) {
-                component.onUnmount();
-            }
+            const component = this.components.get(vnode.type.name)!;
+
+            this.currentComponent = component;
+            const newVNode = vnode.type(component.vNode!.props, ...component.vNode!.children);
+            component.hookIndex = 0;
+
+            console.log("NEW VNODE",newVNode);
+            console.log("OLD VNODE",component.vNode);
+
+            this.update({
+                oldNode: component.vNode,
+                newVNode: newVNode,
+                ref: component.vNode!.ref!,
+                parent: component.vNode!.ref!.parentElement,
+                index: 0,
+                name: component.name
+            });
+
+            addToDom(component?.vNode!.ref!, parent, mode);
+            this.currentComponent = null;
+            return component?.vNode!.ref!;
         }
 
         const component = React.createComponentInstance(vnode);

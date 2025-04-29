@@ -1,5 +1,5 @@
 import { ReactComponentInstance } from "./types/types";
-import { VDomManagerImpl } from "./vdom/manager";
+import { VDomManagerImpl } from "./render/manager";
 
 import { useStateHook } from "./hooks/useState";
 import { useEffectHook } from "./hooks/useEffect";
@@ -7,6 +7,7 @@ import { useStaticHook } from "./hooks/useStatic";
 import { useRefHook } from "./hooks/useRef";
 import { isValidElementMethod } from "./methods/isValidElement";
 import { cloneElementMethod } from "./methods/cloneElement";
+import "./render/hot"
 
 class FtReact {
     public vDomManager: VDomManagerImpl;
@@ -104,13 +105,14 @@ class FtReact {
      */
     render(element: ReactElement, container: HTMLElement) {
         const rootComponent = this.renderComponent(element);
-        // this.vDomManager.mount(rootComponent, container);
 
         this.vDomManager.rootDom = this.vDomManager.mount({
             vnode: rootComponent.vNode!,
             parent: container,
             name: rootComponent.name,
         });
+
+        console.log(this.vDomManager.components)
 
         container.appendChild(this.vDomManager.rootDom!);
     }

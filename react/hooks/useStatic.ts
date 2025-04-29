@@ -1,5 +1,5 @@
 import React from "react";
-import { scheduleUpdate, useStateHook } from "./useState";
+import { scheduleUpdate } from "./useState";
 
 /*
 
