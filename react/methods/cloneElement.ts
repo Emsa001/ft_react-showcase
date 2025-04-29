@@ -1,9 +1,9 @@
 import React from "react";
 
 export const cloneElementMethod = (
-    element: IReactVNode,
+    element: ReactElement,
     props: Record<string, unknown>,
-    ...children: IReactVNode[]
+    ...children: ReactElement[]
 ) => {
     // Check if the element is a valid React element
     if (!React.isValidElement(element)) {
@@ -18,6 +18,6 @@ export const cloneElementMethod = (
         ...element,
         props: mergedProps,
         children: [...(element.children || []), ...children],
-    } as IReactVNode;
+    } as ReactElement;
 
 }

@@ -1,42 +1,45 @@
 // global.d.ts
 
-type IReactElement = string | number | boolean | null | undefined | IReactVNode | Array<IReactElement>;
+type ReactNode = ReactElement | string | number | boolean | null | undefined;
+type ReactElement = VNode; // React uses ReactElement for JSX return types
 
-interface IProps {
-    key?: string | number | null; // Add key here
-    [propName: string]: any; // Allow other props
+interface Props {
+    key?: string | number | null; // React allows keys
+    [propName: string]: any;
 }
 
-interface IReactVNode {
-    tag: string | ComponentFunction;
-    props: IProps;
-    children: IReactVNode[];
+interface VNode {
+    type: string | ComponentType;
+    props: Props;
+    children: VNode[];
     ref: HTMLElement | null;
-    key: string | null;
+    key: string | number | null;
 }
-
 
 declare function h(
-    tag: string | ComponentFunction,
-    props: IProps,
-    ...children: IReactVNode[]
-): IReactVNode;
+    type: string | ComponentType,
+    props: Props,
+    ...children: VNode[]
+): VNode;
 
 declare namespace JSX {
-    type Element = IReactVNode;
+    type Element = VNode;
 
     interface ElementAttributesProperty {
-        props: {}; // tells TypeScript to look inside "props" for props validation
+        props: {}; // Tells TS to look in `props` for prop validation
     }
 
     interface IntrinsicAttributes {
-        key?: string | number; // <- key is allowed on *any* element!
+        key?: string | number;
     }
 
     type IntrinsicElements = {
-        [K in keyof HTMLElementTagNameMap]: IProps;
+        [K in keyof HTMLElementTagNameMap]: Props;
     } & {
-        // Custom components
-        MyComponent: IProps;
+        MyComponent: Props;
     };
 }
+
+
+type Props = { [key: string]: any };
+type ComponentType = (props: Props, ...children: any[]) => VNode;

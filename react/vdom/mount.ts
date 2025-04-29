@@ -4,7 +4,7 @@ import { VDomManagerImpl } from "./manager";
 type mode = "append" | "replace" | "before" | "after" | "create-only";
 
 interface ICreateDomProps {
-    vnode: IReactElement;
+    vnode: ReactNode;
     parent: HTMLElement;
     mode?: mode;
     name: string;
@@ -54,12 +54,12 @@ export function mount(
         return parent;
     }
 
-    if (typeof vnode.tag === "function") {
+    if (typeof vnode.type === "function") {
         const component = React.createComponentInstance(vnode);
         this.components.set(component.name, component);
         
         this.currentComponent = component;
-        component.vNode = vnode.tag(vnode.props, ...vnode.children);
+        component.vNode = vnode.type(vnode.props, ...vnode.children);
         
         component.isMounted = true;
         component.onMount();
@@ -69,7 +69,7 @@ export function mount(
         return this.mount({ vnode: component.vNode, parent, name: component.name, mode });
     }
 
-    const dom = document.createElement(vnode.tag);
+    const dom = document.createElement(vnode.type);
     vnode.ref = dom;
     
     // Set props

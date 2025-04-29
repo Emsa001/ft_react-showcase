@@ -1,4 +1,4 @@
-import { IProps, IReactComponent } from "./types";
+import { ReactComponentInstance } from "./types/types";
 import { VDomManagerImpl } from "./vdom/manager";
 
 import { useStateHook } from "./hooks/useState";
@@ -19,28 +19,36 @@ class FtReact {
      * Creates a Virtual Node
      */
     createElement(
-        tag: string | ((props: IProps, ...children: IReactVNode[]) => IReactVNode),
-        props: IProps = {},
-        ...children: IReactVNode[]
-    ): IReactVNode {
+        type: string | ComponentType,
+        props: Props = {},
+        ...children: VNode[]
+    ): VNode {
         const { key = null, ...restProps } = props || {};
-
+    
+        const finalProps = {
+            ...restProps,
+            children, // Inject children into props
+        };
+    
         return {
-            tag,
-            props: restProps,
-            children,
+            type,
+            props: finalProps,
+            children, // This is mostly for rendering, not for components
             ref: null,
             key,
         };
     }
-
-    createComponentInstance(element: IReactVNode): IReactComponent {
+    
+    createComponentInstance(element: ReactElement): ReactComponentInstance {
+        if (typeof element.type !== "function") {
+            throw new Error("Invalid component type");
+        }
         return {
-            name: element.tag.name,
+            name: element.type.name,
             isMounted: false,
             isUpdating: false,
 
-            states: [],
+            hooks: [],
             hookIndex: 0,
 
             vNode: null,
@@ -52,7 +60,7 @@ class FtReact {
                 // console.log("Component mounted:", this.name);
                 this.isMounted = true;
             },
-            onUnMount() {
+            onUnmount() {
                 // console.log("Component unmounted:", this.name);
                 React.vDomManager.components.delete(this.name);
                 React.vDomManager.staticComponents.delete(this.name);
@@ -62,7 +70,7 @@ class FtReact {
                 this.isMounted = false;
                 this.vNode = null;
                 this.jsx = null;
-                this.states = [];
+                this.hooks = [];
                 this.hookIndex = 0;
             },
             onUpdate() {
@@ -71,11 +79,21 @@ class FtReact {
         };
     }
 
-    renderComponent(element: IReactVNode): IReactComponent {
+    renderComponent(element: ReactElement): ReactComponentInstance {
         const component = this.createComponentInstance(element);
         this.vDomManager.currentComponent = component;
 
-        component.vNode = element.tag(element.props, ...element.children);
+        if(!this.isValidElement(element)){
+            throw new Error("Invalid element type");
+        }
+
+        if(typeof element.type === "string") {
+            component.vNode = this.createElement(element.type, element.props, ...element.children);
+            this.vDomManager.currentComponent = null;
+            return component;
+        }
+
+        component.vNode = element.type(element.props, ...element.children);
 
         this.vDomManager.currentComponent = null;
         return component;
@@ -84,12 +102,12 @@ class FtReact {
     /**
      * Render root component into the real DOM
      */
-    render(element: IReactVNode, container: HTMLElement) {
+    render(element: ReactElement, container: HTMLElement) {
         const rootComponent = this.renderComponent(element);
         // this.vDomManager.mount(rootComponent, container);
 
         this.vDomManager.rootDom = this.vDomManager.mount({
-            vnode: rootComponent.vNode,
+            vnode: rootComponent.vNode!,
             parent: container,
             name: rootComponent.name,
         });
@@ -107,8 +125,8 @@ class FtReact {
     /*
      * Methods
      */
-    isValidElement = (object: unknown): object is IReactVNode => isValidElementMethod(object);
-    cloneElement = (element: IReactVNode, props: Record<string, unknown>, ...children: IReactVNode[]) =>
+    isValidElement = (object: unknown): object is ReactElement => isValidElementMethod(object);
+    cloneElement = (element: ReactElement, props: Record<string, unknown>, ...children: ReactElement[]) =>
         cloneElementMethod(element, props, ...children);
 }
 
@@ -118,10 +136,14 @@ export const useState = React.useState;
 export const useEffect = React.useEffect;
 export const useStatic = React.useStatic;
 export const useRef = React.useRef;
+
 export const isValidElement = React.isValidElement;
 export const cloneElement = React.cloneElement;
+export const createElement = React.createElement;
 // export const createContext = React.createContext;
 // export const useContext = React.useContext;
 // export const setTitle = React.setTitle;
+
+export * from "./types/types";
 
 export default React;

@@ -1,14 +1,14 @@
-import { IVDomManager, IReactComponent, IHook } from "../types";
+import { ReactComponentInstance, Hook, VDomManager } from "../types/types";
 import { mount } from "./mount";
 import { update } from "./update";
 import { removeProp, setProps } from "./props";
 
-export class VDomManagerImpl implements IVDomManager {
+export class VDomManagerImpl implements VDomManager {
     rootDom: HTMLElement | null = null;
-    components: Map<string, IReactComponent> = new Map();
-    currentComponent: IReactComponent | null = null;
+    components: Map<string, ReactComponentInstance> = new Map();
+    currentComponent: ReactComponentInstance | null = null;
 
-    staticStates: Map<string, IHook> = new Map();
+    staticStates: Map<string, Hook> = new Map();
     staticComponents: Map<string, string[]> = new Map();
 
     update = update;

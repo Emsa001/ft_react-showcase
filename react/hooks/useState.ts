@@ -1,8 +1,8 @@
-import { IHook, IReactComponent } from "react/types";
+import { Hook, ReactComponentInstance } from "react";
 import React from "../";
 
 // Process all queued state updates for the hook
-export function processQueue(hook: IHook) {
+export function processQueue(hook: Hook) {
     let state = hook.memoizedState;
 
     for (const update of hook.queue) {
@@ -14,7 +14,7 @@ export function processQueue(hook: IHook) {
 }
 
 // Schedule the component update asynchronously
-export function scheduleUpdate(component: IReactComponent, states: IHook[]) {
+export function scheduleUpdate(component: ReactComponentInstance, states: Hook[]) {
     component.isUpdating = true;
 
     Promise.resolve().then(() => {
@@ -29,10 +29,15 @@ export function scheduleUpdate(component: IReactComponent, states: IHook[]) {
         // Re-render the component with the updated state
         React.vDomManager.currentComponent = component;
         component.hookIndex = 0;
-        const newVNode = component.jsx?.tag(component.jsx.props, ...component.jsx.children);
+
+        if (typeof component.jsx?.type !== "function") {
+            throw new Error("Invalid component type");
+        }
+
+        const newVNode = component.jsx?.type(component.jsx.props, ...component.jsx.children);
         React.vDomManager.currentComponent = null;
-        // console.log("New VNode:", newVNode);
-        // console.log("Old VNode:", component.vNode);
+        console.log("New VNode:", newVNode);
+        console.log("Old VNode:", component.vNode);
         if (newVNode && component.vNode) {
             React.vDomManager.update({
                 oldNode: component.vNode,
@@ -56,7 +61,7 @@ export function useStateHook<T>(initialState: T): [T, (value: T | ((prevState: T
         throw new Error("useState must be called within a component");
     }
     
-    let hook = component.states[component.hookIndex];
+    let hook = component.hooks[component.hookIndex];
     
     if (!hook) {
         hook = {
@@ -65,7 +70,7 @@ export function useStateHook<T>(initialState: T): [T, (value: T | ((prevState: T
             type: 'state'
         };
         
-        component.states.push(hook);
+        component.hooks.push(hook);
     }
     
     component.hookIndex++;
@@ -81,7 +86,7 @@ export function useStateHook<T>(initialState: T): [T, (value: T | ((prevState: T
         
         // Only schedule the update once
         if (!component.isUpdating) {
-            scheduleUpdate(component, component.states);
+            scheduleUpdate(component, component.hooks);
         }        
     };
     

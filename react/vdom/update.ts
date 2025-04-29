@@ -1,8 +1,9 @@
+import { ReactComponentInstance } from "react/types/types";
 import { VDomManagerImpl } from "./manager";
 
 interface IUpdateProps {
-    oldNode: IReactElement;
-    newVNode: IReactElement;
+    oldNode: ReactNode;
+    newVNode: ReactNode;
     ref: HTMLElement | null;
     parent: HTMLElement | null;
     index: number;
@@ -33,7 +34,7 @@ export function update(this: VDomManagerImpl, { oldNode, newVNode, ref, parent, 
         parent.innerHTML = "";        
 
         // create new array
-        for (const child of newVNode as IReactVNode[]) {
+        for (const child of newVNode as ReactElement[]) {
             this.mount({ vnode: child, parent: parent!, name });
         }
 
@@ -52,8 +53,8 @@ export function update(this: VDomManagerImpl, { oldNode, newVNode, ref, parent, 
 
     if (newVNode === null || typeof newVNode === "undefined") {
 
-        if(typeof oldNode === "object" && !Array.isArray(oldNode) && typeof oldNode.tag === "function"){
-            this.components.get(oldNode.tag.name)?.onUnMount();
+        if(typeof oldNode === "object" && !Array.isArray(oldNode) && typeof oldNode.type === "function"){
+            this.components.get(oldNode.type.name)?.onUnmount();
         }
 
         // console.log("Removing node", oldNode, ref);
@@ -69,8 +70,8 @@ export function update(this: VDomManagerImpl, { oldNode, newVNode, ref, parent, 
         if (newVNode === false) {
             if (oldNode) this.mount({ vnode: newVNode, parent: ref!, mode: "replace", name });
 
-            if(typeof oldNode === "object" && !Array.isArray(oldNode) && typeof oldNode.tag === "function"){
-                this.components.get(oldNode.tag.name)?.onUnMount();
+            if(typeof oldNode === "object" && !Array.isArray(oldNode) && typeof oldNode.type === "function"){
+                this.components.get(oldNode.type.name)?.onUnmount();
             }
             return;
         }
@@ -103,26 +104,27 @@ export function update(this: VDomManagerImpl, { oldNode, newVNode, ref, parent, 
         return;
     }
 
-    oldNode = oldNode as IReactVNode;
-    newVNode = newVNode as IReactVNode;
+    oldNode = oldNode as ReactElement;
+    newVNode = newVNode as ReactElement;
     
-    if (oldNode.tag !== newVNode.tag) {
+    if (oldNode.type !== newVNode.type) {
         // console.log("[ Tag difference ]", oldNode, newVNode);
 
         this.mount({ vnode: newVNode, parent: ref!, mode: "replace", name });
         return;
     }
     
-    if(typeof newVNode.tag === "function"){
+    if(typeof newVNode.type === "function"){
         if(JSON.stringify(oldNode.props) == JSON.stringify(newVNode.props)) return ;
         
         // console.log("[ Function difference ]", oldNode, newVNode);
         // this.mount({ vnode: newVNode, parent: ref!, mode: "replace", name });
 
         const component = oldNode;
-        const newComponent = newVNode.tag(newVNode.props, ...newVNode.children);
+        const newComponent = newVNode.type(newVNode.props, ...newVNode.children);
 
-        this.components.set(newComponent.tag.name, newComponent);
+        const componentName = typeof newComponent.type === "function" ? newComponent.type.name : "";
+        this.components.set(componentName, newComponent as unknown as ReactComponentInstance);
 
         this.update({
             oldNode: oldNode,
@@ -130,12 +132,12 @@ export function update(this: VDomManagerImpl, { oldNode, newVNode, ref, parent, 
             ref: ref,
             parent: ref?.parentElement!,
             index: 0,
-            name: newComponent?.name || "",
+            name: componentName,
         })
         
         
         if (component) {
-            const saved = this.components.get(component.tag.name);
+            const saved = this.components.get(componentName);
             if(saved) saved.vNode = newComponent;
         }
         
