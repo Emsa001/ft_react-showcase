@@ -1,5 +1,5 @@
 export type IProps = { [key: string]: any };
-export type ComponentFunction = (props: IProps, ...children: IReactVNode[]) => IReactVNode;
+export type ComponentFunction = (props: IProps, ...children: any[]) => IReactVNode;
 
 export type HookType = 'state' | 'effect' | 'memo' | 'ref';
 export interface IHook {

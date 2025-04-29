@@ -2,6 +2,11 @@
 
 type IReactElement = string | number | boolean | null | undefined | IReactVNode | Array<IReactElement>;
 
+interface IProps {
+    key?: string | number | null; // Add key here
+    [propName: string]: any; // Allow other props
+}
+
 interface IReactVNode {
     tag: string | ComponentFunction;
     props: IProps;
@@ -10,10 +15,6 @@ interface IReactVNode {
     key: string | null;
 }
 
-interface IProps {
-    key?: string | number | null; // Add key here
-    [propName: string]: any; // Allow other props
-}
 
 declare function h(
     tag: string | ComponentFunction,

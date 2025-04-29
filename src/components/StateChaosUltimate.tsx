@@ -23,9 +23,11 @@ function HugeComponent({ title, paragraphs }: HugeComponentProps) {
     return (
         <div>
             <h1>{title}</h1>
-            {paragraphs.map((text, idx) => (
-                <p key={idx}>{text}</p>
-            ))}
+            <div>
+                {paragraphs.map((text, idx) => (
+                    <p key={idx}>{text}</p>
+                ))}
+            </div>
         </div>
     );
 }
@@ -51,8 +53,10 @@ function Tree({ depth }: TreeProps) {
     return (
         <div>
             Branch 🌳 (depth {depth})
-            <Tree depth={depth - 1} />
-            <Tree depth={depth - 2} />
+            <div>
+                <Tree depth={depth - 1} />
+                <Tree depth={depth - 2} />
+            </div>
         </div>
     );
 }
