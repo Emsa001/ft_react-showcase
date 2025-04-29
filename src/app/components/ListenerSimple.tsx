@@ -15,6 +15,7 @@ function ChildComponent() {
 
         const interval = setInterval(() => {
             setTest((prev) => prev + 1);
+            console.log("Child interval");
         }, 1000);
 
         return () => {
@@ -22,13 +23,6 @@ function ChildComponent() {
             console.log("❌ Child unmounted but different function");
         };
     }, []);
-
-    useEffect(() => {
-        console.log("Child updated");
-
-
-
-    }, [test]);
 
     return (
         <div>

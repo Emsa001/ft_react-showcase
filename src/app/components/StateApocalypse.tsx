@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useStatic } from "react";
 
 type Card = {
     id: number;
     text: string;
 };
 
-export default function StateApocalypse() {
+export function StateApocalypse() {
     const [count, setCount] = useState(0);
     const [isVisible, setIsVisible] = useState(true);
     const [messages, setMessages] = useState<string[]>(["Hello", "World"]);
@@ -21,8 +21,8 @@ export default function StateApocalypse() {
     ]);
 
     const incrementAll = () => {
-        setCount((c) => c + 1);
         setIsVisible((v) => !v);
+        setCount((c) => c + 1);
         setMessages((msgs) => [...msgs, `Msg ${msgs.length + 1}`]);
         setCards((cards) => [...cards, { id: cards.length + 1, text: `New Card ${cards.length + 1}` }]);
         setBonusActive((b) => !b);
@@ -46,6 +46,7 @@ export default function StateApocalypse() {
             <button onClick={incrementAll}>Increment All</button>
             <button onClick={addHiddenNumber}>Add Hidden Number</button>
 
+            <p>isVisible: {`${isVisible}`}</p>
             <div>
                 {isVisible ? (
                     <div>

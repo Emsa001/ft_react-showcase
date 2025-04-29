@@ -2,7 +2,7 @@ import { IHook, IReactComponent } from "react/types";
 import React from "../";
 
 // Process all queued state updates for the hook
-function processQueue(hook: IHook) {
+export function processQueue(hook: IHook) {
     let state = hook.memoizedState;
 
     for (const update of hook.queue) {
@@ -14,15 +14,13 @@ function processQueue(hook: IHook) {
 }
 
 // Schedule the component update asynchronously
-function scheduleUpdate(component: IReactComponent) {
-    if (component.isUpdating) return;
+export function scheduleUpdate(component: IReactComponent, states: IHook[]) {
     component.isUpdating = true;
 
     Promise.resolve().then(() => {
-        // console.log("Scheduling update for component:", component.name);
 
         // Process the queued state updates
-        component.states.forEach((hook) => {
+        states.forEach((hook) => {
             processQueue(hook);
         });
 
@@ -48,7 +46,6 @@ function scheduleUpdate(component: IReactComponent) {
         }
         
     });
-
 }
 
 // useState implementation
@@ -84,7 +81,7 @@ export function useStateHook<T>(initialState: T): [T, (value: T | ((prevState: T
         
         // Only schedule the update once
         if (!component.isUpdating) {
-            scheduleUpdate(component); // This triggers the re-render and state processing
+            scheduleUpdate(component, component.states);
         }        
     };
     

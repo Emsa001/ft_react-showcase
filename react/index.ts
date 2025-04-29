@@ -3,6 +3,7 @@ import { VDomManagerImpl } from "./vdom/manager";
 
 import { useStateHook } from "./hooks/useState";
 import { useEffectHook } from "./hooks/useEffect";
+import { useStaticHook } from "./hooks/useStatic";
 
 class FtReact {
     public vDomManager: VDomManagerImpl;
@@ -51,6 +52,7 @@ class FtReact {
             onUnMount() {
                 // console.log("Component unmounted:", this.name);
                 React.vDomManager.components.delete(this.name);
+                React.vDomManager.staticComponents.delete(this.name);
                 this.queueFunctions.forEach(fn => fn());
                 this.queueFunctions.clear();
                 
@@ -59,7 +61,6 @@ class FtReact {
                 this.jsx = null;
                 this.states = [];
                 this.hookIndex = 0;
-                
             },
             onUpdate() {
                 console.log("Updating component:", this.name);
@@ -89,6 +90,7 @@ class FtReact {
     }
 
     useState = <T>(initialState: T) => useStateHook(initialState);
+    useStatic = <T>(name: string, initialState: T) => useStaticHook(name, initialState);
     useEffect = async (callback: () => void, deps?: any[]): Promise<void> => useEffectHook(callback, deps);
     // useRef: <T>(initialValue: T) => useRefHook(initialValue),
 };
@@ -97,6 +99,7 @@ const React = new FtReact();
 
 export const useState = React.useState;
 export const useEffect = React.useEffect;
+export const useStatic = React.useStatic;
 // export const useRef = React.useRef;
 // export const createContext = React.createContext;
 // export const useContext = React.useContext;
