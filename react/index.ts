@@ -57,11 +57,11 @@ class FtReact {
             queueFunctions: new Set<() => void>(),
 
             onMount() {
-                // console.log("Component mounted:", this.name);
+                console.log("Component mounted:", this.name);
                 this.isMounted = true;
             },
             onUnmount() {
-                // console.log("Component unmounted:", this.name);
+                console.log("Component unmounted:", this.name);
                 React.vDomManager.components.delete(this.name);
                 React.vDomManager.staticComponents.delete(this.name);
                 this.queueFunctions.forEach((fn) => fn());
@@ -111,6 +111,7 @@ class FtReact {
             parent: container,
             name: rootComponent.name,
         });
+
         container.appendChild(this.vDomManager.rootDom!);
     }
 

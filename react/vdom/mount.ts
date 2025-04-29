@@ -55,23 +55,33 @@ export function mount(
     }
 
     if (typeof vnode.type === "function") {
+
+        // Check if the component is already mounted
+        if (this.components.has(vnode.type.name)) {
+            const component = this.components.get(vnode.type.name);
+            if (component) {
+                component.onUnmount();
+            }
+        }
+
         const component = React.createComponentInstance(vnode);
         this.components.set(component.name, component);
-        
+                
         this.currentComponent = component;
         component.vNode = vnode.type(vnode.props, ...vnode.children);
         
         component.isMounted = true;
         component.onMount();
         
+        const newRef = this.mount({ vnode: component.vNode, parent, name: component.name, mode });
+        component.vNode.ref = newRef;
         this.currentComponent = null;
-        // console.log("Creating component", component.name, component.vNode);
-        return this.mount({ vnode: component.vNode, parent, name: component.name, mode });
+        return newRef;
     }
 
     const dom = document.createElement(vnode.type);
     vnode.ref = dom;
-    
+
     // Set props
     for (const [key, value] of Object.entries(vnode.props)) {
         this.setProps({ ref: dom, key, value });

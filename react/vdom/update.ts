@@ -18,6 +18,10 @@ export function update(this: VDomManagerImpl, { oldNode, newVNode, ref, parent, 
         
         /* 
             CURRENT IMPLEMENTATION IS VERY BAD, DO NOT USE IN PRODUCTION
+            
+            - FULL ARRAY REPLACEMENT
+            - HUGE ISSUE FOR PERFORMANCE
+            - REMOUNTS ALL CHILDREN
 
             TODO: Handle array diffing
             - Compare the two arrays and find the differences
@@ -46,18 +50,20 @@ export function update(this: VDomManagerImpl, { oldNode, newVNode, ref, parent, 
             console.warn("Cannot Create new now: Parent is null");
             return;
         }
-        // console.log("Creating new node", newVNode);
+
+        console.log("[ Old node is null ]", oldNode, newVNode);
+
         this.mount({ vnode: newVNode, parent: parent, mode: "append", name });
         return;
     }
 
     if (newVNode === null || typeof newVNode === "undefined") {
+        console.log("[ New node is null ]", oldNode, newVNode);
 
         if(typeof oldNode === "object" && !Array.isArray(oldNode) && typeof oldNode.type === "function"){
             this.components.get(oldNode.type.name)?.onUnmount();
         }
 
-        // console.log("Removing node", oldNode, ref);
         if(typeof oldNode === "object" && !Array.isArray(oldNode)){
             ref!.remove();
         }else{
@@ -67,6 +73,11 @@ export function update(this: VDomManagerImpl, { oldNode, newVNode, ref, parent, 
     }
 
     if (typeof oldNode === "boolean" || typeof newVNode === "boolean") {
+
+        if(oldNode === newVNode) return ;
+
+        console.log("[ Boolean difference ]", oldNode, newVNode);
+        
         if (newVNode === false) {
             if (oldNode) this.mount({ vnode: newVNode, parent: ref!, mode: "replace", name });
 
@@ -82,7 +93,6 @@ export function update(this: VDomManagerImpl, { oldNode, newVNode, ref, parent, 
         (typeof newVNode === "string" || typeof newVNode === "number")
     ) {
         if (oldNode.toString() !== newVNode.toString()) {
-            // console.log("Updating text node", oldNode, newVNode);
             ref!.textContent = newVNode.toString();
         }
         return;
@@ -96,8 +106,15 @@ export function update(this: VDomManagerImpl, { oldNode, newVNode, ref, parent, 
 
         const previousChild = parent.childNodes[index - 1] as HTMLElement || parent.lastChild
 
+        console.log("[ Type difference ]", oldNode, newVNode);
+
         if (oldNode === false) {
-            this.mount({ vnode: newVNode, parent: previousChild, mode: "after", name });
+            console.log(index - 1);
+            if(index -1 < 0){
+                this.mount({ vnode: newVNode, parent: parent as HTMLElement, mode: "before", name });
+            }else{
+                this.mount({ vnode: newVNode, parent: previousChild, mode: "after", name });
+            }
         } else {
             this.mount({ vnode: newVNode, parent: ref!, mode: "replace", name });
         }
@@ -108,7 +125,7 @@ export function update(this: VDomManagerImpl, { oldNode, newVNode, ref, parent, 
     newVNode = newVNode as ReactElement;
     
     if (oldNode.type !== newVNode.type) {
-        // console.log("[ Tag difference ]", oldNode, newVNode);
+        console.log("[ Element type difference ]", oldNode, newVNode);
 
         this.mount({ vnode: newVNode, parent: ref!, mode: "replace", name });
         return;
@@ -120,7 +137,6 @@ export function update(this: VDomManagerImpl, { oldNode, newVNode, ref, parent, 
         // console.log("[ Function difference ]", oldNode, newVNode);
         // this.mount({ vnode: newVNode, parent: ref!, mode: "replace", name });
 
-        const component = oldNode;
         const newComponent = newVNode.type(newVNode.props, ...newVNode.children);
 
         const componentName = typeof newComponent.type === "function" ? newComponent.type.name : "";
@@ -134,13 +150,7 @@ export function update(this: VDomManagerImpl, { oldNode, newVNode, ref, parent, 
             index: 0,
             name: componentName,
         })
-        
-        
-        if (component) {
-            const saved = this.components.get(componentName);
-            if(saved) saved.vNode = newComponent;
-        }
-        
+   
         return ;
     }
     
