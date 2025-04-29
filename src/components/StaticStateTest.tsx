@@ -25,10 +25,8 @@ export function StaticStateTest2() {
 export function StaticStateTest() {
     const [test, setTest] = useStatic("testValue", 20);
     const [test2, setTest2] = useStatic("testValue2", 5);
-    const [test3, setTest3] = useStatic("testValue3", 5);
 
     const [normal, setNormal] = useState(0);
-    
 
     const handleClick = () => {
         setTest((prev) => prev + 1);

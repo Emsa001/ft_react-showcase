@@ -14,26 +14,25 @@ export function processQueue(hook: Hook) {
 }
 
 // Schedule the component update asynchronously
-export function scheduleUpdate(component: ReactComponentInstance, states: Hook[]) {
+export async function scheduleUpdate(component: ReactComponentInstance, states: Hook[]) {
     component.isUpdating = true;
 
-    Promise.resolve().then(() => {
-
+    await Promise.resolve().then(async () => {
         // Process the queued state updates
         states.forEach((hook) => {
             processQueue(hook);
         });
-
+        
         component.isUpdating = false;
-
+        
         // Re-render the component with the updated state
         React.vDomManager.currentComponent = component;
         component.hookIndex = 0;
-
+        
         if (typeof component.jsx?.type !== "function") {
             throw new Error("Invalid component type");
         }
-
+        
         const newVNode = component.jsx?.type(component.jsx.props, ...component.jsx.children);
         React.vDomManager.currentComponent = null;
         console.log("New VNode:", newVNode);
@@ -49,7 +48,6 @@ export function scheduleUpdate(component: ReactComponentInstance, states: Hook[]
             });
             component.vNode = newVNode;
         }
-        
     });
 }
 

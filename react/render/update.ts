@@ -64,11 +64,7 @@ export function update(this: VDomManagerImpl, { oldNode, newVNode, ref, parent, 
             this.components.get(oldNode.type.name)?.onUnmount();
         }
 
-        if(typeof oldNode === "object" && !Array.isArray(oldNode)){
-            ref!.remove();
-        }else{
-            ref!.childNodes[index]?.remove();
-        }
+        ref?.remove();
         return;
     }
 

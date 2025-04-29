@@ -103,10 +103,10 @@ class FtReact {
     /**
      * Render root component into the real DOM
      */
-    render(element: ReactElement, container: HTMLElement) {
+    async render(element: ReactElement, container: HTMLElement) {
         const rootComponent = this.renderComponent(element);
 
-        this.vDomManager.rootDom = this.vDomManager.mount({
+        this.vDomManager.rootDom = await this.vDomManager.mount({
             vnode: rootComponent.vNode!,
             parent: container,
             name: rootComponent.name,
@@ -123,6 +123,7 @@ class FtReact {
     useState = <T>(initialState: T) => useStateHook(initialState);
     useStatic = <T>(name: string, initialState: T) => useStaticHook(name, initialState);
     useEffect = async (callback: () => void, deps?: any[]): Promise<void> => useEffectHook(callback, deps);
+    useLayoutEffect = async (callback: () => void, deps?: any[]): Promise<void> => useEffectHook(callback, deps);
     useRef = <T>(initialValue: T) => useRefHook(initialValue);
 
     /*
@@ -137,6 +138,7 @@ const React = new FtReact();
 
 export const useState = React.useState;
 export const useEffect = React.useEffect;
+export const useLayoutEffect = React.useLayoutEffect;
 export const useStatic = React.useStatic;
 export const useRef = React.useRef;
 

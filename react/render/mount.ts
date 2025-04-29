@@ -1,5 +1,6 @@
 import React from "react";
 import { VDomManagerImpl } from "./manager";
+import { scheduleUpdate } from "react/hooks/useState";
 
 type mode = "append" | "replace" | "before" | "after" | "create-only";
 
@@ -25,10 +26,10 @@ function addToDom(dom: HTMLElement | Text, parent: HTMLElement, mode: mode){
     }
 }
 
-export function mount(
+export async function mount(
     this: VDomManagerImpl,
     { vnode, parent, mode = "append", name }: ICreateDomProps
-): HTMLElement {
+): Promise<HTMLElement> {
     if (vnode === null || typeof vnode === "undefined") {
         return parent;
     }
@@ -57,29 +58,35 @@ export function mount(
     if (typeof vnode.type === "function") {
 
         // Check if the component is already mounted
-        if (this.components.has(vnode.type.name)) {
-            const component = this.components.get(vnode.type.name)!;
 
-            this.currentComponent = component;
-            const newVNode = vnode.type(component.vNode!.props, ...component.vNode!.children);
-            component.hookIndex = 0;
+        /* TODO: check existing component remounting: */
+        // if (this.components.has(vnode.type.name)) {
+        //     const component = this.components.get(vnode.type.name)!;
 
-            console.log("NEW VNODE",newVNode);
-            console.log("OLD VNODE",component.vNode);
+        //     // this.currentComponent = component;
+        //     // const newVNode = vnode.type(component.vNode!.props, ...component.vNode!.children);
+        //     // component.hookIndex = 0;
 
-            this.update({
-                oldNode: component.vNode,
-                newVNode: newVNode,
-                ref: component.vNode!.ref!,
-                parent: component.vNode!.ref!.parentElement,
-                index: 0,
-                name: component.name
-            });
+        //     // wait 2 seconds in a await   
+        //     component.jsx = vnode;         
+        //     await scheduleUpdate(component, component.hooks);
 
-            addToDom(component?.vNode!.ref!, parent, mode);
-            this.currentComponent = null;
-            return component?.vNode!.ref!;
-        }
+        //     // console.log("NEW VNODE",newVNode);
+        //     console.log("OLD VNODE",component.vNode);
+
+        //     // this.update({
+        //     //     oldNode: component.vNode,
+        //     //     newVNode: newVNode,
+        //     //     ref: component.vNode!.ref!,
+        //     //     parent: component.vNode!.ref!.parentElement,
+        //     //     index: 0,
+        //     //     name: component.name
+        //     // });
+
+        //     addToDom(component?.vNode!.ref!, parent, mode);
+        //     this.currentComponent = null;
+        //     return component?.vNode!.ref!;
+        // }
 
         const component = React.createComponentInstance(vnode);
         this.components.set(component.name, component);
@@ -90,7 +97,7 @@ export function mount(
         component.isMounted = true;
         component.onMount();
         
-        const newRef = this.mount({ vnode: component.vNode, parent, name: component.name, mode });
+        const newRef = await this.mount({ vnode: component.vNode, parent, name: component.name, mode });
         component.vNode.ref = newRef;
         this.currentComponent = null;
         return newRef;
