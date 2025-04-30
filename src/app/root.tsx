@@ -24,12 +24,7 @@ const Test = () => {
 export default function Root() {
     return (
         <div>
-            <Home>
-                <hr />
-                <h1>Hello World</h1>
-                <p>This is children</p>
-                <hr />
-            </Home>
+            <Home />
         </div>
     );
 }

@@ -27,19 +27,41 @@ export function update(this: VDomManagerImpl, { oldNode, newVNode, ref, parent, 
             - Create a list of actions (add, remove, move, update)
             - Apply the actions to the DOM
         */
+        for (let i = 0; i < Math.max(oldNode.length, newVNode.length); i++) {
 
-        if(!parent){
-            console.warn("Cannot Create new now: Parent is null");
-            return;
+            const newChild = newVNode[i];
+            const oldChild = oldNode[i];
+            const childRef = oldChild?.ref || newChild?.ref || null;
+
+            console.log("========================")
+            console.log("newChild", newChild);
+            console.log("oldChild", oldChild);
+            console.log("parent", parent);
+            console.log("========================")
+
+
+            this.update({
+                oldNode: oldChild,
+                newVNode: newChild,
+                ref: childRef,
+                parent,
+                index: i,
+                name,
+            });
         }
 
-        // remove full array (not a good solution)
-        parent.innerHTML = "";        
+        // if(!parent){
+        //     console.warn("Cannot Create new now: Parent is null");
+        //     return;
+        // }
 
-        // create new array
-        for (const child of newVNode as ReactElement[]) {
-            this.mount({ vnode: child, parent: parent!, name });
-        }
+        // // remove full array (not a good solution)
+        // parent.innerHTML = "";        
+
+        // // create new array
+        // for (const child of newVNode as ReactElement[]) {
+        //     this.mount({ vnode: child, parent: parent!, name });
+        // }
 
         return;
     }
@@ -119,36 +141,34 @@ export function update(this: VDomManagerImpl, { oldNode, newVNode, ref, parent, 
 
     oldNode = oldNode as ReactElement;
     newVNode = newVNode as ReactElement;
-    newVNode.componentName = oldNode.componentName;
+    if(oldNode.componentName)
+        newVNode.componentName = oldNode.componentName;
+
+    if(typeof newVNode.type === "function"){
+        console.log("[ Function component ]", oldNode, newVNode);
+        const newComponent = newVNode.type(newVNode.props, ...newVNode.children);
+        const oldComponent = this.components.get(oldNode.componentName!)!.vNode;
+
+        const componentName = typeof newComponent.type === "function" ? newComponent.type.name : "";
+        this.components.set(componentName, newComponent as unknown as ReactComponentInstance);
+    
+        this.update({
+            oldNode: oldComponent,
+            newVNode: newComponent,
+            ref: ref,
+            parent: ref?.parentElement!,
+            index: 0,
+            name: componentName,
+        });
+    
+        return ;
+    }    
 
     if (oldNode.type !== newVNode.type) {
         console.log("[ Element type difference ]", oldNode, newVNode);
 
         this.mount({ vnode: newVNode, parent: ref!, mode: "replace", name });
         return;
-    }
-    
-    if(typeof newVNode.type === "function"){
-        if(JSON.stringify(oldNode.props) == JSON.stringify(newVNode.props)) return ;
-        
-        // console.log("[ Function difference ]", oldNode, newVNode);
-        // this.mount({ vnode: newVNode, parent: ref!, mode: "replace", name });
-
-        const newComponent = newVNode.type(newVNode.props, ...newVNode.children);
-
-        const componentName = typeof newComponent.type === "function" ? newComponent.type.name : "";
-        this.components.set(componentName, newComponent as unknown as ReactComponentInstance);
-
-        this.update({
-            oldNode: oldNode,
-            newVNode: newComponent,
-            ref: ref,
-            parent: ref?.parentElement!,
-            index: 0,
-            name: componentName,
-        })
-   
-        return ;
     }
     
     // Set props

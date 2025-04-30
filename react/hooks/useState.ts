@@ -43,7 +43,7 @@ export async function scheduleUpdate(component: ReactComponentInstance, states: 
             React.vDomManager.update({
                 oldNode: component.vNode,
                 newVNode,
-                ref: component.vNode.ref!,
+                ref: component.vNode.ref,
                 parent: component.vNode.ref!.parentElement,
                 index: 0,
                 name: component.name

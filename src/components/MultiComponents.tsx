@@ -44,7 +44,7 @@ const Eve = () => {
     );
 };
 
-export default function MultiComponents() {
+export function MultiComponents() {
 
     const [show, setShow] = useState(true);
     const [show2, setShow2] = useState(true);

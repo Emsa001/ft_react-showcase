@@ -11,9 +11,10 @@ interface ICreateDomProps {
     name: string;
 }
 
-function addToDom(dom: HTMLElement | Text, parent: HTMLElement, mode: mode){
-
-    // console.log("addToDom", dom, parent, mode);
+function addToDom(dom: HTMLElement | Text, parent: HTMLElement | null, mode: mode){
+    if(!parent){
+        throw new Error("Parent is null");
+    }
 
     if (mode === "replace") {
         parent.replaceWith(dom);
