@@ -35,6 +35,7 @@ export async function scheduleUpdate(component: ReactComponentInstance, states: 
         }
         
         const newVNode = component.jsx?.type(component.jsx.props, ...component.jsx.children);
+        newVNode.componentName = component.name;
         React.vDomManager.currentComponent = null;
         console.log("New VNode:", newVNode);
         console.log("Old VNode:", component.vNode);
@@ -49,7 +50,9 @@ export async function scheduleUpdate(component: ReactComponentInstance, states: 
             });
             component.vNode = newVNode;
         }
+        console.log(React.vDomManager.components);
     });
+    
 }
 
 // useState implementation

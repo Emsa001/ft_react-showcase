@@ -2,7 +2,6 @@ import React from ".."; // assumes you're importing from `react/index.ts`
 
 const container = document.getElementById("root")!;
 
-let rendered = false;
 async function renderApp() {
     const { default: Root } = await import("../../src/app/root");
 
@@ -11,7 +10,8 @@ async function renderApp() {
     React.vDomManager.components.clear();
     const root = React.createElement(Root);
     React.render(root, container);
-    rendered = true;
+    if(React.vDomManager.isFirstRender)
+        React.vDomManager.isFirstRender = false;
 }
 
 renderApp();
@@ -22,3 +22,8 @@ if (import.meta.webpackHot) {
         await renderApp();
     });
 }
+
+
+// setInterval(() => {
+//     console.log(React.vDomManager.components)
+// }, 1000)

@@ -14,6 +14,7 @@ interface VNode {
     children: VNode[];
     ref: HTMLElement | null;
     key: string | number | null;
+    componentName?: string;
 }
 
 declare function h(

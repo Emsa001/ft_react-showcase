@@ -4,6 +4,7 @@ import { update } from "./update";
 import { removeProp, setProps } from "./props";
 
 export class VDomManagerImpl implements VDomManager {
+    isFirstRender: boolean = true;
     rootDom: HTMLElement | null = null;
     components: Map<string, ReactComponentInstance> = new Map();
     currentComponent: ReactComponentInstance | null = null;

@@ -56,32 +56,28 @@ export async function mount(
     }
 
     if (typeof vnode.type === "function") {
-        // Check if the component is already mounted
 
-        /* TODO: check existing component remounting: */
-        // if (this.currentComponent && this.components.has(this.currentComponent.name)) {
-        //     const component = this.currentComponent;
-        //     console.log("Component already mounted:", component.name);
-        //     // console.log("Component already mounted:", component.name); 
-        //     // this.currentComponent = component;
-        //     // const newVNode = vnode.type(component.vNode!.props, ...component.vNode!.children);
-        //     // component.hookIndex = 0;
+        /*
+         * Check if the component is already mounted, if so, update it
+        */
+        const currentComponent = vnode.componentName && this.components.get(vnode.componentName);
+        if (currentComponent) {
+            await scheduleUpdate(currentComponent, currentComponent.hooks);
+            addToDom(currentComponent.vNode!.ref!, parent, mode);
 
-        //     // component.jsx = vnode;         
-        //     // // await scheduleUpdate(component, component.hooks);
-        //     // console.log("OLD VNODE",component.vNode);
+            return currentComponent.vNode!.ref!;
+        }
 
-        //     // // addToDom(component.vNode!.ref!, parent, mode);
-        //     // this.currentComponent = null;
-        //     // return component.vNode!.ref!;
-        //     return component.vNode!.ref!;
-        // }
+        /*
+         * Component is new, create a new instance and mount
+        */
 
         const component = React.createComponentInstance(vnode);
         this.components.set(component.name, component);
                 
         this.currentComponent = component;
         component.vNode = vnode.type(vnode.props, ...vnode.children);
+        component.vNode.componentName = component.name;
         
         component.isMounted = true;
         component.onMount();

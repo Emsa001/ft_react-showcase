@@ -12,7 +12,7 @@ export function useStaticHook<T>(name: string, initialState: T): [T, (value: T |
     const component = React.vDomManager.currentComponent;
 
     if (!component) {
-        throw new Error("useState must be called within a component");
+        throw new Error("useStatic must be called within a component");
     }
     
     let hook = React.vDomManager.staticStates.get(name);

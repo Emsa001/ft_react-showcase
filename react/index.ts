@@ -44,6 +44,9 @@ class FtReact {
         const name = !React.vDomManager.components.has(element.type.name)
             ? element.type.name
             : element.type.name + Math.random().toString(36).substring(2, 15);
+
+        element.componentName = name;
+
         return {
             name: name,
             isMounted: false,
@@ -63,6 +66,7 @@ class FtReact {
             },
             onUnmount() {
                 console.log("Component unmounted:", this.name);
+                this.vNode?.ref?.remove();
                 React.vDomManager.components.delete(this.name);
                 React.vDomManager.staticComponents.delete(this.name);
                 this.queueFunctions.forEach((fn) => fn());
@@ -73,8 +77,6 @@ class FtReact {
                 this.jsx = null;
                 this.hooks = [];
                 this.hookIndex = 0;
-
-                console.log(React.vDomManager.components);
             },
             onUpdate() {
                 console.log("Updating component:", this.name);
@@ -108,6 +110,8 @@ class FtReact {
      */
     async render(element: ReactElement, container: HTMLElement) {
         const rootComponent = this.renderComponent(element);
+        this.vDomManager.components.set(rootComponent.name, rootComponent);
+        this.vDomManager.currentComponent = rootComponent;
 
         this.vDomManager.rootDom = await this.vDomManager.mount({
             vnode: rootComponent.vNode!,
