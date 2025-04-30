@@ -33,12 +33,11 @@ export function update(this: VDomManagerImpl, { oldNode, newVNode, ref, parent, 
             const oldChild = oldNode[i];
             const childRef = oldChild?.ref || newChild?.ref || null;
 
-            console.log("========================")
-            console.log("newChild", newChild);
-            console.log("oldChild", oldChild);
-            console.log("parent", parent);
-            console.log("========================")
-
+            // console.log("========================")
+            // console.log("newChild", newChild);
+            // console.log("oldChild", oldChild);
+            // console.log("parent", parent);
+            // console.log("========================")
 
             this.update({
                 oldNode: oldChild,
@@ -48,6 +47,7 @@ export function update(this: VDomManagerImpl, { oldNode, newVNode, ref, parent, 
                 index: i,
                 name,
             });
+
         }
 
         // if(!parent){
@@ -73,7 +73,6 @@ export function update(this: VDomManagerImpl, { oldNode, newVNode, ref, parent, 
         }
 
         console.log("[ Old node is null ]", oldNode, newVNode);
-
         this.mount({ vnode: newVNode, parent: parent, mode: "append", name });
         return;
     }
@@ -82,7 +81,7 @@ export function update(this: VDomManagerImpl, { oldNode, newVNode, ref, parent, 
         console.log("[ New node is null ]", oldNode, newVNode);
 
         if(typeof oldNode === "object" && !Array.isArray(oldNode) && typeof oldNode.type === "function"){
-            this.components.get(oldNode.componentName!)?.onUnmount();
+            this.components.get(oldNode.componentName!)!.onUnmount();
             return ;
         }
 
@@ -98,7 +97,7 @@ export function update(this: VDomManagerImpl, { oldNode, newVNode, ref, parent, 
         
         if (newVNode === false) {
             if(typeof oldNode === "object" && !Array.isArray(oldNode) && typeof oldNode.type === "function"){
-                this.components.get(oldNode.componentName!)?.onUnmount();
+                this.components.get(oldNode.componentName!)!.onUnmount();
                 return ;
             }
             if (oldNode) {
@@ -115,7 +114,6 @@ export function update(this: VDomManagerImpl, { oldNode, newVNode, ref, parent, 
         }
 
         const previousChild = parent.childNodes[index - 1] as HTMLElement || parent.lastChild
-        console.log(index - 1);
         if(index -1 < 0){
             this.mount({ vnode: newVNode, parent: parent as HTMLElement, mode: "before", name });
         }else{
@@ -144,25 +142,31 @@ export function update(this: VDomManagerImpl, { oldNode, newVNode, ref, parent, 
     if(oldNode.componentName)
         newVNode.componentName = oldNode.componentName;
 
-    if(typeof newVNode.type === "function"){
-        console.log("[ Function component ]", oldNode, newVNode);
+    if (typeof newVNode.type === "function") {   
         const newComponent = newVNode.type(newVNode.props, ...newVNode.children);
-        const oldComponent = this.components.get(oldNode.componentName!)!.vNode;
-
+        newComponent.componentName = newVNode.componentName;
+        const oldComponent = this.components.get(oldNode.componentName!);
         const componentName = typeof newComponent.type === "function" ? newComponent.type.name : "";
-        this.components.set(componentName, newComponent as unknown as ReactComponentInstance);
     
+        console.log("[ Function component ]", newComponent, oldComponent?.vNode);
+        
         this.update({
-            oldNode: oldComponent,
+            oldNode: oldComponent?.vNode,
             newVNode: newComponent,
             ref: ref,
             parent: ref?.parentElement!,
             index: 0,
             name: componentName,
         });
+
+
+        // TODO: if something doesn't work correctly, probably because of it
+        oldComponent!.vNode!.children = newComponent.children;
+        oldComponent!.vNode!.componentName = componentName;
     
-        return ;
-    }    
+        return;
+    }
+      
 
     if (oldNode.type !== newVNode.type) {
         console.log("[ Element type difference ]", oldNode, newVNode);

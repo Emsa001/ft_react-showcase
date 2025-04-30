@@ -13,7 +13,8 @@ import { ArrayComponents } from "../../components/ArrayComponents";
 export default function Home() {
     return (
         <div>
-            <ArrayComponents />
+            <h1>Ellen is Nerd</h1>
+            <MultiComponents />
         </div>
     );
 }
