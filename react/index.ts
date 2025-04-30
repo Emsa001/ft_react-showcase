@@ -7,7 +7,7 @@ import { useStaticHook } from "./hooks/useStatic";
 import { useRefHook } from "./hooks/useRef";
 import { isValidElementMethod } from "./methods/isValidElement";
 import { cloneElementMethod } from "./methods/cloneElement";
-import "./render/hot"
+import "./render/hot";
 
 class FtReact {
     public vDomManager: VDomManagerImpl;
@@ -19,18 +19,14 @@ class FtReact {
     /**
      * Creates a Virtual Node
      */
-    createElement(
-        type: string | ComponentType,
-        props: Props = {},
-        ...children: VNode[]
-    ): VNode {
+    createElement(type: string | ComponentType, props: Props = {}, ...children: VNode[]): VNode {
         const { key = null, ...restProps } = props || {};
-    
+
         const finalProps = {
             ...restProps,
             children, // Inject children into props
         };
-    
+
         return {
             type,
             props: finalProps,
@@ -39,13 +35,17 @@ class FtReact {
             key,
         };
     }
-    
+
     createComponentInstance(element: ReactElement): ReactComponentInstance {
         if (typeof element.type !== "function") {
             throw new Error("Invalid component type");
         }
+
+        const name = !React.vDomManager.components.has(element.type.name)
+            ? element.type.name
+            : element.type.name + Math.random().toString(36).substring(2, 15);
         return {
-            name: element.type.name,
+            name: name,
             isMounted: false,
             isUpdating: false,
 
@@ -73,6 +73,8 @@ class FtReact {
                 this.jsx = null;
                 this.hooks = [];
                 this.hookIndex = 0;
+
+                console.log(React.vDomManager.components);
             },
             onUpdate() {
                 console.log("Updating component:", this.name);
@@ -84,11 +86,12 @@ class FtReact {
         const component = this.createComponentInstance(element);
         this.vDomManager.currentComponent = component;
 
-        if(!this.isValidElement(element)){
+        if (!this.isValidElement(element)) {
+            this.vDomManager.currentComponent = null;
             throw new Error("Invalid element type");
         }
 
-        if(typeof element.type === "string") {
+        if (typeof element.type === "string") {
             component.vNode = this.createElement(element.type, element.props, ...element.children);
             this.vDomManager.currentComponent = null;
             return component;
@@ -112,8 +115,7 @@ class FtReact {
             name: rootComponent.name,
         });
 
-        console.log(this.vDomManager.components)
-
+        console.log(this.vDomManager.components);
         container.appendChild(this.vDomManager.rootDom!);
     }
 
@@ -122,16 +124,21 @@ class FtReact {
      */
     useState = <T>(initialState: T) => useStateHook(initialState);
     useStatic = <T>(name: string, initialState: T) => useStaticHook(name, initialState);
-    useEffect = async (callback: () => void, deps?: any[]): Promise<void> => useEffectHook(callback, deps);
-    useLayoutEffect = async (callback: () => void, deps?: any[]): Promise<void> => useEffectHook(callback, deps);
+    useEffect = async (callback: () => void, deps?: any[]): Promise<void> =>
+        useEffectHook(callback, deps);
+    useLayoutEffect = async (callback: () => void, deps?: any[]): Promise<void> =>
+        useEffectHook(callback, deps);
     useRef = <T>(initialValue: T) => useRefHook(initialValue);
 
     /*
      * Methods
      */
     isValidElement = (object: unknown): object is ReactElement => isValidElementMethod(object);
-    cloneElement = (element: ReactElement, props: Record<string, unknown>, ...children: ReactElement[]) =>
-        cloneElementMethod(element, props, ...children);
+    cloneElement = (
+        element: ReactElement,
+        props: Record<string, unknown>,
+        ...children: ReactElement[]
+    ) => cloneElementMethod(element, props, ...children);
 }
 
 const React = new FtReact();

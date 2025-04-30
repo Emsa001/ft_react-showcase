@@ -61,7 +61,8 @@ export function update(this: VDomManagerImpl, { oldNode, newVNode, ref, parent, 
         console.log("[ New node is null ]", oldNode, newVNode);
 
         if(typeof oldNode === "object" && !Array.isArray(oldNode) && typeof oldNode.type === "function"){
-            this.components.get(oldNode.type.name)?.onUnmount();
+            // this.components.get(oldNode.type.name)?.onUnmount();
+            this.currentComponent?.onUnmount();
         }
 
         ref?.remove();
@@ -78,7 +79,8 @@ export function update(this: VDomManagerImpl, { oldNode, newVNode, ref, parent, 
             if (oldNode) this.mount({ vnode: newVNode, parent: ref!, mode: "replace", name });
 
             if(typeof oldNode === "object" && !Array.isArray(oldNode) && typeof oldNode.type === "function"){
-                this.components.get(oldNode.type.name)?.onUnmount();
+                // this.components.get(oldNode.type.name)?.onUnmount();
+                this.currentComponent?.onUnmount();
             }
             return;
         }

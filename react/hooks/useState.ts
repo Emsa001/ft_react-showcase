@@ -30,6 +30,7 @@ export async function scheduleUpdate(component: ReactComponentInstance, states: 
         component.hookIndex = 0;
         
         if (typeof component.jsx?.type !== "function") {
+            React.vDomManager.currentComponent = null;
             throw new Error("Invalid component type");
         }
         
