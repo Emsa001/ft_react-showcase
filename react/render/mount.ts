@@ -85,7 +85,7 @@ export async function mount(
         
         const newRef = await this.mount({ vnode: component.vNode, parent, name: component.name, mode });
         component.vNode.ref = newRef;
-        this.currentComponent = null;
+        // this.currentComponent = null;
         return newRef;
     }
 

@@ -14,7 +14,7 @@ export default function Home() {
     return (
         <div>
             <h1>Ellen is Nerd</h1>
-            <MultiComponents />
+            <BooleansMadnessLevels />
         </div>
     );
 }

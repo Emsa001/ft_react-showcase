@@ -89,19 +89,19 @@ class FtReact {
         this.vDomManager.currentComponent = component;
 
         if (!this.isValidElement(element)) {
-            this.vDomManager.currentComponent = null;
+            // this.vDomManager.currentComponent = null;
             throw new Error("Invalid element type");
         }
 
         if (typeof element.type === "string") {
             component.vNode = this.createElement(element.type, element.props, ...element.children);
-            this.vDomManager.currentComponent = null;
+            // this.vDomManager.currentComponent = null;
             return component;
         }
 
         component.vNode = element.type(element.props, ...element.children);
 
-        this.vDomManager.currentComponent = null;
+        // this.vDomManager.currentComponent = null;
         return component;
     }
 

@@ -1,4 +1,4 @@
-import { ReactComponentInstance } from "react/types/types";
+import React from "..";
 import { VDomManagerImpl } from "./manager";
 
 interface IUpdateProps {
@@ -11,6 +11,43 @@ interface IUpdateProps {
 }
 
 export let componentsInUse: string[] = [];
+
+const needUpdate = (oldProps: any, newProps: any) => {
+    if (oldProps === newProps) return false;
+
+    const oldKeys = Object.keys(oldProps);
+    const newKeys = Object.keys(newProps);
+
+    if (oldKeys.length !== newKeys.length) return true;
+
+    for (const key of oldKeys) {
+        if (key === "children" || key === "ref") continue;
+        if (oldProps[key] !== newProps[key]) return true;
+    }
+
+    return false;
+}
+
+const unMountFunctionChild = (node: any) => {
+    // Check if the current node's type is a function
+    if (typeof node.type === "function") {
+        React.vDomManager.components.get(node.componentName!)!.onUnmount();
+    }
+
+    // If the node has children, recursively check them
+    if (Array.isArray(node.children)) {
+        for (const child of node.children) {
+            // Handle cases where children are nested arrays
+            if (Array.isArray(child)) {
+                for (const nestedChild of child) {
+                    unMountFunctionChild(nestedChild);
+                }
+            } else {
+                unMountFunctionChild(child);
+            }
+        }
+    }
+};
 
 export function update(this: VDomManagerImpl, { oldNode, newVNode, ref, parent, index, name }: IUpdateProps) {
     if (Array.isArray(oldNode) && Array.isArray(newVNode)) {
@@ -101,7 +138,14 @@ export function update(this: VDomManagerImpl, { oldNode, newVNode, ref, parent, 
                 return ;
             }
             if (oldNode) {
-                console.warn("[ Old node is boolean ]", oldNode, newVNode);
+                console.warn("[ oldNode did exist ]", oldNode, newVNode);
+                if(typeof oldNode === "object" && !Array.isArray(oldNode)){
+                    const allChildren = Array.isArray(oldNode.children) ? oldNode.children : [];
+                    for (const child of allChildren) {
+                        unMountFunctionChild(child);
+                    }
+                }
+
                 // this.mount({ vnode: newVNode, parent: ref!, mode: "replace", name });
                 ref?.remove();
             }
@@ -143,12 +187,23 @@ export function update(this: VDomManagerImpl, { oldNode, newVNode, ref, parent, 
         newVNode.componentName = oldNode.componentName;
 
     if (typeof newVNode.type === "function") {   
+
+        // Compare props to check if function needs an update;
+        const oldProps = oldNode.props || {};
+        const newProps = newVNode.props || {};
+        if(!needUpdate(oldProps, newProps)){
+            console.log("[ Function component ], no update necessary", oldNode, newVNode);
+            return;
+        }
+       
         const newComponent = newVNode.type(newVNode.props, ...newVNode.children);
         newComponent.componentName = newVNode.componentName;
         const oldComponent = this.components.get(oldNode.componentName!);
         const componentName = typeof newComponent.type === "function" ? newComponent.type.name : "";
     
         console.log("[ Function component ]", newComponent, oldComponent?.vNode);
+
+        this.currentComponent = oldComponent!;
         
         this.update({
             oldNode: oldComponent?.vNode,

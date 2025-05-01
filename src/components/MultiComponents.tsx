@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
-const Bob = () => {
+const Bob = ({ title }: { title: string }) => {
     const [count, setCount] = useState(0);
 
     return (
         <div>
-            <p>Bob</p>
+            <p>{title}</p>
             <p>Count: {count}</p>
             <button onClick={() => setCount(count + 1)}>Increment</button>
         </div>
@@ -45,14 +45,13 @@ const Eve = () => {
 };
 
 export function MultiComponents() {
-
     const [show, setShow] = useState(true);
     const [show2, setShow2] = useState(true);
 
     return (
         <div>
-            {show && <Bob />}
-            {show2 && <Bob />}
+            {show && <Bob title="bob 1" />}
+            {show2 && <Bob title="bob 2" />}
             <p>Hello people!</p>
 
             <hr />

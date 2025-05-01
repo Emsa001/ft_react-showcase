@@ -30,13 +30,13 @@ export async function scheduleUpdate(component: ReactComponentInstance, states: 
         component.hookIndex = 0;
         
         if (typeof component.jsx?.type !== "function") {
-            React.vDomManager.currentComponent = null;
+            // React.vDomManager.currentComponent = null;
             throw new Error("Invalid component type");
         }
         
         const newVNode = component.jsx?.type(component.jsx.props, ...component.jsx.children);
         newVNode.componentName = component.name;
-        React.vDomManager.currentComponent = null;
+        // React.vDomManager.currentComponent = null;
         console.log("New VNode:", newVNode);
         console.log("Old VNode:", component.vNode);
         if (newVNode && component.vNode) {
