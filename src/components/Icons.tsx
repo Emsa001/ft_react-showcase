@@ -26,8 +26,9 @@ interface IconProps {
 export const Icon = ({ icon, width, height, size, color }: IconProps) => {
 
     const iconElement = icon() as unknown as ReactElement;
-    const viewBox = iconElement.props.attr.viewBox
-    const path = iconElement.props.children[0][0]
+    const viewBox = iconElement.props.attr.viewBox;
+
+    console.log(iconElement);
 
     return (
         <svg
@@ -37,7 +38,9 @@ export const Icon = ({ icon, width, height, size, color }: IconProps) => {
             fill={color || "currentColor"}
             viewBox={viewBox}
         >
-            {path}
+            {iconElement.children.map((child: any) => {
+                return child;
+            })}
         </svg>
     );
 };

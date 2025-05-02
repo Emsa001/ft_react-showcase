@@ -48,6 +48,22 @@ export async function mount(
     }
 
     if (typeof vnode.type === "function") {
+
+        /*
+         * Check if the component is already mounted, if so, update it
+        */
+
+        // const currentComponent = vnode.componentName && this.components.get(vnode.componentName);
+        // console.log("Component", currentComponent);
+        // if (currentComponent) {
+        //     console.log("Updating component", currentComponent.name);
+        //     await scheduleUpdate(currentComponent, currentComponent.hooks);
+        //     addToDom(currentComponent.vNode!.ref!, parent, mode);
+
+        //     return currentComponent.vNode!.ref!;
+        // }
+
+
         const component = React.createComponentInstance(vnode);
 
         this.components.set(component.name, component);
