@@ -1,10 +1,10 @@
 // global.d.ts
 
 type ReactNode = ReactElement | string | number | boolean | null | undefined;
-type ReactElement = VNode; // React uses ReactElement for JSX return types
+type ReactElement = VNode;
 
 interface Props {
-    key?: string | number | null; // React allows keys
+    key?: string | number | null;
     [propName: string]: any;
 }
 
@@ -27,7 +27,7 @@ declare namespace JSX {
     type Element = VNode;
 
     interface ElementAttributesProperty {
-        props: {}; // Tells TS to look in `props` for prop validation
+        props: {};
     }
 
     interface IntrinsicAttributes {

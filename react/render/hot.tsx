@@ -1,11 +1,11 @@
-import React from ".."; // assumes you're importing from `react/index.ts`
+import React from "..";
 
 const container = document.getElementById("root")!;
 
 async function renderApp() {
     const { default: Root } = await import("../../src/app/root");
 
-    container.innerHTML = ""; // Clear the container before rendering
+    container.innerHTML = "";
 
     React.vDomManager.components.clear();
     const root = React.createElement(Root);
@@ -22,8 +22,3 @@ if (import.meta.webpackHot) {
         await renderApp();
     });
 }
-
-
-// setInterval(() => {
-//     console.log(React.vDomManager.components)
-// }, 1000)

@@ -53,16 +53,7 @@ export function update(this: VDomManagerImpl, { oldNode, newVNode, ref, parent, 
     if (Array.isArray(oldNode) && Array.isArray(newVNode)) {
         
         /* 
-            CURRENT IMPLEMENTATION IS VERY BAD, DO NOT USE IN PRODUCTION
-            
-            - FULL ARRAY REPLACEMENT
-            - HUGE ISSUE FOR PERFORMANCE
-            - REMOUNTS ALL CHILDREN
-
-            TODO: Handle array diffing
-            - Compare the two arrays and find the differences
-            - Create a list of actions (add, remove, move, update)
-            - Apply the actions to the DOM
+            TODO: Key checking
         */
         for (let i = 0; i < Math.max(oldNode.length, newVNode.length); i++) {
 
