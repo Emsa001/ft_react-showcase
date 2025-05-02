@@ -1,22 +1,23 @@
 import { ReactComponentInstance, RouterProps } from "./types/types";
 import { VDomManagerImpl } from "./render/manager";
-import { useStateHook } from "./hooks/useState";
-import { useEffectHook } from "./hooks/useEffect";
-import { useStaticHook } from "./hooks/useStatic";
-import { useRefHook } from "./hooks/useRef";
+
 import { isValidElementMethod } from "./methods/isValidElement";
 import { cloneElementMethod } from "./methods/cloneElement";
-import { useContextHook } from "./hooks/useContext";
-import { Context } from "vm";
 import { createContextMethod } from "./methods/createContext";
 import { createComponentInstanceMethod } from "./methods/createComponentInstance";
 import { renderComponentMethod } from "./methods/renderComponent";
 import { renderMethod } from "./methods/render";
 import { createElementMethod } from "./methods/createElement";
+import { BrowserRouterMethod, RouterMethod } from "./methods/BrowserRouter";
+
+import { useStateHook } from "./hooks/useState";
+import { useEffectHook } from "./hooks/useEffect";
+import { useStaticHook } from "./hooks/useStatic";
+import { useRefHook } from "./hooks/useRef";
+import { useContextHook } from "./hooks/useContext";
+import { useNavigationHook } from "./hooks/useNavigation";
 
 import "./render/hot";
-import { BrowserRouterMethod, RouterMethod } from "./methods/BrowserRouter";
-import { useNavigationHook } from "./hooks/useNavigation";
 
 class FtReact {
     public vDomManager: VDomManagerImpl;
@@ -25,6 +26,9 @@ class FtReact {
         this.vDomManager = new VDomManagerImpl();
     }
 
+    /*
+     * Methods
+     */
 
     createElement = (
         type: string | ComponentType,
@@ -38,7 +42,7 @@ class FtReact {
     ) => cloneElementMethod(element, props, ...children);
     isValidElement = (object: unknown): object is ReactElement => isValidElementMethod(object);
 
-    createContext = <T>(defaultValue: T): Context => createContextMethod(defaultValue);
+    createContext = <T>(defaultValue: T) => createContextMethod(defaultValue);
     createComponentInstance = (element: ReactElement): ReactComponentInstance =>
         createComponentInstanceMethod(element);
 
@@ -49,6 +53,10 @@ class FtReact {
 
     BrowserRouter = (props: { children?: ReactElement[] }) => BrowserRouterMethod(props);
     RouterMethod = (props: RouterProps) => RouterMethod(props);
+
+    /*
+     * Hooks
+     */
 
     useState = <T>(initialState: T) => useStateHook(initialState);
     useStatic = <T>(name: string, initialState: T) => useStaticHook(name, initialState);
@@ -62,12 +70,20 @@ class FtReact {
 
 
     /*
-     * Methods
+     * Custom Methods
      */
+
+    setTitle = (title: string) => {
+        document.title = title;
+    };
 }
 
 const React = new FtReact();
 
+
+/*
+ * Methods
+ */
 
 export const createElement = React.createElement;
 export const cloneElement = React.cloneElement;
@@ -75,6 +91,10 @@ export const isValidElement = React.isValidElement;
 export const createContext = React.createContext;
 export const BrowserRouter = React.BrowserRouter;
 export const Router = React.RouterMethod;
+
+/*
+ * Hooks
+ */
 
 export const useState = React.useState;
 export const useEffect = React.useEffect;
@@ -84,11 +104,15 @@ export const useRef = React.useRef;
 export const useContext = React.useContext;
 export const useNavigation = React.useNavigation;
 
-// export const createContext = React.createContext;
-// export const useContext = React.useContext;
-// export const setTitle = React.setTitle;
+/*
+ * Custom Methods
+ */
+
+export const setTitle = React.setTitle;
+
+
+/* ========================================================== */
 
 export * from "./types/types";
-
 export const IS_DEVELOPMENT = false;
 export default React;

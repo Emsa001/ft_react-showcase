@@ -1,30 +1,21 @@
-import React, { useEffect, useNavigation, useState, useStatic } from "react";
-import { BooleanSimple, BooleanSimple2 } from "../../components/BooleanSimple";
-import { BooleansMadnessLevels } from "../../components/BooleansMadness";
-import { StateChaosUltimate } from "../../components/StateChaosUltimate";
-import { StateApocalypse } from "../../components/StateApocalypse";
-import { ListenerSimple } from "../../components/ListenerSimple";
-import { StaticStateTest, StaticStateTest2 } from "../../components/StaticStateTest";
-import { ReactToasts } from "../../components/ReactToasts";
-import { MultiComponents } from "../../components/MultiComponents";
-import { ArraySimple } from "../../components/ArraySimple";
-import { ArrayComponents } from "../../components/ArrayComponents";
-import { CustomHooks } from "../../components/CustomHooks";
-import { CustomProvider } from "../../components/CustomProvider";
-import { StaticStateSimple } from "../../components/StaticStateSimple";
+import React, { useEffect } from 'react';
 
-export default function Home() {
+const App = () => {
+    const [count, setCount] = React.useState<number>(0);
+    const [name, setName] = React.useState<string>("Anonymous");
 
-    const [isVisible, setIsVisible] = useState(true);
-    const navigate = useNavigation();
-
-    const goToProfile = () => {
-        navigate("/profile");
-    };
+    useEffect(() => {
+        React.setTitle(`Hello, ${name}!`);
+    }, [name]);
 
     return (
         <div>
-            <StateChaosUltimate />
+            <h1>Hello, {name}!</h1>
+            <p>Number: {count}</p>
+            <button onClick={() => setCount((prev) => prev + 1)}>Increment</button>
+            <input value={name} onChange={(e: any) => setName(e.target.value)} />
         </div>
     );
-}
+};
+
+export default App;

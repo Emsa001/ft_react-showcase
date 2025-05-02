@@ -25,21 +25,22 @@ export async function scheduleUpdate(component: ReactComponentInstance, states: 
         
         component.isUpdating = false;
         
-        // Re-render the component with the updated state
         React.vDomManager.currentComponent = component;
         component.hookIndex = 0;
         
         if (typeof component.jsx?.type !== "function") {
-            // React.vDomManager.currentComponent = null;
             throw new Error("Invalid component type");
         }
         
         const newVNode = component.jsx?.type(component.jsx.props, ...component.jsx.children);
         newVNode.componentName = component.name;
-        // React.vDomManager.currentComponent = null;
         if(IS_DEVELOPMENT){
             console.log("New VNode:", newVNode);
             console.log("Old VNode:", component.vNode);
+        }
+
+        if(!component.vNode?.ref){
+            throw new Error("Component ref is null, are you sure the component has a parent?");
         }
         
         if (newVNode && component.vNode) {

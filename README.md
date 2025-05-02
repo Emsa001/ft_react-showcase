@@ -10,12 +10,12 @@ The idea for this project came from my final project at 42 coding school (`ft_tr
 ## Features
 
 - **Routing**: Basic routing capabilities for navigation between different pages.
-- **Hooks**: Implemented `useState`, `useStatic`, `useEffect`, `useRef`, and `useContext`.
+- **Hooks**: Implemented `useState`, `useStatic`, `useEffect`, `useRef`, `useContext` and `useNavigation`.
 - **Context and Providers**: A basic context API for managing global state.
 
 ### What is `useStatic`?
 
-`useStatic` is a custom hook I always wanted to have in React, so I implemented it here. It works like `useState`, except it retains its value across the entire application—even and can be shared between components.
+`useStatic` is a custom hook I always wanted to have in React, so I implemented it here. It works like `useState`, except it retains its value across the entire application and can be shared between components.
 
 **Example:**
 
@@ -107,14 +107,14 @@ npm run dev
 Here’s a basic example of how to use `ft_react`:
 
 ```tsx
-import React, { useEffect } from 'react';
+import React, { useState, useEffect, setTitle } from 'react';
 
 const App = () => {
-    const [count, setCount] = React.useState(0);
-    const [name, setName] = React.useState("Anonymous");
+    const [count, setCount] = useState<number>(0);
+    const [name, setName] = useState<string>("Anonymous");
 
     useEffect(() => {
-        React.setTitle(`Hello, ${name}!`);
+        setTitle(`Hello, ${name}!`);
     }, [name]);
 
     return (
@@ -122,7 +122,7 @@ const App = () => {
             <h1>Hello, {name}!</h1>
             <p>Number: {count}</p>
             <button onClick={() => setCount((prev) => prev + 1)}>Increment</button>
-            <input value={name} onChange={(e) => setName(e.target.value)} />
+            <input value={name} onChange={(e: any) => setName(e.target.value)} />
         </div>
     );
 };
