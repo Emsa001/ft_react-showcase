@@ -53,7 +53,6 @@ class FtReact {
     useState = <T>(initialState: T) => useStateHook(initialState);
     useStatic = <T>(name: string, initialState: T) => useStaticHook(name, initialState);
     useEffect = async (callback: () => void, deps?: any[]): Promise<void> => useEffectHook(callback, deps);
-    useLayoutEffect = async (callback: () => void, deps?: any[]): Promise<void> => useEffect(callback, deps);
     useRef = <T>(initialValue: T) => useRefHook(initialValue);
     useContext = (context: any) => useContextHook(context);
     useNavigation = () => useNavigationHook();
@@ -90,7 +89,6 @@ export const Router = React.RouterMethod;
 
 export const useState = React.useState;
 export const useEffect = React.useEffect;
-export const useLayoutEffect = React.useLayoutEffect;
 export const useStatic = React.useStatic;
 export const useRef = React.useRef;
 export const useContext = React.useContext;

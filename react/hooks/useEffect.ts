@@ -1,13 +1,6 @@
 import React from "..";
 import { useRefHook } from "./useRef";
 
-interface IEffectCallback {
-    (): (() => void) | void;
-}
-
-type TEffectCallback = IEffectCallback | (() => void);
-type TDependencyList = any[];
-
 const checkDependenciesChanged = (prevDeps: TDependencyList, deps: TDependencyList): boolean => {
     if (prevDeps.length !== deps.length) {
         console.warn(

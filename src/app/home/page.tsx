@@ -27,6 +27,7 @@ const App = () => {
     const [staticTest, setStaticTest] = useStatic("username", 50);
     const [isVisible, setIsVisible] = useState(true);
 
+
     return (
         <div>
 
@@ -40,9 +41,9 @@ const App = () => {
             </button>
 
             <p>Static value: {staticTest}</p>
-            
         </div>
     );
+
 };
 
 export default App;
