@@ -11,6 +11,5 @@ export async function renderMethod(element: ReactElement, container: HTMLElement
         name: rootComponent.name,
     });
 
-    console.log(React.vDomManager.components);
     container.appendChild(React.vDomManager.rootDom!);
 }

@@ -11,12 +11,17 @@ import { ArraySimple } from "../../components/ArraySimple";
 import { ArrayComponents } from "../../components/ArrayComponents";
 import { CustomHooks } from "../../components/CustomHooks";
 import { CustomProvider } from "../../components/CustomProvider";
+import { StaticStateSimple } from "../../components/StaticStateSimple";
 
 export default function Home() {
+
+    const [isVisible, setIsVisible] = useState(true);
+
     return (
         <div>
-            <StaticStateTest />
-            {/* <CustomProvider /> */}
+            {/* <StaticStateTest /> */}
+            {isVisible && <StaticStateSimple />}
+            <button onClick={() => setIsVisible((prev) => !prev)}>Toggle</button>
         </div>
     );
 }

@@ -23,9 +23,9 @@ export const useUser = (): UserContextType => {
 export const UserProvider = ({ children }: { children?: any }) => {
     const [user, setUser] = useState("");
 
-    useEffect(() => {
-        setUser("Emanuel");
-    }, []);
+    // useEffect(() => {
+    //     setUser("Emanuel");
+    // }, []);
 
     return (
         <div>
