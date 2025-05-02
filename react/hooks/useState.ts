@@ -1,4 +1,4 @@
-import { Hook, ReactComponentInstance } from "react";
+import { Hook, IS_DEVELOPMENT, ReactComponentInstance } from "react";
 import React from "../";
 
 // Process all queued state updates for the hook
@@ -37,8 +37,11 @@ export async function scheduleUpdate(component: ReactComponentInstance, states: 
         const newVNode = component.jsx?.type(component.jsx.props, ...component.jsx.children);
         newVNode.componentName = component.name;
         // React.vDomManager.currentComponent = null;
-        console.log("New VNode:", newVNode);
-        console.log("Old VNode:", component.vNode);
+        if(IS_DEVELOPMENT){
+            console.log("New VNode:", newVNode);
+            console.log("Old VNode:", component.vNode);
+        }
+        
         if (newVNode && component.vNode) {
             React.vDomManager.update({
                 oldNode: component.vNode,
@@ -50,7 +53,7 @@ export async function scheduleUpdate(component: ReactComponentInstance, states: 
             });
             component.vNode = newVNode;
         }
-        console.log(React.vDomManager.components);
+        if(IS_DEVELOPMENT) console.log(React.vDomManager.components);
     });
     
 }

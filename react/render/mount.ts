@@ -30,7 +30,7 @@ function addToDom(dom: HTMLElement | Text, parent: HTMLElement | null, mode: mod
 export async function mount(
     this: VDomManagerImpl,
     { vnode, parent, mode = "append", name }: ICreateDomProps
-): Promise<HTMLElement> {
+): Promise<HTMLElement | null> {
     if (vnode === null || typeof vnode === "undefined") {
         return parent;
     }
@@ -61,6 +61,7 @@ export async function mount(
         /*
          * Check if the component is already mounted, if so, update it
         */
+
         const currentComponent = vnode.componentName && this.components.get(vnode.componentName);
         if (currentComponent) {
             await scheduleUpdate(currentComponent, currentComponent.hooks);
@@ -74,10 +75,12 @@ export async function mount(
         */
 
         const component = React.createComponentInstance(vnode);
+        
         this.components.set(component.name, component);
-                
         this.currentComponent = component;
         component.vNode = vnode.type(vnode.props, ...vnode.children);
+
+        if(component.vNode === null) return null;
         component.vNode.componentName = component.name;
         
         component.isMounted = true;

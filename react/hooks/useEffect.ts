@@ -10,7 +10,9 @@ type TDependencyList = any[];
 
 const checkDependenciesChanged = (prevDeps: TDependencyList, deps: TDependencyList): boolean => {
     if (prevDeps.length !== deps.length) {
-        console.warn("The length of the dependencies array must remain consistent between renders.");
+        console.warn(
+            "The length of the dependencies array must remain consistent between renders."
+        );
     }
     return deps.some((dep, index) => !Object.is(dep, prevDeps[index]));
 };
@@ -38,7 +40,6 @@ export function useEffectHook(callback: TEffectCallback, deps?: TDependencyList)
     } else if (deps && prevDeps.current && !checkDependenciesChanged(prevDeps.current, deps)) {
         return;
     } else {
-        // dependencies changed, cleanup previous effect
         if (typeof cleanupRef.current === "function") {
             cleanupRef.current();
             component.queueFunctions.delete(cleanupRef.current);

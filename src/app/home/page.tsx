@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useStatic } from "react";
+import React, { useEffect, useNavigation, useState, useStatic } from "react";
 import { BooleanSimple, BooleanSimple2 } from "../../components/BooleanSimple";
 import { BooleansMadnessLevels } from "../../components/BooleansMadness";
 import { StateChaosUltimate } from "../../components/StateChaosUltimate";
@@ -16,12 +16,15 @@ import { StaticStateSimple } from "../../components/StaticStateSimple";
 export default function Home() {
 
     const [isVisible, setIsVisible] = useState(true);
+    const navigate = useNavigation();
+
+    const goToProfile = () => {
+        navigate("/profile");
+    };
 
     return (
         <div>
-            {/* <StaticStateTest /> */}
-            {isVisible && <StaticStateSimple />}
-            <button onClick={() => setIsVisible((prev) => !prev)}>Toggle</button>
+            <StateChaosUltimate />
         </div>
     );
 }

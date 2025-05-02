@@ -1,30 +1,16 @@
-import React, { useEffect, useState, useStatic } from "react";
+import React, { BrowserRouter, Router } from "react";
 import Home from "./home/page";
 import "./global.css";
-
-const Test = () => {
-    const [count, setCount] = useState(0);
-
-    useEffect(() => {
-        return () => {
-            console.log("Unmounting Test component");
-        }
-    }, [])
-
-    return (
-        <div>
-            <h1 className="text-3xl font-bold underline">
-                Hello world! {count}
-            </h1>
-            <button onClick={() => setCount(count + 1)}>Increment</button>
-        </div>
-    )
-}
+import Profile from "./profile/page";
+import NotFound from "./404";
 
 export default function Root() {
+
     return (
-        <div>
-            <Home />
-        </div>
+        <BrowserRouter>
+            <Router src="/" component={<Home />} />
+            <Router src="/profile" component={<Profile />} />
+            <Router src="*" component={<NotFound />} />
+        </BrowserRouter>
     );
 }

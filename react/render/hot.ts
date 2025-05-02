@@ -22,3 +22,9 @@ if (import.meta.webpackHot) {
         await renderApp();
     });
 }
+
+// listen for popstate event
+window.addEventListener("popstate", async () => {
+    console.log("[HMR] Reloading App module...");
+    await renderApp();
+});

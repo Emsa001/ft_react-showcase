@@ -1,4 +1,4 @@
-import React from "react";
+import React, { IS_DEVELOPMENT } from "react";
 import { scheduleUpdate } from "./useState";
 
 /*
@@ -34,7 +34,7 @@ export function useStaticHook<T>(name: string, initialState: T): [T, (value: T |
     const staticComponents = React.vDomManager.staticComponents.get(name)!;
     if (!staticComponents.includes(component.name)) {
         staticComponents.push(component.name);
-        console.log("Adding static component:", component.name, "to staticStates:", name);
+        if(IS_DEVELOPMENT) console.log("Adding static component:", component.name, "to staticStates:", name);
     }
     
     const setState = (newValue: T | ((prevState: T) => T)) => {

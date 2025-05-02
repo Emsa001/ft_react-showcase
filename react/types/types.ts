@@ -45,3 +45,9 @@ export interface VDomManager {
     components: Map<string, ReactComponentInstance>;
     currentComponent: ReactComponentInstance | null;
 }
+
+export interface RouterProps {
+    src: string;
+    component: ReactElement;
+    default?: boolean;
+}

@@ -1,13 +1,11 @@
-import { ReactComponentInstance } from "./types/types";
+import { ReactComponentInstance, RouterProps } from "./types/types";
 import { VDomManagerImpl } from "./render/manager";
-
 import { useStateHook } from "./hooks/useState";
 import { useEffectHook } from "./hooks/useEffect";
 import { useStaticHook } from "./hooks/useStatic";
 import { useRefHook } from "./hooks/useRef";
 import { isValidElementMethod } from "./methods/isValidElement";
 import { cloneElementMethod } from "./methods/cloneElement";
-import "./render/hot";
 import { useContextHook } from "./hooks/useContext";
 import { Context } from "vm";
 import { createContextMethod } from "./methods/createContext";
@@ -16,6 +14,10 @@ import { renderComponentMethod } from "./methods/renderComponent";
 import { renderMethod } from "./methods/render";
 import { createElementMethod } from "./methods/createElement";
 
+import "./render/hot";
+import { BrowserRouterMethod, RouterMethod } from "./methods/BrowserRouter";
+import { useNavigationHook } from "./hooks/useNavigation";
+
 class FtReact {
     public vDomManager: VDomManagerImpl;
 
@@ -23,25 +25,31 @@ class FtReact {
         this.vDomManager = new VDomManagerImpl();
     }
 
-    /**
-     * Creates a Virtual Node
-     */
+
     createElement = (
         type: string | ComponentType,
         props: Props = {},
         ...children: VNode[]
     ): VNode => createElementMethod(type, props, ...children);
+    cloneElement = (
+        element: ReactElement,
+        props: Record<string, unknown>,
+        ...children: ReactElement[]
+    ) => cloneElementMethod(element, props, ...children);
+    isValidElement = (object: unknown): object is ReactElement => isValidElementMethod(object);
+
     createContext = <T>(defaultValue: T): Context => createContextMethod(defaultValue);
     createComponentInstance = (element: ReactElement): ReactComponentInstance =>
         createComponentInstanceMethod(element);
+
     renderComponent = (element: ReactElement): ReactComponentInstance =>
         renderComponentMethod(element);
     render = async (element: ReactElement, container: HTMLElement): Promise<void> =>
         renderMethod(element, container);
 
-    /*
-     * Hooks
-     */
+    BrowserRouter = (props: { children?: ReactElement[] }) => BrowserRouterMethod(props);
+    RouterMethod = (props: RouterProps) => RouterMethod(props);
+
     useState = <T>(initialState: T) => useStateHook(initialState);
     useStatic = <T>(name: string, initialState: T) => useStaticHook(name, initialState);
     useEffect = async (callback: () => void, deps?: any[]): Promise<void> =>
@@ -50,36 +58,37 @@ class FtReact {
         useEffectHook(callback, deps);
     useRef = <T>(initialValue: T) => useRefHook(initialValue);
     useContext = (context: any) => useContextHook(context);
+    useNavigation = () => useNavigationHook();
+
 
     /*
      * Methods
      */
-    isValidElement = (object: unknown): object is ReactElement => isValidElementMethod(object);
-    cloneElement = (
-        element: ReactElement,
-        props: Record<string, unknown>,
-        ...children: ReactElement[]
-    ) => cloneElementMethod(element, props, ...children);
 }
 
 const React = new FtReact();
+
+
+export const createElement = React.createElement;
+export const cloneElement = React.cloneElement;
+export const isValidElement = React.isValidElement;
+export const createContext = React.createContext;
+export const BrowserRouter = React.BrowserRouter;
+export const Router = React.RouterMethod;
 
 export const useState = React.useState;
 export const useEffect = React.useEffect;
 export const useLayoutEffect = React.useLayoutEffect;
 export const useStatic = React.useStatic;
 export const useRef = React.useRef;
-
 export const useContext = React.useContext;
-export const createContext = React.createContext;
+export const useNavigation = React.useNavigation;
 
-export const isValidElement = React.isValidElement;
-export const cloneElement = React.cloneElement;
-export const createElement = React.createElement;
 // export const createContext = React.createContext;
 // export const useContext = React.useContext;
 // export const setTitle = React.setTitle;
 
 export * from "./types/types";
 
+export const IS_DEVELOPMENT = false;
 export default React;

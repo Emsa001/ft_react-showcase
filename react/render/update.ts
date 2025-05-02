@@ -1,4 +1,4 @@
-import React from "..";
+import React, { IS_DEVELOPMENT } from "..";
 import { VDomManagerImpl } from "./manager";
 
 interface IUpdateProps {
@@ -11,6 +11,27 @@ interface IUpdateProps {
 }
 
 export let componentsInUse: string[] = [];
+
+export const unMountFunctionChild = (node: any) => {
+    // Check if the current node's type is a function
+    if (typeof node.type === "function") {
+        React.vDomManager.components.get(node.componentName)?.onUnmount();
+    }
+
+    // If the node has children, recursively check them
+    if (Array.isArray(node.children)) {
+        for (const child of node.children) {
+            // Handle cases where children are nested arrays
+            if (Array.isArray(child)) {
+                for (const nestedChild of child) {
+                    unMountFunctionChild(nestedChild);
+                }
+            } else {
+                unMountFunctionChild(child);
+            }
+        }
+    }
+};
 
 const needUpdate = (oldProps: any, newProps: any) => {
     if (oldProps === newProps) return false;
@@ -79,22 +100,23 @@ export function update(
             return;
         }
 
-        console.log("[ Old node is null ]", oldNode, newVNode);
+        if(IS_DEVELOPMENT) console.log("[ Old node is null ]", oldNode, newVNode);
         this.mount({ vnode: newVNode, parent: parent, mode: "append", name });
         return;
     }
 
     if (newVNode === null || typeof newVNode === "undefined") {
-        console.log("[ New node is null ]", oldNode, newVNode);
+        if(IS_DEVELOPMENT)  console.log("[ New node is null ]", oldNode, newVNode);
 
-        if (
-            typeof oldNode === "object" &&
-            !Array.isArray(oldNode) &&
-            typeof oldNode.type === "function"
-        ) {
-            this.components.get(oldNode.componentName!)?.onUnmount();
-            return;
-        }
+        unMountFunctionChild(oldNode);
+        // if (
+        //     typeof oldNode === "object" &&
+        //     !Array.isArray(oldNode) &&
+        //     typeof oldNode.type === "function"
+        // ) {
+        //     this.components.get(oldNode.componentName!)?.onUnmount();
+        //     return;
+        // }
 
         ref?.remove();
         return;
@@ -103,25 +125,18 @@ export function update(
     if (typeof oldNode === "boolean" || typeof newVNode === "boolean") {
         if (oldNode === newVNode) return;
 
-        console.log("[ Boolean difference ]", oldNode, newVNode, ref);
+        if(IS_DEVELOPMENT) console.log("[ Boolean difference ]", oldNode, newVNode, ref);
 
         if (newVNode === false) {
-            if (typeof oldNode === "object" && !Array.isArray(oldNode)) {
+            // if (typeof oldNode === "object" && oldNode.componentName) {
+            //     const component = this.components.get(oldNode.componentName);
+            //     console.log("Unmounting component:", oldNode.componentName, component);
+            //     if (component) {
+            //         component.onUnmount();
+            //     }
+            // }
 
-                const component = this.components.get(oldNode.componentName!);
-                if (component) {
-                    component.onUnmount();
-                }
-            }
-
-            if (
-                typeof oldNode === "object" &&
-                !Array.isArray(oldNode) &&
-                typeof oldNode.type === "function"
-            ) {
-                this.components.get(oldNode.componentName!)?.onUnmount();
-                return;
-            }
+            unMountFunctionChild(oldNode);
             if (oldNode) {
                 // this.mount({ vnode: newVNode, parent: ref!, mode: "replace", name });
                 ref?.remove();
@@ -155,6 +170,7 @@ export function update(
 
     if (typeof oldNode != typeof newVNode) {
         this.mount({ vnode: newVNode, parent: ref!, mode: "replace", name });
+        unMountFunctionChild(oldNode);
         return;
     }
 
@@ -162,7 +178,7 @@ export function update(
     newVNode = newVNode as ReactElement;
     if (oldNode.componentName) newVNode.componentName = oldNode.componentName;
 
-    if (typeof newVNode.type === "function") {
+    if (typeof newVNode.type === "function" && typeof oldNode.type === "function") {
         // Compare props to check if function needs an update;
         const oldProps = oldNode.props || {};
         const newProps = newVNode.props || {};
@@ -170,18 +186,23 @@ export function update(
             oldNode.componentName && this.components.get(oldNode.componentName!)?.isDirty;
 
         if (!needUpdate(oldProps, newProps) && !isDirty) {
-            console.log("[ Function component ], no update necessary", oldNode, newVNode);
+            if(IS_DEVELOPMENT) console.log("[ Function component ], no update necessary", oldNode, newVNode);
             return;
         }
 
         const newComponent = newVNode.type(newVNode.props, ...newVNode.children);
         newComponent.componentName = newVNode.componentName;
         const oldComponent = this.components.get(oldNode.componentName!);
+
+        if(!oldComponent){
+            console.warn("Old component not found", oldNode, newVNode);
+            return;
+        }
+
         const componentName = typeof newComponent.type === "function" ? newComponent.type.name : "";
 
-        console.log("[ Function component ]", newComponent, oldComponent?.vNode);
-
-        this.currentComponent = oldComponent!;
+        if(IS_DEVELOPMENT) console.log("[ Function component ]", newComponent, oldComponent.vNode);
+        this.currentComponent = oldComponent;
 
         this.update({
             oldNode: oldComponent?.vNode,
@@ -201,9 +222,10 @@ export function update(
     }
 
     if (oldNode.type !== newVNode.type) {
-        console.log("[ Element type difference ]", oldNode, newVNode);
+        if(IS_DEVELOPMENT) console.log("[ Element type difference ]", oldNode, newVNode);
 
         this.mount({ vnode: newVNode, parent: ref!, mode: "replace", name });
+        unMountFunctionChild(oldNode);
         return;
     }
 
