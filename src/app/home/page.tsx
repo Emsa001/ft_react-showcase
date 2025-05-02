@@ -1,4 +1,5 @@
 import React, { useState, useStatic } from 'react';
+import { EffectTest } from '../../components/EffectTest';
 
 const StaticComponent = () => {
     const [test, setTest] = useStatic("simple", 20);
@@ -27,6 +28,12 @@ const App = () => {
     const [staticTest, setStaticTest] = useStatic("username", 50);
     const [isVisible, setIsVisible] = useState(true);
 
+
+    return (
+        <div>
+            <EffectTest />
+        </div>
+    )
 
     return (
         <div>
