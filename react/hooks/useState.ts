@@ -40,7 +40,7 @@ export async function scheduleUpdate(component: ReactComponentInstance, states: 
         }
 
         if(!component.vNode?.ref){
-            // throw new Error("Component ref is null, are you sure the component has a parent?");
+            throw new Error("Component ref is null, are you sure the component has a parent?");
         }
         
         if (newVNode && component.vNode) {
