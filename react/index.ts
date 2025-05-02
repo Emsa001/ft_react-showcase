@@ -8,6 +8,13 @@ import { useRefHook } from "./hooks/useRef";
 import { isValidElementMethod } from "./methods/isValidElement";
 import { cloneElementMethod } from "./methods/cloneElement";
 import "./render/hot";
+import { useContextHook } from "./hooks/useContext";
+import { Context } from "vm";
+import { createContextMethod } from "./methods/createContext";
+import { createComponentInstanceMethod } from "./methods/createComponentInstance";
+import { renderComponentMethod } from "./methods/renderComponent";
+import { renderMethod } from "./methods/render";
+import { createElementMethod } from "./methods/createElement";
 
 class FtReact {
     public vDomManager: VDomManagerImpl;
@@ -19,109 +26,18 @@ class FtReact {
     /**
      * Creates a Virtual Node
      */
-    createElement(type: string | ComponentType, props: Props = {}, ...children: VNode[]): VNode {
-        const { key = null, ...restProps } = props || {};
-
-        const finalProps = {
-            ...restProps,
-            children, // Inject children into props
-        };
-
-        return {
-            type,
-            props: finalProps,
-            children, // This is mostly for rendering, not for components
-            ref: null,
-            key,
-        };
-    }
-
-    createComponentInstance(element: ReactElement): ReactComponentInstance {
-        if (typeof element.type !== "function") {
-            throw new Error("Invalid component type");
-        }
-
-        const name = !React.vDomManager.components.has(element.type.name)
-            ? element.type.name
-            : element.type.name + Math.random().toString(36).substring(2, 15);
-
-        element.componentName = name;
-
-        return {
-            name: name,
-            isMounted: false,
-            isUpdating: false,
-
-            hooks: [],
-            hookIndex: 0,
-
-            vNode: null,
-            jsx: element,
-
-            queueFunctions: new Set<() => void>(),
-
-            onMount() {
-                console.log("Component mounted:", this.name);
-                this.isMounted = true;
-            },
-            onUnmount() {
-                console.log("Component unmounted:", this.name);
-                this.vNode?.ref?.remove();
-                React.vDomManager.components.delete(this.name);
-                React.vDomManager.staticComponents.delete(this.name);
-                this.queueFunctions.forEach((fn) => fn());
-                this.queueFunctions.clear();
-
-                this.isMounted = false;
-                this.vNode = null;
-                this.jsx = null;
-                this.hooks = [];
-                this.hookIndex = 0;
-            },
-            onUpdate() {
-                console.log("Updating component:", this.name);
-            },
-        };
-    }
-
-    renderComponent(element: ReactElement): ReactComponentInstance {
-        const component = this.createComponentInstance(element);
-        this.vDomManager.currentComponent = component;
-
-        if (!this.isValidElement(element)) {
-            // this.vDomManager.currentComponent = null;
-            throw new Error("Invalid element type");
-        }
-
-        if (typeof element.type === "string") {
-            component.vNode = this.createElement(element.type, element.props, ...element.children);
-            // this.vDomManager.currentComponent = null;
-            return component;
-        }
-
-        component.vNode = element.type(element.props, ...element.children);
-
-        // this.vDomManager.currentComponent = null;
-        return component;
-    }
-
-    /**
-     * Render root component into the real DOM
-     */
-    async render(element: ReactElement, container: HTMLElement) {
-        const rootComponent = this.renderComponent(element);
-        this.vDomManager.components.set(rootComponent.name, rootComponent);
-        this.vDomManager.currentComponent = rootComponent;
-
-        this.vDomManager.rootDom = await this.vDomManager.mount({
-            vnode: rootComponent.vNode!,
-            parent: container,
-            name: rootComponent.name,
-        });
-
-        console.log(this.vDomManager.components);
-        container.appendChild(this.vDomManager.rootDom!);
-    }
+    createElement = (
+        type: string | ComponentType,
+        props: Props = {},
+        ...children: VNode[]
+    ): VNode => createElementMethod(type, props, ...children);
+    createContext = <T>(defaultValue: T): Context => createContextMethod(defaultValue);
+    createComponentInstance = (element: ReactElement): ReactComponentInstance =>
+        createComponentInstanceMethod(element);
+    renderComponent = (element: ReactElement): ReactComponentInstance =>
+        renderComponentMethod(element);
+    render = async (element: ReactElement, container: HTMLElement): Promise<void> =>
+        renderMethod(element, container);
 
     /*
      * Hooks
@@ -133,6 +49,7 @@ class FtReact {
     useLayoutEffect = async (callback: () => void, deps?: any[]): Promise<void> =>
         useEffectHook(callback, deps);
     useRef = <T>(initialValue: T) => useRefHook(initialValue);
+    useContext = (context: any) => useContextHook(context);
 
     /*
      * Methods
@@ -152,6 +69,9 @@ export const useEffect = React.useEffect;
 export const useLayoutEffect = React.useLayoutEffect;
 export const useStatic = React.useStatic;
 export const useRef = React.useRef;
+
+export const useContext = React.useContext;
+export const createContext = React.createContext;
 
 export const isValidElement = React.isValidElement;
 export const cloneElement = React.cloneElement;

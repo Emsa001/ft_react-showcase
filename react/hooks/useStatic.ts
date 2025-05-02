@@ -52,11 +52,11 @@ export function useStaticHook<T>(name: string, initialState: T): [T, (value: T |
 
         staticComponents.forEach((comp) => {
             const compInstance = React.vDomManager.components.get(comp);
-            if(compInstance) {
-                setTimeout(() => {
-                    scheduleUpdate(compInstance, [hook]);
-                }, 0);
+            if(!compInstance) {
+                throw new Error("No component found");
             }
+            compInstance.isDirty = true;
+            scheduleUpdate(compInstance, [hook]);
         })    
     };
     

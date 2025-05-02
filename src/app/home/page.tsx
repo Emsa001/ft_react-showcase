@@ -9,12 +9,14 @@ import { ReactToasts } from "../../components/ReactToasts";
 import { MultiComponents } from "../../components/MultiComponents";
 import { ArraySimple } from "../../components/ArraySimple";
 import { ArrayComponents } from "../../components/ArrayComponents";
+import { CustomHooks } from "../../components/CustomHooks";
+import { CustomProvider } from "../../components/CustomProvider";
 
 export default function Home() {
     return (
         <div>
-            <h1>Ellen is Nerd</h1>
-            <BooleansMadnessLevels />
+            <StaticStateTest />
+            {/* <CustomProvider /> */}
         </div>
     );
 }

@@ -39,6 +39,7 @@ export function StaticStateTest() {
             <button onClick={handleClick}>Click from 1</button>
             <p>Normal: {normal}</p>
             <button onClick={() => setNormal((prev) => prev + 1)}>Click normal</button>
+            <StaticStateTest2 />
         </div>
     );
 }

@@ -12,11 +12,6 @@ The idea for this project came from my last project in my 42 coding school (ft_t
 - **Hooks**: Implemented `useState`, `useEffect`, `useRef`, and `useContext` hooks.
 - **Context and Providers**: Basic context API to manage global state.
 
-## Current Issues
-
-- **Rendering**: 
-  - `useEffect` has issues, such as `setInterval` inside `useEffect` not working correctly.
-
 ## Installation
 
 To get started with `ft_react`, clone the repository and install the dependencies:

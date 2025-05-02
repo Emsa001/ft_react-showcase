@@ -182,7 +182,9 @@ export function update(this: VDomManagerImpl, { oldNode, newVNode, ref, parent, 
         // Compare props to check if function needs an update;
         const oldProps = oldNode.props || {};
         const newProps = newVNode.props || {};
-        if(!needUpdate(oldProps, newProps)){
+        const isDirty = oldNode.componentName && this.components.get(oldNode.componentName!)?.isDirty;
+
+        if(!needUpdate(oldProps, newProps) && !isDirty){
             console.log("[ Function component ], no update necessary", oldNode, newVNode);
             return;
         }
@@ -209,6 +211,8 @@ export function update(this: VDomManagerImpl, { oldNode, newVNode, ref, parent, 
         // TODO: if something doesn't work correctly, probably because of it
         oldComponent!.vNode!.children = newComponent.children;
         oldComponent!.vNode!.componentName = componentName;
+        oldComponent!.isDirty = false;
+        
     
         return;
     }

@@ -8,9 +8,20 @@ export interface Hook {
     type: HookType;
 }
 
+export interface Context {
+    _currentValue: any;
+    _defaultValue: any;
+    _calledByProvider: boolean;
+    subscriptions: Set<ReactComponentInstance>;
+    _currentProvider: ReactComponentInstance | null;
+
+    Provider: (props: { value?: any; children?: any }) => any;
+}
+
 export interface ReactComponentInstance {
     name: string;
     isMounted: boolean;
+    isDirty: boolean;
 
     hooks: Hook[];
     hookIndex: number;
