@@ -14,38 +14,42 @@ export function useEffectHook(callback: TEffectCallback, deps?: TDependencyList)
         throw new Error("useEffect must be called inside a component render function");
     }
 
-    setTimeout(() => {
-        const prevDeps = useRefHook<TDependencyList | undefined>(undefined);
-        const cleanupRef = useRefHook<(() => void) | void>(undefined);
-        const isFirstRender = useRefHook(true);
+    const prevDeps = useRefHook<TDependencyList | undefined>(undefined);
+    const cleanupRef = useRefHook<(() => void) | undefined>(undefined);
+    const isFirstRender = useRefHook(true);
 
-        // Wrap the effect logic inside a Promise to defer execution
-        if (isFirstRender.current) {
-            isFirstRender.current = false;
-
-            const cleanup = callback();
-            cleanupRef.current = cleanup;
-
-            // Register the cleanup function to component's unmount queue
-            if (typeof cleanup === "function") {
-                component.queueFunctions.add(cleanup);
-            }
-        } else if (deps && prevDeps.current && !checkDependenciesChanged(prevDeps.current, deps)) {
-            return;
-        } else {
-            if (typeof cleanupRef.current === "function") {
+    const runEffect = () => setTimeout(() => {
+        if (typeof cleanupRef.current === "function") {
+            try {
                 cleanupRef.current();
-                component.queueFunctions.delete(cleanupRef.current);
+            } catch (err) {
+                console.error("Error running cleanup:", err);
             }
-
-            const cleanup = callback();
-            cleanupRef.current = cleanup;
-
-            if (typeof cleanup === "function") {
-                component.queueFunctions.add(cleanup);
-            }
+            component.queueFunctions.delete(cleanupRef.current);
         }
 
-        prevDeps.current = deps;
+        let cleanup: void | (() => void);
+        try {
+            cleanup = callback();
+        } catch (err) {
+            console.error("useEffectHook callback threw:", err);
+            cleanup = undefined;
+        }
+
+        if (typeof cleanup === "function") {
+            cleanupRef.current = cleanup;
+            component.queueFunctions.add(cleanup);
+        } else {
+            cleanupRef.current = undefined;
+        }
     }, 0);
+
+    if (isFirstRender.current) {
+        isFirstRender.current = false;
+        runEffect();
+    } else if (!deps || !prevDeps.current || checkDependenciesChanged(prevDeps.current, deps)) {
+        runEffect();
+    }
+
+    prevDeps.current = deps;
 }

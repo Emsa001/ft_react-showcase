@@ -1,4 +1,4 @@
-import React, { useState, useStatic } from 'react';
+import React, { useEffect, useState, useStatic } from 'react';
 import { EffectTest } from '../../components/EffectTest';
 
 const StaticComponent = () => {
@@ -24,32 +24,43 @@ const NormalComponent = () => {
 }
 
 const App = () => {
-
     const [staticTest, setStaticTest] = useStatic("username", 50);
     const [isVisible, setIsVisible] = useState(true);
 
+    useEffect(() => {
+        console.log("Static test changed:", staticTest);
+    }, [staticTest]);
+
+    useEffect(() => {
+        console.log("Static test changed:", staticTest);
+    }, [staticTest]);
+
+    useEffect(() => {
+        console.log("Static test changed:", staticTest);
+    }, [staticTest]);
 
     return (
         <div>
             <EffectTest />
+            <button onClick={() => setStaticTest((prev) => prev + 1)}>Click</button>
         </div>
     )
 
-    return (
-        <div>
+    // return (
+    //     <div>
 
-            {isVisible && <StaticComponent />}
-            {isVisible && <NormalComponent />}
+    //         {isVisible && <StaticComponent />}
+    //         {isVisible && <NormalComponent />}
 
-            <hr />
+    //         <hr />
             
-            <button onClick={() => setIsVisible((prev) => !prev)}>
-                Toggle
-            </button>
+    //         <button onClick={() => setIsVisible((prev) => !prev)}>
+    //             Toggle
+    //         </button>
 
-            <p>Static value: {staticTest}</p>
-        </div>
-    );
+    //         <p>Static value: {staticTest}</p>
+    //     </div>
+    // );
 
 };
 

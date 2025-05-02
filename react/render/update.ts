@@ -200,11 +200,11 @@ export function update(this: VDomManagerImpl, { oldNode, newVNode, ref, parent, 
 
         const componentName = typeof newComponent.type === "function" ? newComponent.type.name : "";
 
-        if (IS_DEVELOPMENT) console.log("[ Function component ]", newComponent, oldComponent.vNode);
+        if (IS_DEVELOPMENT) console.log("[ Function component ]", newComponent, oldComponent);
         this.currentComponent = oldComponent;
 
         this.update({
-            oldNode: oldComponent?.vNode,
+            oldNode: oldComponent?.vNode || oldNode,
             newVNode: newComponent,
             ref: ref,
             parent: ref?.parentElement!,
@@ -213,9 +213,11 @@ export function update(this: VDomManagerImpl, { oldNode, newVNode, ref, parent, 
         });
 
         // TODO: if something doesn't work correctly, probably because of it
-        oldComponent!.vNode!.children = newComponent.children;
-        oldComponent!.vNode!.componentName = componentName;
-        oldComponent!.isDirty = false;
+        if(oldComponent.vNode){
+            oldComponent.vNode.children = newComponent.children;
+            oldComponent.vNode.componentName = componentName;
+        }
+        oldComponent.isDirty = false;
 
         return;
     }

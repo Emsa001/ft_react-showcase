@@ -52,7 +52,7 @@ class FtReact {
 
     useState = <T>(initialState: T) => useStateHook(initialState);
     useStatic = <T>(name: string, initialState: T) => useStaticHook(name, initialState);
-    useEffect = async (callback: () => void, deps?: any[]): Promise<void> => useEffectHook(callback, deps);
+    useEffect = (callback: () => void, deps?: any[]) => useEffectHook(callback, deps);
     useRef = <T>(initialValue: T) => useRefHook(initialValue);
     useContext = (context: any) => useContextHook(context);
     useNavigation = () => useNavigationHook();
