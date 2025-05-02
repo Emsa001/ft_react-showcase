@@ -19,7 +19,7 @@ const SecondComponent = () => {
         <div>
             <h1>Second Component</h1>
             <p>User: {user}</p>
-            <button onClick={() => setUser("New User")}>Set User</button>
+            <button onClick={() => setUser("Emanuel")}>Set User</button>
         </div>
     );
 };

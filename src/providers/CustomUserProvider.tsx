@@ -21,7 +21,7 @@ export const useUser = (): UserContextType => {
 
 // UserProvider component
 export const UserProvider = ({ children }: { children?: any }) => {
-    const [user, setUser] = useState("");
+    const [user, setUser] = useState("Ellen");
 
     // useEffect(() => {
     //     setUser("Emanuel");
