@@ -18,6 +18,7 @@ import { useContextHook } from "./hooks/useContext";
 import { useNavigationHook } from "./hooks/useNavigation";
 
 import "./render/hot";
+import { useSyncExternalStoreMethod } from "./hooks/useSyncExternalStore";
 
 class FtReact {
     public vDomManager: VDomManagerImpl;
@@ -30,26 +31,17 @@ class FtReact {
      * Methods
      */
 
-    createElement = (
-        type: string | ComponentType,
-        props: Props = {},
-        ...children: VNode[]
-    ): VNode => createElementMethod(type, props, ...children);
-    cloneElement = (
-        element: ReactElement,
-        props: Record<string, unknown>,
-        ...children: ReactElement[]
-    ) => cloneElementMethod(element, props, ...children);
+    createElement = (type: string | ComponentType, props: Props = {}, ...children: VNode[]): VNode =>
+        createElementMethod(type, props, ...children);
+    cloneElement = (element: ReactElement, props: Record<string, unknown>, ...children: ReactElement[]) =>
+        cloneElementMethod(element, props, ...children);
     isValidElement = (object: unknown): object is ReactElement => isValidElementMethod(object);
 
     createContext = <T>(defaultValue: T) => createContextMethod(defaultValue);
-    createComponentInstance = (element: ReactElement): ReactComponentInstance =>
-        createComponentInstanceMethod(element);
+    createComponentInstance = (element: ReactElement): ReactComponentInstance => createComponentInstanceMethod(element);
 
-    renderComponent = (element: ReactElement): ReactComponentInstance =>
-        renderComponentMethod(element);
-    render = async (element: ReactElement, container: HTMLElement): Promise<void> =>
-        renderMethod(element, container);
+    renderComponent = (element: ReactElement): ReactComponentInstance => renderComponentMethod(element);
+    render = async (element: ReactElement, container: HTMLElement): Promise<void> => renderMethod(element, container);
 
     BrowserRouter = (props: { children?: ReactElement[] }) => BrowserRouterMethod(props);
     RouterMethod = (props: RouterProps) => RouterMethod(props);
@@ -60,14 +52,15 @@ class FtReact {
 
     useState = <T>(initialState: T) => useStateHook(initialState);
     useStatic = <T>(name: string, initialState: T) => useStaticHook(name, initialState);
-    useEffect = async (callback: () => void, deps?: any[]): Promise<void> =>
-        useEffectHook(callback, deps);
-    useLayoutEffect = async (callback: () => void, deps?: any[]): Promise<void> =>
-        useEffectHook(callback, deps);
+    useEffect = async (callback: () => void, deps?: any[]): Promise<void> => useEffectHook(callback, deps);
+    useLayoutEffect = async (callback: () => void, deps?: any[]): Promise<void> => useEffect(callback, deps);
     useRef = <T>(initialValue: T) => useRefHook(initialValue);
     useContext = (context: any) => useContextHook(context);
     useNavigation = () => useNavigationHook();
-
+    useSyncExternalStore = <T>(
+        subscribe: (onStoreChange: () => void) => () => void,
+        getSnapshot: () => T,
+    ) => useSyncExternalStoreMethod(subscribe, getSnapshot);
 
     /*
      * Custom Methods
@@ -79,7 +72,6 @@ class FtReact {
 }
 
 const React = new FtReact();
-
 
 /*
  * Methods
@@ -103,14 +95,13 @@ export const useStatic = React.useStatic;
 export const useRef = React.useRef;
 export const useContext = React.useContext;
 export const useNavigation = React.useNavigation;
+export const useSyncExternalStore = React.useSyncExternalStore;
 
 /*
  * Custom Methods
  */
 
 export const setTitle = React.setTitle;
-
-
 /* ========================================================== */
 
 export * from "./types/types";

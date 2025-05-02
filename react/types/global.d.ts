@@ -44,3 +44,10 @@ declare namespace JSX {
 
 type Props = { [key: string]: any };
 type ComponentType = (props: Props, ...children: any[]) => VNode;
+
+interface IEffectCallback {
+    (): (() => void) | void;
+}
+
+type TEffectCallback = IEffectCallback | (() => void);
+type TDependencyList = any[];
