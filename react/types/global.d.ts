@@ -12,7 +12,7 @@ interface VNode {
     type: string | ComponentType;
     props: Props;
     children: VNode[];
-    ref: HTMLElement | null;
+    ref: Element | null;
     key: string | number | null;
     componentName?: string;
 }
@@ -32,15 +32,17 @@ declare namespace JSX {
 
     interface IntrinsicAttributes {
         key?: string | number;
+        className?: string;
     }
 
     type IntrinsicElements = {
         [K in keyof HTMLElementTagNameMap]: Props;
     } & {
         MyComponent: Props;
+        svg: Props;
+        path: Props
     };
 }
-
 
 type Props = { [key: string]: any };
 type ComponentType = (props: Props, ...children: any[]) => VNode;

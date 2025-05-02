@@ -3,13 +3,13 @@ export function createElementMethod(type: string | ComponentType, props: Props =
 
     const finalProps = {
         ...restProps,
-        children, // Inject children into props
+        children,
     };
 
     return {
         type,
         props: finalProps,
-        children, // This is mostly for rendering, not for components
+        children,
         ref: null,
         key,
     };

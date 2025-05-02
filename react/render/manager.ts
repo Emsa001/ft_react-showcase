@@ -5,7 +5,7 @@ import { removeProp, setProps } from "./props";
 
 export class VDomManagerImpl implements VDomManager {
     isFirstRender: boolean = true;
-    rootDom: HTMLElement | null = null;
+    rootDom: Element | null = null;
     components: Map<string, ReactComponentInstance> = new Map();
     currentComponent: ReactComponentInstance | null = null;
 

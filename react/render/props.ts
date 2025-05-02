@@ -1,10 +1,10 @@
 import { VDomManagerImpl } from "./manager";
 
-export function setProps(this: VDomManagerImpl, { ref, key, value }: { ref: HTMLElement; key: string; value: any }): void {
+export function setProps(this: VDomManagerImpl, { ref, key, value }: { ref: Element; key: string; value: any }): void {
     if (key === "children") return;
 
     if (key === "style" && typeof value === "object") {
-        Object.assign(ref.style, value);
+        Object.assign((ref as HTMLElement).style, value);
         return;
     }
 
@@ -30,10 +30,15 @@ export function setProps(this: VDomManagerImpl, { ref, key, value }: { ref: HTML
         return;
     }
 
-    (ref as any)[key] = value;
+    if(key === "className"){
+        ref.setAttribute("class", value);
+        return;
+    }
+
+    ref.setAttribute(key, value);
 }
 
-export function removeProp(this: VDomManagerImpl, { ref, key }: { ref: HTMLElement; key: string }): void {
+export function removeProp(this: VDomManagerImpl, { ref, key }: { ref: Element; key: string }): void {
     if (key === "style") {
         ref.removeAttribute("style");
         return;

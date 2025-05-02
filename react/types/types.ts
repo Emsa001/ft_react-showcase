@@ -40,7 +40,7 @@ export interface ReactComponentInstance {
 }
 
 export interface VDomManager {
-    rootDom: HTMLElement | null;
+    rootDom: Element | null;
 
     components: Map<string, ReactComponentInstance>;
     currentComponent: ReactComponentInstance | null;
@@ -50,4 +50,13 @@ export interface RouterProps {
     src: string;
     component: ReactElement;
     default?: boolean;
+}
+
+export type MountMode = "append" | "replace" | "before" | "after" | "create-only";
+
+export interface ICreateDomProps {
+    vnode: ReactNode;
+    parent: Element;
+    mode?: MountMode;
+    name: string;
 }

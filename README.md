@@ -9,7 +9,7 @@ The idea for this project came from my final project at 42 coding school (`ft_tr
 
 ## Features
 
-- **Routing**: Basic routing capabilities for navigation between different pages.
+- **Routing**: Basic routing capabilities for navigation between different pages without reloading.
 - **Hooks**: Implemented `useState`, `useStatic`, `useEffect`, `useRef`, `useContext`, `useNavigation` and `useSyncExternalStore`.
 - **Context and Providers**: A basic context API for managing global state.
 
@@ -48,42 +48,6 @@ export function StaticStateSimple() {
 Even after the component unmounts, the static value `"simple"` will persist. It can also be accessed in different components, and the value will be shared with need of using Context providers. 
 `useStatic` optimally tracks all subscribed to it components and updates them as needed.
 
-## Known Issues
-
-### Required Parent Element
-
-Each component requires a parent element such as `<div>`. For example:
-
-❌ **This will crash:**
-
-```tsx
-export function CustomProvider() {
-    return (
-        <UserProvider>
-            <FirstComponent />
-            <SecondComponent />
-            <ThirdComponent />
-        </UserProvider>
-    );
-}
-```
-
-✅ **This works:**
-
-```tsx
-export function CustomProvider() {
-    return (
-        <div>
-            <UserProvider>
-                <FirstComponent />
-                <SecondComponent />
-                <ThirdComponent />
-            </UserProvider>
-        </div>
-    );
-}
-```
-
 ## Installation
 
 To get started with `ft_react`, clone the repository and install the dependencies:
@@ -100,6 +64,18 @@ To start the development server:
 
 ```bash
 npm run dev
+```
+
+## Tailwindcss
+
+Tailwindcss v4 is included in `ft_react`. Simply go to `src/app/global.css` and uncomment:
+```css
+@layer theme, base, components, utilities;
+
+@import "tailwindcss";
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/preflight.css" layer(base);
+@import "tailwindcss/utilities.css" layer(utilities);
 ```
 
 ## Example
@@ -131,8 +107,6 @@ export default App;
 ```
 
 ### Example Routing
-
-*(Work in progress)*
 
 ```tsx
 <BrowserRouter>

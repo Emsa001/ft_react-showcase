@@ -5,8 +5,7 @@ import { isValidElementMethod } from "./methods/isValidElement";
 import { cloneElementMethod } from "./methods/cloneElement";
 import { createContextMethod } from "./methods/createContext";
 import { createComponentInstanceMethod } from "./methods/createComponentInstance";
-import { renderComponentMethod } from "./methods/renderComponent";
-import { renderMethod } from "./methods/render";
+import { renderComponentMethod, renderMethod } from "./render/render";
 import { createElementMethod } from "./methods/createElement";
 import { BrowserRouterMethod, RouterMethod } from "./methods/BrowserRouter";
 
@@ -103,5 +102,5 @@ export const setTitle = React.setTitle;
 /* ========================================================== */
 
 export * from "./types/types";
-export const IS_DEVELOPMENT = true;
+export const IS_DEVELOPMENT = false;
 export default React;

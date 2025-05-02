@@ -1,17 +1,9 @@
-import React from "react";
+import React, { ICreateDomProps, MountMode } from "react";
 import { VDomManagerImpl } from "./manager";
-import { scheduleUpdate } from "react/hooks/useState";
 
-type mode = "append" | "replace" | "before" | "after" | "create-only";
+const isSvgElement = (type: string) => type === "svg" || type === "circle" || type === "rect" || type === "path" || type === "line" || type === "ellipse" || type === "polygon" || type === "polyline";
 
-interface ICreateDomProps {
-    vnode: ReactNode;
-    parent: HTMLElement;
-    mode?: mode;
-    name: string;
-}
-
-function addToDom(dom: HTMLElement | Text, parent: HTMLElement | null, mode: mode){
+function addToDom(dom: Element | Text, parent: Element | null, mode: MountMode){
     if(!parent){
         throw new Error("Parent is null");
     }
@@ -29,83 +21,71 @@ function addToDom(dom: HTMLElement | Text, parent: HTMLElement | null, mode: mod
 
 export async function mount(
     this: VDomManagerImpl,
-    { vnode, parent, mode = "append", name }: ICreateDomProps
-): Promise<HTMLElement | null> {
+    { vnode, parent, mode = "append", name, isSvg = false }: ICreateDomProps & { isSvg?: boolean }
+  ): Promise<Element | null> {  
     if (vnode === null || typeof vnode === "undefined") {
         return parent;
     }
 
     if (Array.isArray(vnode)) {
         for (const child of vnode) {
-            this.mount({ vnode: child, parent, name });
+            this.mount({ vnode: child, parent, name, isSvg });
         }
         return parent;
     }
-    
+
     if (typeof vnode === "string" || typeof vnode === "number") {
-        const textNode = document.createTextNode(vnode.toString())
+        const textNode = document.createTextNode(vnode.toString());
         addToDom(textNode, parent, mode);
-        
         return parent;
     }
-    
-    if(typeof vnode === "boolean"){        
-        if(vnode === false){
+
+    if (typeof vnode === "boolean") {
+        if (vnode === false) {
             parent.remove();
         }
         return parent;
     }
 
     if (typeof vnode.type === "function") {
-
-        /*
-         * Check if the component is already mounted, if so, update it
-        */
-
-        const currentComponent = vnode.componentName && this.components.get(vnode.componentName);
-        if (currentComponent) {
-            await scheduleUpdate(currentComponent, currentComponent.hooks);
-            addToDom(currentComponent.vNode!.ref!, parent, mode);
-
-            return currentComponent.vNode!.ref!;
-        }
-
-        /*
-         * Component is new, create a new instance and mount
-        */
-
         const component = React.createComponentInstance(vnode);
-        
+
         this.components.set(component.name, component);
         this.currentComponent = component;
         component.vNode = vnode.type(vnode.props, ...vnode.children);
 
-        if(component.vNode === null) return null;
+        if (!component.vNode.type) {
+            component.vNode.type = "div";
+        }
+
+        if (component.vNode === null) return null;
         component.vNode.componentName = component.name;
-        
+
         component.isMounted = true;
         component.onMount();
-        
-        const newRef = await this.mount({ vnode: component.vNode, parent, name: component.name, mode });
-        component.vNode.ref = newRef;
-        // this.currentComponent = null;
+
+        const newRef = await this.mount({ vnode: component.vNode, parent, name: component.name, mode, isSvg });
+        component.vNode.ref = newRef as HTMLElement | null;
         return newRef;
     }
 
-    const dom = document.createElement(vnode.type);
-    vnode.ref = dom;
+    const nextIsSvg = isSvgElement(vnode.type) || isSvg;
+    const dom = nextIsSvg
+        ? document.createElementNS("http://www.w3.org/2000/svg", vnode.type)
+        : document.createElement(vnode.type);
+
+    vnode.ref = dom as Element | null;
 
     // Set props
     for (const [key, value] of Object.entries(vnode.props)) {
         this.setProps({ ref: dom, key, value });
     }
-    
-    // Create children recursively
+
+    // Mount children recursively with SVG awareness
     for (const child of vnode.children) {
-        this.mount({ vnode: child, parent: dom, name });
+        this.mount({ vnode: child, parent: dom, name, isSvg: nextIsSvg });
     }
 
     addToDom(dom, parent, mode);
     return dom;
-    
 }

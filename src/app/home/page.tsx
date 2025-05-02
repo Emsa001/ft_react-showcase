@@ -1,67 +1,31 @@
-import React, { useEffect, useState, useStatic } from 'react';
-import { EffectTest } from '../../components/EffectTest';
+import React, { useEffect, useNavigation, useState, useStatic } from "react";
+import { BooleanSimple, BooleanSimple2 } from "../../components/BooleanSimple";
+import { BooleansMadnessLevels } from "../../components/BooleansMadness";
+import { StateChaosUltimate } from "../../components/StateChaosUltimate";
+import { StateApocalypse } from "../../components/StateApocalypse";
+import { ListenerSimple } from "../../components/ListenerSimple";
+import { StaticStateTest, StaticStateTest2 } from "../../components/StaticStateTest";
+import { MultiComponents } from "../../components/MultiComponents";
+import { ArraySimple } from "../../components/ArraySimple";
+import { ArrayComponents } from "../../components/ArrayComponents";
+import { CustomHooks } from "../../components/CustomHooks";
+import { CustomProvider } from "../../components/CustomProvider";
+import { StaticStateSimple } from "../../components/StaticStateSimple";
+import { FaBeer } from "react-icons/fa";
+import { Icon } from "../../components/Icons";
 
-const StaticComponent = () => {
-    const [test, setTest] = useStatic("simple", 20);
+export default function Home() {
 
-    return (
-        <div>
-            <p>Static test: {test}</p>
-            <button onClick={() => setTest((prev) => prev + 1)}>Click</button>
-        </div>
-    );
-}
-
-const NormalComponent = () => {
-    const [test, setTest] = useState(0);
-
-    return (
-        <div>
-            <p>Normal test: {test}</p>
-            <button onClick={() => setTest((prev) => prev + 1)}>Click</button>
-        </div>
-    );
-}
-
-const App = () => {
-    const [staticTest, setStaticTest] = useStatic("username", 50);
     const [isVisible, setIsVisible] = useState(true);
+    const navigate = useNavigation();
 
-    useEffect(() => {
-        console.log("Static test changed:", staticTest);
-    }, [staticTest]);
-
-    useEffect(() => {
-        console.log("Static test changed:", staticTest);
-    }, [staticTest]);
-
-    useEffect(() => {
-        console.log("Static test changed:", staticTest);
-    }, [staticTest]);
+    const goToProfile = () => {
+        navigate("/profile");
+    };
 
     return (
         <div>
-            <EffectTest />
-            <button onClick={() => setStaticTest((prev) => prev + 1)}>Click</button>
+            Hello world!
         </div>
-    )
-
-    // return (
-    //     <div>
-
-    //         {isVisible && <StaticComponent />}
-    //         {isVisible && <NormalComponent />}
-
-    //         <hr />
-            
-    //         <button onClick={() => setIsVisible((prev) => !prev)}>
-    //             Toggle
-    //         </button>
-
-    //         <p>Static value: {staticTest}</p>
-    //     </div>
-    // );
-
-};
-
-export default App;
+    );
+}

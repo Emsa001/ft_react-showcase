@@ -4,8 +4,8 @@ import { VDomManagerImpl } from "./manager";
 interface IUpdateProps {
     oldNode: ReactNode;
     newVNode: ReactNode;
-    ref: HTMLElement | null;
-    parent: HTMLElement | null;
+    ref: Element | null;
+    parent: Element | null;
     index: number;
     name: string;
 }

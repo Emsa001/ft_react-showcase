@@ -18,7 +18,6 @@ export async function scheduleUpdate(component: ReactComponentInstance, states: 
     component.isUpdating = true;
 
     await Promise.resolve().then(async () => {
-        // Process the queued state updates
         states.forEach((hook) => {
             processQueue(hook);
         });
@@ -34,13 +33,14 @@ export async function scheduleUpdate(component: ReactComponentInstance, states: 
         
         const newVNode = component.jsx?.type(component.jsx.props, ...component.jsx.children);
         newVNode.componentName = component.name;
+
         if(IS_DEVELOPMENT){
             console.log("New VNode:", newVNode);
             console.log("Old VNode:", component.vNode);
         }
 
         if(!component.vNode?.ref){
-            throw new Error("Component ref is null, are you sure the component has a parent?");
+            // throw new Error("Component ref is null, are you sure the component has a parent?");
         }
         
         if (newVNode && component.vNode) {
