@@ -1,31 +1,57 @@
-import React from "react";
-import { BooleanSimple, BooleanSimple2 } from "../../components/BooleanSimple";
-import { BooleansMadnessLevels } from "../../components/BooleansMadness";
-import { StateChaosUltimate } from "../../components/StateChaosUltimate";
-import { StateApocalypse } from "../../components/StateApocalypse";
-import { ListenerSimple } from "../../components/ListenerSimple";
-import { StaticStateTest, StaticStateTest2 } from "../../components/StaticStateTest";
-import { MultiComponents } from "../../components/MultiComponents";
-import { ArraySimple } from "../../components/ArraySimple";
-import { ArrayComponents } from "../../components/ArrayComponents";
-import { CustomHooks } from "../../components/CustomHooks";
-import { CustomProvider } from "../../components/CustomProvider";
-import { StaticStateSimple } from "../../components/StaticStateSimple";
-import { Icon } from "../../components/Icons";
-import { PropTest } from "../../components/PropTest";
-import { ThreejsTest } from "../../components/ThreeJsTest";
+import React, { useEffect, useState, useRef, setTitle } from "react";
+import NavButton from "../../components/NavButton";
+import Header from "../../components/Header";
 
 export default function Home() {
+    const [count, setCount] = useState(0);
+    const [name, setName] = useState("");
+    const inputRef = useRef<HTMLInputElement | null>(null);
 
-    const [show, setShow] = React.useState(false);
+    useEffect(() => {
+        setTitle("Home - Dark Custom React");
+        inputRef.current?.focus();
+    }, []);
 
     return (
-        <div>
-            Hello world!
-            {/* <PropTest name="Person 1" age={22} />
-            <PropTest name="Person 2" age={22} />
-            <PropTest name="Person 3" age={25} /> */}
-            {show && <ThreejsTest />}
+        <div className="min-h-screen flex items-center justify-center bg-gray-900 px-4">
+            <div className="w-full max-w-lg text-center">
+                <Header title="🌙 Welcome to ft_react" />
+
+                <p className="text-gray-400 mb-6">Dark theme, clean layout, working navigation & hooks.</p>
+
+                <div className="mb-6">
+                    <label className="block text-sm text-gray-300 mb-2">Enter your name:</label>
+                    <input
+                        ref={inputRef}
+                        type="text"
+                        value={name}
+                        onChange={(e: any) => setName(e.target.value)}
+                        placeholder="Jane Doe"
+                        className="w-full px-4 py-2 rounded bg-gray-800 text-white border border-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    />
+                    <p className="text-sm text-indigo-400 mt-2">
+                        Hello, <span className="font-semibold">{name || "stranger"}</span>!
+                    </p>
+                </div>
+
+                <div className="mb-6">
+                    <label className="block text-sm text-gray-300 mb-2">Click counter:</label>
+                    <div className="flex justify-center items-center gap-4">
+                        <button
+                            onClick={() => setCount(count + 1)}
+                            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 rounded text-white"
+                        >
+                            +1
+                        </button>
+                        <span className="text-lg">{count}</span>
+                    </div>
+                </div>
+
+                <div className="flex justify-center gap-4">
+                    <NavButton to="/profile" label="Profile →" />
+                    <NavButton to="/404" label="404 Page" />
+                </div>
+            </div>
         </div>
     );
 }
