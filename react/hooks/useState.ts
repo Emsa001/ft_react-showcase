@@ -53,6 +53,7 @@ export async function scheduleUpdate(component: ReactComponentInstance, states: 
                 name: component.name
             });
             component.vNode = newVNode;
+            component.isDirty = false;
         }
         if(IS_DEVELOPMENT) console.log(React.vDomManager.components);
     });
@@ -91,9 +92,11 @@ export function useStateHook<T>(initialState: T): [T, (value: T | ((prevState: T
         });
         
         // Only schedule the update once
+        component.isDirty = true;
+        if(IS_DEVELOPMENT) console.log("Component is dirty:", component.name);
         if (!component.isUpdating) {
             scheduleUpdate(component, component.hooks);
-        }        
+        }
     };
     
     // Do not process state updates immediately in the current render cycle!
