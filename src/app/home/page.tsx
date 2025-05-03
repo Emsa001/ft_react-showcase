@@ -26,7 +26,6 @@ export default function Home() {
             <PropTest name="Person 2" age={22} />
             <PropTest name="Person 3" age={25} /> */}
             {show && <ThreejsTest />}
-            <button onClick={() => setShow(!show)}>Toggle</button>
         </div>
     );
 }

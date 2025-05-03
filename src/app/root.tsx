@@ -11,7 +11,7 @@ export default function Root() {
         <BrowserRouter>
             <Router src="/" component={<Home />} />
             <Router src="/profile" component={<Profile />} />
-            <Router src="*" component={<NotFound />} />
+            <Router src="/404" component={<NotFound />} default />
         </BrowserRouter>
     );
 }
