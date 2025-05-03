@@ -1,6 +1,12 @@
-import React from "react";
+import React, { useEffect, useNavigate } from "react";
 
 export default function NotFound() {
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        navigate("/profile");
+    }, [])
+
     return (
         <div>
             <h1>404</h1>

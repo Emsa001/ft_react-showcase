@@ -14,7 +14,7 @@ import { useEffectHook } from "./hooks/useEffect";
 import { useStaticHook } from "./hooks/useStatic";
 import { useRefHook } from "./hooks/useRef";
 import { useContextHook } from "./hooks/useContext";
-import { useNavigationHook } from "./hooks/useNavigation";
+import { useNavigateHook } from "./hooks/useNavigate";
 
 import "./render/hot";
 import { useSyncExternalStoreMethod } from "./hooks/useSyncExternalStore";
@@ -54,7 +54,7 @@ class FtReact {
     useEffect = (callback: () => void, deps?: any[]) => useEffectHook(callback, deps);
     useRef = <T>(initialValue: T) => useRefHook(initialValue);
     useContext = (context: any) => useContextHook(context);
-    useNavigation = () => useNavigationHook();
+    useNavigate = () => useNavigateHook();
     useSyncExternalStore = <T>(
         subscribe: (onStoreChange: () => void) => () => void,
         getSnapshot: () => T,
@@ -91,7 +91,7 @@ export const useEffect = React.useEffect;
 export const useStatic = React.useStatic;
 export const useRef = React.useRef;
 export const useContext = React.useContext;
-export const useNavigation = React.useNavigation;
+export const useNavigate = React.useNavigate;
 export const useSyncExternalStore = React.useSyncExternalStore;
 
 /*

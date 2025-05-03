@@ -10,7 +10,7 @@ The idea for this project came from my final project at 42 coding school (`ft_tr
 ## Features
 
 - **Routing**: Basic routing capabilities for navigation between different pages without reloading.
-- **Hooks**: Implemented `useState`, `useStatic`, `useEffect`, `useRef`, `useContext`, `useNavigation` and `useSyncExternalStore`.
+- **Hooks**: Implemented `useState`, `useStatic`, `useEffect`, `useRef`, `useContext`, `useNavigate` and `useSyncExternalStore`.
 - **Context and Providers**: A basic context API for managing global state.
 
 ### What is `useStatic`?
