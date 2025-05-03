@@ -1,7 +1,7 @@
-import React, { useNavigation } from "react";
+import React, { useNavigate } from "react";
 
 export default function NavButton({ to, label }: { to: string; label: string }) {
-    const navigate = useNavigation();
+    const navigate = useNavigate();
 
     return (
         <button
