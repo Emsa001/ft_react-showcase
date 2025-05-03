@@ -12,10 +12,8 @@
         "forceConsistentCasingInFileNames": true,
         "typeRoots": ["./react/types", "./node_modules/@types"],
         "types": ["node", "webpack-env"],
-        "baseUrl": "./src",
-        "paths": {
-            "*": ["./*", "../*"] 
-        }
+        "baseUrl": "./",
+        "paths": { }
     },
     "include": [
         "src/**/*",

@@ -12,11 +12,15 @@ import { CustomHooks } from "../../components/CustomHooks";
 import { CustomProvider } from "../../components/CustomProvider";
 import { StaticStateSimple } from "../../components/StaticStateSimple";
 import { Icon } from "../../components/Icons";
+import { PropTest } from "../../components/PropTest";
 
 export default function Home() {
     return (
         <div>
             Hello world!
+            <PropTest name="Person 1" age={22} />
+            <PropTest name="Person 2" age={22} />
+            <PropTest name="Person 3" age={25} />
         </div>
     );
 }
