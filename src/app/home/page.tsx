@@ -13,14 +13,20 @@ import { CustomProvider } from "../../components/CustomProvider";
 import { StaticStateSimple } from "../../components/StaticStateSimple";
 import { Icon } from "../../components/Icons";
 import { PropTest } from "../../components/PropTest";
+import { ThreejsTest } from "../../components/ThreeJsTest";
 
 export default function Home() {
+
+    const [show, setShow] = React.useState(false);
+
     return (
         <div>
             Hello world!
-            <PropTest name="Person 1" age={22} />
+            {/* <PropTest name="Person 1" age={22} />
             <PropTest name="Person 2" age={22} />
-            <PropTest name="Person 3" age={25} />
+            <PropTest name="Person 3" age={25} /> */}
+            {show && <ThreejsTest />}
+            <button onClick={() => setShow(!show)}>Toggle</button>
         </div>
     );
 }
