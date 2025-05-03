@@ -1,4 +1,4 @@
-import React, { useEffect, useNavigation, useState, useStatic } from "react";
+import React from "react";
 import { BooleanSimple, BooleanSimple2 } from "../../components/BooleanSimple";
 import { BooleansMadnessLevels } from "../../components/BooleansMadness";
 import { StateChaosUltimate } from "../../components/StateChaosUltimate";
@@ -11,18 +11,9 @@ import { ArrayComponents } from "../../components/ArrayComponents";
 import { CustomHooks } from "../../components/CustomHooks";
 import { CustomProvider } from "../../components/CustomProvider";
 import { StaticStateSimple } from "../../components/StaticStateSimple";
-import { FaBeer } from "react-icons/fa";
 import { Icon } from "../../components/Icons";
 
 export default function Home() {
-
-    const [isVisible, setIsVisible] = useState(true);
-    const navigate = useNavigation();
-
-    const goToProfile = () => {
-        navigate("/profile");
-    };
-
     return (
         <div>
             Hello world!
