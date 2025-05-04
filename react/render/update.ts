@@ -33,32 +33,41 @@ export const unMountFunctionChild = (node: any) => {
     }
 };
 
-function areNodesDifferent(oldNode:ReactElement, newNode:ReactElement) {
+function areNodesDifferent(oldNode: ReactElement, newNode: ReactElement) {
     if (oldNode.type !== newNode.type) return true;
-  
+
     const oldChildren = oldNode.children || [];
     const newChildren = newNode.children || [];
-  
+
     if (oldChildren.length !== newChildren.length) return true;
-  
-    for (let i = 0; i < oldChildren.length; i++) {
-      const oldChild = oldChildren[i];
-      const newChild = newChildren[i];
-  
-      // If primitive (text, number), compare directly
-      if (typeof oldChild === "string" || typeof oldChild === "number") {
-        if (oldChild !== newChild) return true;
-      } else if (typeof oldChild === "object" && typeof newChild === "object") {
-        // Recursively compare elements
-        if (areNodesDifferent(oldChild, newChild)) return true;
-      } else {
-        return true; // Mixed types
-      }
+
+    // Compare props
+    const oldProps = oldNode.props || {};
+    const newProps = newNode.props || {};
+    const oldPropsKeys = Object.keys(oldProps);
+    const newPropsKeys = Object.keys(newProps);
+
+    if (oldPropsKeys.length !== newPropsKeys.length) return true;
+
+    for (const key of oldPropsKeys) {
+        if (oldProps[key] !== newProps[key]) return true;
     }
-  
-    return false; // No differences found
-  }
-  
+
+    for (let i = 0; i < oldChildren.length; i++) {
+        const oldChild = oldChildren[i];
+        const newChild = newChildren[i];
+
+        if (typeof oldChild === "string" || typeof oldChild === "number") {
+            if (oldChild !== newChild) return true;
+        } else if (typeof oldChild === "object" && typeof newChild === "object") {
+            if (areNodesDifferent(oldChild, newChild)) return true;
+        } else {
+            return true;
+        }
+    }
+
+    return false;
+}
 
 let addToIndex = 0;
 
@@ -196,26 +205,25 @@ export function update(this: VDomManagerImpl, { oldNode, newVNode, ref, parent, 
             console.warn("Old component not found", oldNode, newVNode);
             return;
         }
-        
-        
-        if(areNodesDifferent(oldNode, newVNode)){
+
+        if (areNodesDifferent(oldNode, newVNode)) {
             oldComponent.isDirty = true;
         }
-        
+
         const isDirty = oldNode.componentName && this.components.get(oldNode.componentName!)?.isDirty;
         if (!isDirty) {
-            if (IS_DEVELOPMENT){
+            if (IS_DEVELOPMENT) {
                 console.log("[ Function component ], no update necessary");
                 console.log("Old node", oldNode);
                 console.log("New node", newVNode);
                 console.log("[ Component ]", this.components.get(oldNode.componentName!));
-            } 
+            }
             return;
         }
-        
+
         const newComponent = newVNode.type(newVNode.props, ...newVNode.children);
         newComponent.componentName = newVNode.componentName;
-        
+
         oldComponent.isDirty = false;
         const componentName = typeof newComponent.type === "function" ? newComponent.type.name : "";
 
@@ -232,11 +240,10 @@ export function update(this: VDomManagerImpl, { oldNode, newVNode, ref, parent, 
         });
 
         // TODO: if something doesn't work correctly, probably because of it
-        if(oldComponent.vNode){
+        if (oldComponent.vNode) {
             oldComponent.vNode.children = newComponent.children;
             oldComponent.vNode.componentName = componentName;
         }
-
 
         return;
     }
