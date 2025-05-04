@@ -35,7 +35,9 @@ export function setProps(this: VDomManagerImpl, { ref, key, value }: { ref: Elem
         return;
     }
 
+    // TODO: do we need both?
     ref.setAttribute(key, value);
+    (ref as any)[key] = value;
 }
 
 export function removeProp(this: VDomManagerImpl, { ref, key }: { ref: Element; key: string }): void {
