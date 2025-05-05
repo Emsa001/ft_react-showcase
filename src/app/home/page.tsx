@@ -29,7 +29,7 @@ export default function Home() {
 
     return (
         <div>
-            <BooleanSimple3 />
+            <StateApocalypse />
         </div>
     );
 }

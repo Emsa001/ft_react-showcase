@@ -4,7 +4,10 @@ import { mount, unMountNode } from "./mount";
 import React, { IS_DEVELOPMENT } from "react";
 import { removeProp, setProps } from "./props";
 
+
+// TODO: get rid of global variables
 let addToIndex = 0;
+let prevElement: Element | null = null;
 
 const isDifferent = (oldNode: ReactElement, newNode: ReactElement): boolean => {
     if (oldNode.type !== newNode.type) return true;
@@ -131,14 +134,14 @@ const updateBoolean = (
 
     */
 
-    if (index - 1 < 0) {
-        if (IS_DEVELOPMENT) console.log("Mounting first child", parent);
-        mount({ vNode: newNode, parent: parent as HTMLElement, mode: "before", name });
-        addToIndex++;
+   if (index - 1 < 0) {
+       if (IS_DEVELOPMENT) console.log("Mounting first child", parent);
+       mount({ vNode: newNode, parent: parent as HTMLElement, mode: "before", name });
+       addToIndex++;
     } else {
-        const previousChild = (parent.childNodes[index - 1] as HTMLElement) || parent.lastChild;
-        if (IS_DEVELOPMENT) console.log("Mounting after previous child", previousChild, parent);
-        mount({ vNode: newNode, parent: previousChild, mode: "after", name });
+        // const previousChild = (parent.childNodes[index - 1] as HTMLElement) || parent.lastChild;
+        if (IS_DEVELOPMENT) console.log("Mounting after previous child", prevElement, parent);
+        mount({ vNode: newNode, parent: prevElement!, mode: "after", name });
     }
 
     return true;
@@ -279,7 +282,10 @@ const updateElement = (
                 newChild?.ref ||
                 (oldNode.ref!.childNodes[realIndex] as HTMLElement | null);
 
-            if (newChild && oldChild) realIndex++;
+            if (newChild && oldChild) {
+                realIndex++;
+                prevElement = childRef;
+            }
 
             update({
                 oldNode: oldChild,

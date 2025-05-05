@@ -53,13 +53,13 @@ export function BooleanSimple3() {
 
     return (
         <div>
-            <div>{isVisible1 && <p>This is the first paragraph.</p>}</div>
+            {isVisible1 && <p>This is the first paragraph.</p>}
             <hr />
-            <div>{isVisible2 && <p>This is the second paragraph.</p>}</div>
+            {isVisible2 && <p>This is the second paragraph.</p>}
             <hr />
-            <div>{isVisible3 && <p>This is the third paragraph.</p>}</div>
+            {isVisible3 && <p>This is the third paragraph.</p>}
             <hr />
-            <div>{isVisible4 && <p>This is the fourth paragraph.</p>}</div>
+            {isVisible4 && <p>This is the fourth paragraph.</p>}
             <hr />
 
             <button onClick={setAllVisible}>Set All Visible</button>

@@ -4,12 +4,10 @@ import CopyWebpackPlugin from "copy-webpack-plugin";
 import dotenv from "dotenv";
 import webpack from "webpack";
 
-// Load environment variables from .env file
 dotenv.config();
 
-// Filter only REACT_PUBLIC_ variables and stringify them
 const envKeys = Object.keys(process.env)
-    .filter((key) => key.startsWith("REACT_PUBLIC_"))
+    .filter((key) => key.startsWith("FT_REACT_PUBLIC_"))
     .reduce((env, key) => {
         env[`process.env.${key}`] = JSON.stringify(process.env[key]);
         return env;
