@@ -1,5 +1,5 @@
 import React, { Hook, IS_DEVELOPMENT, ReactComponentInstance } from "react";
-import { update } from "../render/update";
+import { update } from "react/render/update";
 
 // Process all queued state updates for the hook
 export function processQueue(hook: Hook) {

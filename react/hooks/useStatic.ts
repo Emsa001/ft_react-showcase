@@ -31,7 +31,8 @@ export function useStaticHook<T>(name: string, initialState: T): [T, (value: T |
     
     const setState = (newValue: T | ((prevState: T) => T)) => {
         if(!staticComponents) {
-            throw new Error("No static components found");
+            console.warn("Tried to set state on a static component that doesn't exist");
+            return ;
         }
 
         hook!.queue.push((prevState: T) => {
@@ -45,11 +46,13 @@ export function useStaticHook<T>(name: string, initialState: T): [T, (value: T |
         staticComponents.forEach((comp) => {
             const compInstance = React.components.get(comp);
             if(!compInstance) {
-                throw new Error("No component found");
-            }
-            if (!compInstance.isDirty) {
-                compInstance.isDirty = true;
-                scheduleUpdate(compInstance, []);
+                console.warn("Tried to set state on a static component that doesn't exist, probably component was unmounted and not unsubscribed from the static state. After this message, the component will be removed from the staticStates");
+                React.staticComponents.delete(comp);
+            }else{
+                if (!compInstance.isDirty) {
+                    compInstance.isDirty = true;
+                    scheduleUpdate(compInstance, []);
+                }
             }
         })    
     };

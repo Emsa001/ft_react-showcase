@@ -29,15 +29,7 @@ export default function Home() {
 
     return (
         <div>
-            {toggle && <StaticStateNormalState />}
-            <button onClick={() => setToggle((prev) => !prev)}>Toggle</button>
-            <hr />
-
-            <StaticStateSimple />
-            <StaticStateTest />
-
-            <button onClick={() => setState((prev) => prev + 1)}>State: {state}</button>
-            <ArraySimple />
+            <StateApocalypse />
         </div>
     );
 }

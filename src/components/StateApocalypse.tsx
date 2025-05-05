@@ -111,17 +111,19 @@ export function StateApocalypse() {
                 </div>
             </div>
 
-            {count > 10 && (
-                <div>
-                    <h2>🚀 FINAL PHASE UNLOCKED 🚀</h2>
-                    <p>You have clicked over 10 times!</p>
+            <div>
+                {count > 2 && (
                     <div>
-                        {Array.from({ length: count - 10 }, (_, idx) => (
-                            <div key={idx}>Overdrive {idx + 1}</div>
-                        ))}
+                        <h2>🚀 FINAL PHASE UNLOCKED 🚀</h2>
+                        <p>You have clicked over 10 times!</p>
+                        <div>
+                            {Array.from({ length: count - 10 }, (_, idx) => (
+                                <div key={idx}>Overdrive {idx + 1}</div>
+                            ))}
+                        </div>
                     </div>
-                </div>
-            )}
+                )}
+            </div>
         </div>
     );
 }
