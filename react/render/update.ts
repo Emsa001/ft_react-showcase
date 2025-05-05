@@ -1,5 +1,6 @@
 import React, { IS_DEVELOPMENT } from "..";
 import { VDomManagerImpl } from "./manager";
+import { unMountFull } from "./mount";
 
 interface IUpdateProps {
     oldNode: ReactNode;
@@ -10,30 +11,7 @@ interface IUpdateProps {
     name: string;
 }
 
-export let componentsInUse: string[] = [];
-
-export const unMountFunctionChild = (node: any) => {
-    // Check if the current node's type is a function
-    if (typeof node.type === "function") {
-        React.vDomManager.components.get(node.componentName)?.onUnmount();
-    }
-
-    // If the node has children, recursively check them
-    if (Array.isArray(node.children)) {
-        for (const child of node.children) {
-            // Handle cases where children are nested arrays
-            if (Array.isArray(child)) {
-                for (const nestedChild of child) {
-                    unMountFunctionChild(nestedChild);
-                }
-            } else {
-                unMountFunctionChild(child);
-            }
-        }
-    }
-};
-
-function areNodesDifferent(oldNode: ReactElement, newNode: ReactElement) {
+const areNodesDifferent = (oldNode: ReactElement, newNode: ReactElement): boolean => {
     if (oldNode.type !== newNode.type) return true;
 
     const oldChildren = oldNode.children || [];
@@ -67,7 +45,8 @@ function areNodesDifferent(oldNode: ReactElement, newNode: ReactElement) {
     }
 
     return false;
-}
+};
+
 
 let addToIndex = 0;
 
@@ -81,12 +60,6 @@ export function update(this: VDomManagerImpl, { oldNode, newVNode, ref, parent, 
             const oldChild = oldNode[i];
             const childRef = oldChild?.ref || newChild?.ref || null;
 
-            // console.log("========================")
-            // console.log("newChild", newChild);
-            // console.log("oldChild", oldChild);
-            // console.log("parent", parent);
-            // console.log("========================")
-
             this.update({
                 oldNode: oldChild,
                 newVNode: newChild,
@@ -96,19 +69,6 @@ export function update(this: VDomManagerImpl, { oldNode, newVNode, ref, parent, 
                 name,
             });
         }
-
-        // if(!parent){
-        //     console.warn("Cannot Create new now: Parent is null");
-        //     return;
-        // }
-
-        // // remove full array (not a good solution)
-        // parent.innerHTML = "";
-
-        // // create new array
-        // for (const child of newVNode as ReactElement[]) {
-        //     this.mount({ vnode: child, parent: parent!, name });
-        // }
 
         return;
     }
@@ -120,23 +80,14 @@ export function update(this: VDomManagerImpl, { oldNode, newVNode, ref, parent, 
         }
 
         if (IS_DEVELOPMENT) console.log("[ Old node is null ]", oldNode, newVNode);
-        this.mount({ vnode: newVNode, parent: parent, mode: "append", name });
+        this.mount({ vNode: newVNode, parent: parent, mode: "append", name });
         return;
     }
 
     if (newVNode === null || typeof newVNode === "undefined") {
         if (IS_DEVELOPMENT) console.log("[ New node is null ]", oldNode, newVNode);
 
-        unMountFunctionChild(oldNode);
-        // if (
-        //     typeof oldNode === "object" &&
-        //     !Array.isArray(oldNode) &&
-        //     typeof oldNode.type === "function"
-        // ) {
-        //     this.components.get(oldNode.componentName!)?.onUnmount();
-        //     return;
-        // }
-
+        unMountFull(oldNode);
         ref?.remove();
         return;
     }
@@ -147,17 +98,9 @@ export function update(this: VDomManagerImpl, { oldNode, newVNode, ref, parent, 
         if (IS_DEVELOPMENT) console.log("[ Boolean difference ]", oldNode, newVNode, ref);
 
         if (newVNode === false) {
-            // if (typeof oldNode === "object" && oldNode.componentName) {
-            //     const component = this.components.get(oldNode.componentName);
-            //     console.log("Unmounting component:", oldNode.componentName, component);
-            //     if (component) {
-            //         component.onUnmount();
-            //     }
-            // }
-
-            unMountFunctionChild(oldNode);
+            unMountFull(oldNode);
             if (typeof oldNode != "object" || (typeof oldNode === "object" && typeof oldNode.type !== "function")) {
-                // this.mount({ vnode: newVNode, parent: ref!, mode: "replace", name });
+                // this.mount({ vNode: newVNode, parent: ref!, mode: "replace", name });
                 ref?.remove();
             }
             return;
@@ -170,12 +113,12 @@ export function update(this: VDomManagerImpl, { oldNode, newVNode, ref, parent, 
 
         if (index - 1 < 0) {
             if (IS_DEVELOPMENT) console.log("Mounting first child", parent);
-            this.mount({ vnode: newVNode, parent: parent as HTMLElement, mode: "before", name });
+            this.mount({ vNode: newVNode, parent: parent as HTMLElement, mode: "before", name });
             addToIndex++;
         } else {
             const previousChild = (parent.childNodes[index - 1] as HTMLElement) || parent.lastChild;
             if (IS_DEVELOPMENT) console.log("Mounting after previous child", previousChild);
-            this.mount({ vnode: newVNode, parent: previousChild, mode: "after", name });
+            this.mount({ vNode: newVNode, parent: previousChild, mode: "after", name });
         }
         return;
     }
@@ -189,8 +132,8 @@ export function update(this: VDomManagerImpl, { oldNode, newVNode, ref, parent, 
 
     if (typeof oldNode != typeof newVNode) {
         if (IS_DEVELOPMENT) console.log("[ Type difference ]", oldNode, newVNode);
-        this.mount({ vnode: newVNode, parent: ref!, mode: "replace", name });
-        unMountFunctionChild(oldNode);
+        this.mount({ vNode: newVNode, parent: ref!, mode: "replace", name });
+        unMountFull(oldNode);
         return;
     }
 
@@ -251,8 +194,8 @@ export function update(this: VDomManagerImpl, { oldNode, newVNode, ref, parent, 
     if (oldNode.type !== newVNode.type) {
         if (IS_DEVELOPMENT) console.log("[ Element type difference ]", oldNode, newVNode);
 
-        this.mount({ vnode: newVNode, parent: ref!, mode: "replace", name });
-        unMountFunctionChild(oldNode);
+        this.mount({ vNode: newVNode, parent: ref!, mode: "replace", name });
+        unMountFull(oldNode);
         return;
     }
 
@@ -285,14 +228,6 @@ export function update(this: VDomManagerImpl, { oldNode, newVNode, ref, parent, 
 
             if (newChild && oldChild) realIndex++;
 
-            // console.log("========================")
-            // console.log("newChild", newChild);
-            // console.log("oldChild", oldChild);
-            // console.log("childRef", childRef);
-            // console.log("index", i,oldNode.ref!.childNodes);
-            // console.log("realIndex", realIndex);
-            // console.log("addToIndex", addToIndex);
-
             this.update({
                 oldNode: oldChild,
                 newVNode: newChild,
@@ -301,8 +236,6 @@ export function update(this: VDomManagerImpl, { oldNode, newVNode, ref, parent, 
                 index: realIndex + addToIndex,
                 name,
             });
-
-            // console.log("========================")
         }
     }
 }

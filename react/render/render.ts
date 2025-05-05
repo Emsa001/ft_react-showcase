@@ -1,4 +1,4 @@
-import React, { ReactComponentInstance } from "..";
+import React, { IS_DEVELOPMENT, ReactComponentInstance } from "..";
 
 export async function renderMethod(element: ReactElement, container: HTMLElement) {
     const rootComponent = renderComponentMethod(element);
@@ -6,12 +6,12 @@ export async function renderMethod(element: ReactElement, container: HTMLElement
     React.vDomManager.currentComponent = rootComponent;
 
     React.vDomManager.rootDom = await React.vDomManager.mount({
-        vnode: rootComponent.vNode!,
+        vNode: rootComponent.vNode!,
         parent: container,
         name: rootComponent.name,
     });
 
-    console.log(React.vDomManager.components);
+    if(IS_DEVELOPMENT) console.log("[ components ]", React.vDomManager.components);
     if(React.vDomManager.rootDom === null) return;
     container.appendChild(React.vDomManager.rootDom);
 }

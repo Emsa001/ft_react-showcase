@@ -14,15 +14,13 @@ export function processQueue(hook: Hook) {
 }
 
 // Schedule the component update asynchronously
-export async function scheduleUpdate(component: ReactComponentInstance, states: Hook[]) {
-    component.isUpdating = true;
-
+export async function scheduleUpdate(component: ReactComponentInstance, states: Hook[]) {    
     await Promise.resolve().then(async () => {
         states.forEach((hook) => {
             processQueue(hook);
         });
         
-        component.isUpdating = false;
+        component.isDirty = false;
         
         React.vDomManager.currentComponent = component;
         component.hookIndex = 0;
@@ -40,7 +38,7 @@ export async function scheduleUpdate(component: ReactComponentInstance, states: 
         }
 
         if(!component.vNode?.ref){
-            throw new Error("Component ref is null, are you sure the component has a parent?");
+            throw new Error("Component ref is null, something is very wrong here :|");
         }
         
         if (newVNode && component.vNode) {
@@ -92,16 +90,12 @@ export function useStateHook<T>(initialState: T): [T, (value: T | ((prevState: T
         });
         
         // Only schedule the update once
-        component.isDirty = true;
-        if(IS_DEVELOPMENT) console.log("Component is dirty:", component.name);
-        if (!component.isUpdating) {
+        if (!component.isDirty) {
+            if(IS_DEVELOPMENT) console.log("Component is dirty:", component.name);
+            component.isDirty = true;
             scheduleUpdate(component, component.hooks);
         }
     };
     
-    // Do not process state updates immediately in the current render cycle!
-    // Process state updates in the next render cycle via `scheduleUpdate`.
-    
-    // Return the current memoized state
     return [hook.memoizedState, setState] as [T, (value: T | ((prevState: T) => T)) => void];
 }

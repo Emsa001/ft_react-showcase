@@ -1,6 +1,6 @@
 import { ReactComponentInstance } from "react/types/types";
 import React, { IS_DEVELOPMENT } from "..";
-import { unMountFunctionChild } from "react/render/update";
+import { unMountFull } from "react/render/mount";
 
 export function createComponentInstanceMethod(element: ReactElement): ReactComponentInstance {
     if (typeof element.type !== "function") {
@@ -16,7 +16,6 @@ export function createComponentInstanceMethod(element: ReactElement): ReactCompo
     return {
         name: name,
         isMounted: false,
-        isUpdating: false,
         isDirty: false,
 
         hooks: [],
@@ -37,7 +36,7 @@ export function createComponentInstanceMethod(element: ReactElement): ReactCompo
             const allChildren = Array.isArray(this.vNode?.children) ? this.vNode?.children : [];
             if(IS_DEVELOPMENT) console.log("Unmounting children:", allChildren);
             for (const child of allChildren) {
-                unMountFunctionChild(child);
+                unMountFull(child);
             }
             
             this.vNode?.ref?.remove();

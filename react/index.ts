@@ -102,5 +102,8 @@ export const setTitle = React.setTitle;
 /* ========================================================== */
 
 export * from "./types/types";
-export const IS_DEVELOPMENT = true;
+export const IS_DEVELOPMENT = false;
 export default React;
+
+console.log("public", process.env.REACT_PUBLIC_TEST);
+console.log("secret", process.env.SECRET_API_KEY)
