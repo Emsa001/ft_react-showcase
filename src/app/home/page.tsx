@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { BooleanSimple, BooleanSimple2 } from "../../components/BooleanSimple";
 import { BooleansMadnessLevels } from "../../components/BooleansMadness";
 import { StateChaosUltimate } from "../../components/StateChaosUltimate";
@@ -17,6 +17,15 @@ import { ThreejsTest } from "../../components/ThreeJsTest";
 
 export default function Home() {
     const [toggle, setToggle] = useState(true);
+    const [state, setState] = useState(0);
+
+    useEffect(() => {
+        console.log("State changed", state);
+
+        return () => {
+            console.log("Cleanup");
+        }
+    }, [state])
 
     return (
         <div>
@@ -26,6 +35,9 @@ export default function Home() {
 
             <StaticStateSimple />
             <StaticStateTest />
+
+            <button onClick={() => setState((prev) => prev + 1)}>State: {state}</button>
+            <ArraySimple />
         </div>
     );
 }

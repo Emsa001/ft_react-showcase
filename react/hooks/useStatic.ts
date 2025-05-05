@@ -2,13 +2,13 @@ import React, { IS_DEVELOPMENT } from "react";
 import { processQueue, scheduleUpdate, useStateHook } from "./useState";
 
 export function useStaticHook<T>(name: string, initialState: T): [T, (value: T | ((prevState: T) => T)) => void] {
-    const component = React.vDomManager.currentComponent;
+    const component = React.currentComponent;
 
     if (!component) {
         throw new Error("useStatic must be called within a component");
     }
     
-    let hook = React.vDomManager.staticStates.get(name);
+    let hook = React.staticStates.get(name);
     
     if (!hook) {
         hook = {
@@ -16,14 +16,14 @@ export function useStaticHook<T>(name: string, initialState: T): [T, (value: T |
             queue: [],
             type: 'state'
         };
-        React.vDomManager.staticStates.set(name, hook);
+        React.staticStates.set(name, hook);
     }
 
-    if (!React.vDomManager.staticComponents.has(name)) {
-        React.vDomManager.staticComponents.set(name, []);
+    if (!React.staticComponents.has(name)) {
+        React.staticComponents.set(name, []);
     }
 
-    const staticComponents = React.vDomManager.staticComponents.get(name)!;
+    const staticComponents = React.staticComponents.get(name)!;
     if (!staticComponents.includes(component.name)) {
         staticComponents.push(component.name);
         if(IS_DEVELOPMENT) console.log("Adding static component:", component.name, "to staticStates:", name);
@@ -43,7 +43,7 @@ export function useStaticHook<T>(name: string, initialState: T): [T, (value: T |
         processQueue(hook);
         
         staticComponents.forEach((comp) => {
-            const compInstance = React.vDomManager.components.get(comp);
+            const compInstance = React.components.get(comp);
             if(!compInstance) {
                 throw new Error("No component found");
             }

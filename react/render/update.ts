@@ -1,15 +1,6 @@
-import React, { IS_DEVELOPMENT } from "..";
-import { VDomManagerImpl } from "./manager";
-import { unMountFull } from "./mount";
-
-interface IUpdateProps {
-    oldNode: ReactNode;
-    newVNode: ReactNode;
-    ref: Element | null;
-    parent: Element | null;
-    index: number;
-    name: string;
-}
+import React, { IS_DEVELOPMENT, UpdateProps } from "..";
+import { mount, unMountNode } from "./mount";
+import { removeProp, setProps } from "./props";
 
 const areNodesDifferent = (oldNode: ReactElement, newNode: ReactElement): boolean => {
     if (oldNode.type !== newNode.type) return true;
@@ -50,19 +41,19 @@ const areNodesDifferent = (oldNode: ReactElement, newNode: ReactElement): boolea
 
 let addToIndex = 0;
 
-export function update(this: VDomManagerImpl, { oldNode, newVNode, ref, parent, index, name }: IUpdateProps) {
-    if (Array.isArray(oldNode) && Array.isArray(newVNode)) {
+export function update({ oldNode, newNode, ref, parent, index, name }: UpdateProps) {
+    if (Array.isArray(oldNode) && Array.isArray(newNode)) {
         /* 
             TODO: Key checking
         */
-        for (let i = 0; i < Math.max(oldNode.length, newVNode.length); i++) {
-            const newChild = newVNode[i];
+        for (let i = 0; i < Math.max(oldNode.length, newNode.length); i++) {
+            const newChild = newNode[i];
             const oldChild = oldNode[i];
             const childRef = oldChild?.ref || newChild?.ref || null;
 
-            this.update({
+            update({
                 oldNode: oldChild,
-                newVNode: newChild,
+                newNode: newChild,
                 ref: childRef,
                 parent,
                 index: i,
@@ -79,28 +70,27 @@ export function update(this: VDomManagerImpl, { oldNode, newVNode, ref, parent, 
             return;
         }
 
-        if (IS_DEVELOPMENT) console.log("[ Old node is null ]", oldNode, newVNode);
-        this.mount({ vNode: newVNode, parent: parent, mode: "append", name });
+        if (IS_DEVELOPMENT) console.log("[ Old node is null ]", oldNode, newNode);
+        mount({ vNode: newNode, parent: parent, mode: "append", name });
         return;
     }
 
-    if (newVNode === null || typeof newVNode === "undefined") {
-        if (IS_DEVELOPMENT) console.log("[ New node is null ]", oldNode, newVNode);
+    if (newNode === null || typeof newNode === "undefined") {
+        if (IS_DEVELOPMENT) console.log("[ New node is null ]", oldNode, newNode);
 
-        unMountFull(oldNode);
+        unMountNode(oldNode);
         ref?.remove();
         return;
     }
 
-    if (typeof oldNode === "boolean" || typeof newVNode === "boolean") {
-        if (oldNode === newVNode) return;
+    if (typeof oldNode === "boolean" || typeof newNode === "boolean") {
+        if (oldNode === newNode) return;
 
-        if (IS_DEVELOPMENT) console.log("[ Boolean difference ]", oldNode, newVNode, ref);
+        if (IS_DEVELOPMENT) console.log("[ Boolean difference ]", oldNode, newNode, ref);
 
-        if (newVNode === false) {
-            unMountFull(oldNode);
+        if (newNode === false) {
+            unMountNode(oldNode);
             if (typeof oldNode != "object" || (typeof oldNode === "object" && typeof oldNode.type !== "function")) {
-                // this.mount({ vNode: newVNode, parent: ref!, mode: "replace", name });
                 ref?.remove();
             }
             return;
@@ -113,69 +103,69 @@ export function update(this: VDomManagerImpl, { oldNode, newVNode, ref, parent, 
 
         if (index - 1 < 0) {
             if (IS_DEVELOPMENT) console.log("Mounting first child", parent);
-            this.mount({ vNode: newVNode, parent: parent as HTMLElement, mode: "before", name });
+            mount({ vNode: newNode, parent: parent as HTMLElement, mode: "before", name });
             addToIndex++;
         } else {
             const previousChild = (parent.childNodes[index - 1] as HTMLElement) || parent.lastChild;
             if (IS_DEVELOPMENT) console.log("Mounting after previous child", previousChild);
-            this.mount({ vNode: newVNode, parent: previousChild, mode: "after", name });
+            mount({ vNode: newNode, parent: previousChild, mode: "after", name });
         }
         return;
     }
 
-    if ((typeof oldNode === "string" || typeof oldNode === "number") && (typeof newVNode === "string" || typeof newVNode === "number")) {
-        if (oldNode.toString() !== newVNode.toString()) {
-            ref!.textContent = newVNode.toString();
+    if ((typeof oldNode === "string" || typeof oldNode === "number") && (typeof newNode === "string" || typeof newNode === "number")) {
+        if (oldNode.toString() !== newNode.toString()) {
+            ref!.textContent = newNode.toString();
         }
         return;
     }
 
-    if (typeof oldNode != typeof newVNode) {
-        if (IS_DEVELOPMENT) console.log("[ Type difference ]", oldNode, newVNode);
-        this.mount({ vNode: newVNode, parent: ref!, mode: "replace", name });
-        unMountFull(oldNode);
+    if (typeof oldNode != typeof newNode) {
+        if (IS_DEVELOPMENT) console.log("[ Type difference ]", oldNode, newNode);
+        mount({ vNode: newNode, parent: ref!, mode: "replace", name });
+        unMountNode(oldNode);
         return;
     }
 
     oldNode = oldNode as ReactElement;
-    newVNode = newVNode as ReactElement;
-    if (oldNode.componentName) newVNode.componentName = oldNode.componentName;
+    newNode = newNode as ReactElement;
+    if (oldNode.componentName) newNode.componentName = oldNode.componentName;
 
-    if (typeof newVNode.type === "function" && typeof oldNode.type === "function") {
+    if (typeof newNode.type === "function" && typeof oldNode.type === "function") {
         // Compare props to check if function needs an update;
-        const oldComponent = this.components.get(oldNode.componentName!);
+        const oldComponent = React.components.get(oldNode.componentName!);
         if (!oldComponent) {
-            console.warn("Old component not found", oldNode, newVNode);
+            console.warn("Old component not found", oldNode, newNode);
             return;
         }
 
-        if (areNodesDifferent(oldNode, newVNode)) {
+        if (areNodesDifferent(oldNode, newNode)) {
             oldComponent.isDirty = true;
         }
 
-        const isDirty = oldNode.componentName && this.components.get(oldNode.componentName!)?.isDirty;
+        const isDirty = oldNode.componentName && React.components.get(oldNode.componentName!)?.isDirty;
         if (!isDirty) {
             if (IS_DEVELOPMENT) {
                 console.log("[ Function component ], no update necessary");
                 console.log("Old node", oldNode);
-                console.log("New node", newVNode);
-                console.log("[ Component ]", this.components.get(oldNode.componentName!));
+                console.log("New node", newNode);
+                console.log("[ Component ]", React.components.get(oldNode.componentName!));
             }
             return;
         }
 
-        const newComponent = newVNode.type(newVNode.props, ...newVNode.children);
-        newComponent.componentName = newVNode.componentName;
+        const newComponent = newNode.type(newNode.props, ...newNode.children);
+        newComponent.componentName = newNode.componentName;
 
         oldComponent.isDirty = false;
         const componentName = typeof newComponent.type === "function" ? newComponent.type.name : "";
 
         if (IS_DEVELOPMENT) console.log("[ Function component ]", newComponent, oldComponent);
-        this.currentComponent = oldComponent;
+        React.currentComponent = oldComponent;
 
-        this.update({
+        update({
             oldNode: oldComponent?.vNode || oldNode,
-            newVNode: newComponent,
+            newNode: newComponent,
             ref: ref,
             parent: ref?.parentElement!,
             index: 0,
@@ -191,46 +181,46 @@ export function update(this: VDomManagerImpl, { oldNode, newVNode, ref, parent, 
         return;
     }
 
-    if (oldNode.type !== newVNode.type) {
-        if (IS_DEVELOPMENT) console.log("[ Element type difference ]", oldNode, newVNode);
+    if (oldNode.type !== newNode.type) {
+        if (IS_DEVELOPMENT) console.log("[ Element type difference ]", oldNode, newNode);
 
-        this.mount({ vNode: newVNode, parent: ref!, mode: "replace", name });
-        unMountFull(oldNode);
+        mount({ vNode: newNode, parent: ref!, mode: "replace", name });
+        unMountNode(oldNode);
         return;
     }
 
     // Set props
     const oldProps = oldNode.props || {};
-    const newProps = newVNode.props || {};
+    const newProps = newNode.props || {};
 
     // Add or update props
     for (const [key, value] of Object.entries(newProps)) {
-        this.setProps({ ref: ref!, key, value });
+        setProps({ ref: ref!, key, value });
     }
 
     // Remove props that no longer exist
     for (const key of Object.keys(oldProps)) {
         if (!(key in newProps)) {
-            this.removeProp({ ref: ref!, key });
+            removeProp({ ref: ref!, key });
         }
     }
 
-    newVNode.ref = ref;
+    newNode.ref = ref;
 
     // Check for children
-    if (Array.isArray(oldNode.children) && Array.isArray(newVNode.children)) {
+    if (Array.isArray(oldNode.children) && Array.isArray(newNode.children)) {
         let realIndex = 0;
         addToIndex = 0;
-        for (let i = 0; i < Math.max(oldNode.children.length, newVNode.children.length); i++) {
-            const newChild = newVNode.children[i];
+        for (let i = 0; i < Math.max(oldNode.children.length, newNode.children.length); i++) {
+            const newChild = newNode.children[i];
             const oldChild = oldNode.children[i];
             const childRef = oldChild?.ref || newChild?.ref || (oldNode.ref!.childNodes[realIndex] as HTMLElement | null);
 
             if (newChild && oldChild) realIndex++;
 
-            this.update({
+            update({
                 oldNode: oldChild,
-                newVNode: newChild,
+                newNode: newChild,
                 ref: childRef,
                 parent: ref,
                 index: realIndex + addToIndex,

@@ -1,15 +1,17 @@
 import { ReactComponentInstance } from "react/types/types";
 import React, { IS_DEVELOPMENT } from "..";
-import { unMountFull } from "react/render/mount";
+import { unMountNode } from "react/render/mount";
 
 export function createComponentInstanceMethod(element: ReactElement): ReactComponentInstance {
     if (typeof element.type !== "function") {
         throw new Error("Invalid component type");
     }
 
-    const name = !React.vDomManager.components.has(element.type.name)
-        ? element.type.name
-        : element.type.name + Math.random().toString(36).substring(2, 15);
+    let name = element.type.name;
+
+    while(React.components.has(name)) {
+        name = element.type.name + Math.random().toString(36).substring(2, 15);
+    }
 
     element.componentName = name;
 
@@ -36,12 +38,12 @@ export function createComponentInstanceMethod(element: ReactElement): ReactCompo
             const allChildren = Array.isArray(this.vNode?.children) ? this.vNode?.children : [];
             if(IS_DEVELOPMENT) console.log("Unmounting children:", allChildren);
             for (const child of allChildren) {
-                unMountFull(child);
+                unMountNode(child);
             }
             
             this.vNode?.ref?.remove();
-            React.vDomManager.components.delete(this.name);
-            React.vDomManager.staticComponents.delete(this.name);
+            React.components.delete(this.name);
+            React.staticComponents.delete(this.name);
             this.queueFunctions.forEach((fn) => fn());
             this.queueFunctions.clear();
             

@@ -1,5 +1,5 @@
-import { Hook, IS_DEVELOPMENT, ReactComponentInstance } from "react";
-import React from "../";
+import React, { Hook, IS_DEVELOPMENT, ReactComponentInstance } from "react";
+import { update } from "../render/update";
 
 // Process all queued state updates for the hook
 export function processQueue(hook: Hook) {
@@ -22,18 +22,18 @@ export async function scheduleUpdate(component: ReactComponentInstance, states: 
         
         component.isDirty = false;
         
-        React.vDomManager.currentComponent = component;
+        React.currentComponent = component;
         component.hookIndex = 0;
         
         if (typeof component.jsx?.type !== "function") {
             throw new Error("Invalid component type");
         }
         
-        const newVNode = component.jsx?.type(component.jsx.props, ...component.jsx.children);
-        newVNode.componentName = component.name;
+        const newNode = component.jsx?.type(component.jsx.props, ...component.jsx.children);
+        newNode.componentName = component.name;
 
         if(IS_DEVELOPMENT){
-            console.log("New VNode:", newVNode);
+            console.log("New VNode:", newNode);
             console.log("Old VNode:", component.vNode);
         }
 
@@ -41,26 +41,26 @@ export async function scheduleUpdate(component: ReactComponentInstance, states: 
             throw new Error("Component ref is null, something is very wrong here :|");
         }
         
-        if (newVNode && component.vNode) {
-            React.vDomManager.update({
+        if (newNode && component.vNode) {
+            update({
                 oldNode: component.vNode,
-                newVNode,
+                newNode,
                 ref: component.vNode.ref,
                 parent: component.vNode.ref!.parentElement,
                 index: 0,
                 name: component.name
             });
-            component.vNode = newVNode;
+            component.vNode = newNode;
             component.isDirty = false;
         }
-        if(IS_DEVELOPMENT) console.log(React.vDomManager.components);
+        if(IS_DEVELOPMENT) console.log(React.components);
     });
     
 }
 
 // useState implementation
 export function useStateHook<T>(initialState: T): [T, (value: T | ((prevState: T) => T)) => void] {
-    const component = React.vDomManager.currentComponent;
+    const component = React.currentComponent;
 
     if (!component) {
         throw new Error("useState must be called within a component");

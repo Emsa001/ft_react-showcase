@@ -8,8 +8,20 @@ const checkDependenciesChanged = (prevDeps: TDependencyList, deps: TDependencyLi
     return deps.some((dep, index) => !Object.is(dep, prevDeps[index]));
 };
 
+/*
+
+    useEffect is a hook that allows you to perform side effects in function components.
+    It takes two arguments:
+    1. A callback function that contains the side effect logic.
+    2. An optional dependencies array that determines when the effect should run.
+    
+    The effect will run after the component renders, and it can return a cleanup function
+    that will be called before the component unmounts or before the effect runs again.
+
+*/
+
 export function useEffectHook(callback: TEffectCallback, deps?: TDependencyList): void {
-    const component = React.vDomManager.currentComponent;
+    const component = React.currentComponent;
     if (!component) {
         throw new Error("useEffect must be called inside a component render function");
     }

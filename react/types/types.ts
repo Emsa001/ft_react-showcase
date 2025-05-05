@@ -52,9 +52,19 @@ export interface RouterProps {
 
 export type MountMode = "append" | "replace" | "before" | "after" | "create-only";
 
-export interface ICreateDomProps {
+export interface MountProps {
     vNode: ReactNode;
     parent: Element;
     mode?: MountMode;
+    name: string;
+    isSvg?: boolean;
+}
+
+export interface UpdateProps {
+    oldNode: ReactNode;
+    newNode: ReactNode;
+    ref: Element | null;
+    parent: Element | null;
+    index: number;
     name: string;
 }
