@@ -1,107 +1,159 @@
-import React, { ICreateDomProps, MountMode } from "react";
-import { VDomManagerImpl } from "./manager";
+import React, { MountMode, MountProps } from "react";
+import { addToDom } from "./utils";
+import { setProps } from "./props";
 
-const isSvgElement = (type: string) => type === "svg" || type === "circle" || type === "rect" || type === "path" || type === "line" || type === "ellipse" || type === "polygon" || type === "polyline";
+/* ================= */
 
-function addToDom(dom: Element | Text, parent: Element | null, mode: MountMode){
-    if(!parent){
-        throw new Error("Parent is null");
-    }
+const isNullOrUndefined = (vNode: ReactNode): boolean =>
+    vNode === null || typeof vNode === "undefined";
 
-    if (mode === "replace") {
-        parent.replaceWith(dom);
-    } else if (mode === "before") {
-        parent.insertBefore(dom, parent.firstChild);
-    } else if (mode === "after") {
-        parent.after(dom);
-    } else {
-        parent.appendChild(dom);
-    }
-}
+const isPrimitive = (vNode: ReactNode): boolean =>
+    typeof vNode === "string" || typeof vNode === "number";
 
-export async function mount(
-    this: VDomManagerImpl,
-    { vnode, parent, mode = "append", name, isSvg = false }: ICreateDomProps & { isSvg?: boolean }
-  ): Promise<Element | null> {  
-    if (vnode === null || typeof vnode === "undefined") {
-        return parent;
-    }
+const mountArrayVNode = (
+    vNodes: ReactNode[],
+    parent: Element,
+    name: string,
+    isSvg?: boolean
+): Element => {
+    for (const child of vNodes) mount({ vNode: child, parent, name, isSvg });
+    return parent;
+};
 
-    if (Array.isArray(vnode)) {
-        for (const child of vnode) {
-            this.mount({ vnode: child, parent, name, isSvg });
-        }
-        return parent;
-    }
+const mountPrimitive = (vNode: string | number, parent: Element, mode: MountMode): Element => {
+    const textNode = document.createTextNode(vNode.toString());
+    addToDom(textNode, parent, mode);
+    return parent;
+};
 
-    if (typeof vnode === "string" || typeof vnode === "number") {
-        const textNode = document.createTextNode(vnode.toString());
-        addToDom(textNode, parent, mode);
-        return parent;
-    }
+const mountBooleanVNode = (vNode: boolean, parent: Element): Element => {
+    if (vNode === false) parent.remove();
+    return parent;
+};
 
-    if (typeof vnode === "boolean") {
-        if (vnode === false) {
-            parent.remove();
-        }
-        return parent;
-    }
+/* ================= */
 
-    if (typeof vnode.type === "function") {
+const mountComponentVNode = async (
+    vNode: VNode,
+    parent: Element,
+    mode: MountMode,
+    isSvg?: boolean
+): Promise<Element | null> => {
+    const component = React.createComponentInstance(vNode);
 
-        /*
-         * Check if the component is already mounted, if so, update it
-        */
+    React.components.set(component.name, component);
+    React.currentComponent = component;
 
-        // const currentComponent = vnode.componentName && this.components.get(vnode.componentName);
-        // console.log("Component", currentComponent);
-        // if (currentComponent) {
-        //     console.log("Updating component", currentComponent.name);
-        //     await scheduleUpdate(currentComponent, currentComponent.hooks);
-        //     addToDom(currentComponent.vNode!.ref!, parent, mode);
+    component.vNode = (vNode.type as ComponentType)(vNode.props, ...vNode.children);
+    if (component.vNode === null) return null;
+    if (!component.vNode.type) component.vNode!.type = "div";
 
-        //     return currentComponent.vNode!.ref!;
-        // }
+    component.vNode.componentName = component.name;
+    component.isMounted = true;
+    component.onMount();
 
+    const newRef = await mount({
+        vNode: component.vNode,
+        parent,
+        name: component.name,
+        mode,
+        isSvg,
+    });
 
-        const component = React.createComponentInstance(vnode);
+    component.vNode.ref = newRef as HTMLElement | null;
 
-        this.components.set(component.name, component);
-        this.currentComponent = component;
-        component.vNode = vnode.type(vnode.props, ...vnode.children);
+    return newRef;
+};
 
-        if (!component.vNode.type) {
-            component.vNode.type = "div";
-        }
-
-        if (component.vNode === null) return null;
-        component.vNode.componentName = component.name;
-
-        component.isMounted = true;
-        component.onMount();
-
-        const newRef = await this.mount({ vnode: component.vNode, parent, name: component.name, mode, isSvg });
-        component.vNode.ref = newRef as HTMLElement | null;
-        return newRef;
-    }
-
-    const nextIsSvg = isSvgElement(vnode.type) || isSvg;
+const mountElementVNode = (
+    vNode: ReactElement,
+    parent: Element,
+    name: string,
+    mode: MountMode,
+    isSvg?: boolean
+): Element => {
+    const nextIsSvg = vNode.type === "svg" || isSvg;
     const dom = nextIsSvg
-        ? document.createElementNS("http://www.w3.org/2000/svg", vnode.type)
-        : document.createElement(vnode.type);
+        ? document.createElementNS("http://www.w3.org/2000/svg", vNode.type as string)
+        : document.createElement(vNode.type as string);
 
-    vnode.ref = dom as Element | null;
+    vNode.ref = dom;
 
-    // Set props
-    for (const [key, value] of Object.entries(vnode.props)) {
-        this.setProps({ ref: dom, key, value });
+    for (const [key, value] of Object.entries(vNode.props)) {
+        setProps({ ref: dom, key, value });
     }
 
-    // Mount children recursively with SVG awareness
-    for (const child of vnode.children) {
-        this.mount({ vnode: child, parent: dom, name, isSvg: nextIsSvg });
+    for (const child of vNode.children) {
+        mount({ vNode: child, parent: dom, name, isSvg: nextIsSvg });
     }
 
     addToDom(dom, parent, mode);
     return dom;
+};
+
+/*
+ * Unmounts a VNode and it's children from the DOM and components list.
+ * @param {ReactNode} node - The VNode to unmount.
+ */
+
+export const unMountNode = (node: ReactNode) => {
+    if (node === null || typeof node === "undefined") return;
+    if (typeof node === "string" || typeof node === "number" || typeof node === "boolean") return;
+
+    if (Array.isArray(node)) {
+        for (const child of node) {
+            unMountNode(child);
+        }
+        return;
+    }
+
+    if (typeof node.type === "function") {
+        if (!node.componentName) {
+            console.warn("Tried to unmount component but it's name is not defined");
+            return;
+        }
+        React.components.get(node.componentName)?.onUnmount();
+    }
+
+    for (const child of node.children) {
+        if (Array.isArray(child)) {
+            for (const nestedChild of child) {
+                unMountNode(nestedChild);
+            }
+        } else {
+            unMountNode(child);
+        }
+    }
+};
+
+/*
+ * Mounts a VNode to the DOM.
+ * @param {MountProps} props - The properties for mounting.
+ * @returns {Promise<Element | null>} - The mounted DOM element or null.
+ */
+
+export async function mount(props: MountProps): Promise<Element | null> {
+    const { vNode, parent, name, mode = "append", isSvg } = props;
+
+    if (isNullOrUndefined(vNode)) {
+        return parent;
+    }
+
+    if (Array.isArray(vNode)) {
+        return mountArrayVNode(vNode, parent, name, isSvg);
+    }
+
+    if (isPrimitive(vNode)) {
+        return mountPrimitive(vNode as string | number, parent, mode);
+    }
+
+    if (typeof vNode === "boolean") {
+        return mountBooleanVNode(vNode, parent);
+    }
+
+    if (typeof (vNode as VNode).type === "function") {
+        return await mountComponentVNode(vNode as ReactElement, parent, mode, isSvg);
+    }
+
+    return mountElementVNode(vNode as ReactElement, parent, name, mode, isSvg);
 }

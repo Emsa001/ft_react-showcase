@@ -1,24 +1,25 @@
-import React, { ReactComponentInstance } from "..";
+import React, { IS_DEVELOPMENT, ReactComponentInstance } from "..";
+import { mount } from "./mount";
 
 export async function renderMethod(element: ReactElement, container: HTMLElement) {
     const rootComponent = renderComponentMethod(element);
-    React.vDomManager.components.set(rootComponent.name, rootComponent);
-    React.vDomManager.currentComponent = rootComponent;
+    React.components.set(rootComponent.name, rootComponent);
+    React.currentComponent = rootComponent;
 
-    React.vDomManager.rootDom = await React.vDomManager.mount({
-        vnode: rootComponent.vNode!,
+    React.rootDom = await mount({
+        vNode: rootComponent.vNode!,
         parent: container,
         name: rootComponent.name,
     });
 
-    console.log(React.vDomManager.components);
-    if(React.vDomManager.rootDom === null) return;
-    container.appendChild(React.vDomManager.rootDom);
+    if(IS_DEVELOPMENT) console.log("[ components ]", React.components);
+    if(React.rootDom === null) return;
+    container.appendChild(React.rootDom);
 }
 
 export function renderComponentMethod(element: ReactElement): ReactComponentInstance {
     const component = React.createComponentInstance(element);
-    React.vDomManager.currentComponent = component;
+    React.currentComponent = component;
 
     if (!React.isValidElement(element)) {
         throw new Error("Invalid element type");

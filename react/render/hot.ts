@@ -7,11 +7,11 @@ async function renderApp() {
 
     container.innerHTML = "";
 
-    React.vDomManager.components.clear();
+    React.components.clear();
     const root = React.createElement(Root);
     React.render(root, container);
-    if(React.vDomManager.isFirstRender)
-        React.vDomManager.isFirstRender = false;
+    if(React.isFirstRender)
+        React.isFirstRender = false;
 }
 
 renderApp();

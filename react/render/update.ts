@@ -1,39 +1,12 @@
-import React, { IS_DEVELOPMENT } from "..";
-import { VDomManagerImpl } from "./manager";
+import { UpdateProps } from "../types";
+import { isEqual } from "lodash";
+import { mount, unMountNode } from "./mount";
+import React, { IS_DEVELOPMENT } from "react";
+import { removeProp, setProps } from "./props";
 
-interface IUpdateProps {
-    oldNode: ReactNode;
-    newVNode: ReactNode;
-    ref: Element | null;
-    parent: Element | null;
-    index: number;
-    name: string;
-}
+let addToIndex = 0;
 
-export let componentsInUse: string[] = [];
-
-export const unMountFunctionChild = (node: any) => {
-    // Check if the current node's type is a function
-    if (typeof node.type === "function") {
-        React.vDomManager.components.get(node.componentName)?.onUnmount();
-    }
-
-    // If the node has children, recursively check them
-    if (Array.isArray(node.children)) {
-        for (const child of node.children) {
-            // Handle cases where children are nested arrays
-            if (Array.isArray(child)) {
-                for (const nestedChild of child) {
-                    unMountFunctionChild(nestedChild);
-                }
-            } else {
-                unMountFunctionChild(child);
-            }
-        }
-    }
-};
-
-function areNodesDifferent(oldNode: ReactElement, newNode: ReactElement) {
+const isDifferent = (oldNode: ReactElement, newNode: ReactElement): boolean => {
     if (oldNode.type !== newNode.type) return true;
 
     const oldChildren = oldNode.children || [];
@@ -50,7 +23,10 @@ function areNodesDifferent(oldNode: ReactElement, newNode: ReactElement) {
     if (oldPropsKeys.length !== newPropsKeys.length) return true;
 
     for (const key of oldPropsKeys) {
-        if (oldProps[key] !== newProps[key]) return true;
+        if (!isEqual(oldProps[key], newProps[key])) {
+            console.log("Props are different", oldProps[key], newProps[key]);
+            return true;
+        }
     }
 
     for (let i = 0; i < oldChildren.length; i++) {
@@ -60,249 +36,311 @@ function areNodesDifferent(oldNode: ReactElement, newNode: ReactElement) {
         if (typeof oldChild === "string" || typeof oldChild === "number") {
             if (oldChild !== newChild) return true;
         } else if (typeof oldChild === "object" && typeof newChild === "object") {
-            if (areNodesDifferent(oldChild, newChild)) return true;
+            if (isDifferent(oldChild, newChild)) return true;
         } else {
             return true;
         }
     }
 
     return false;
-}
+};
 
-let addToIndex = 0;
+const updateArray = (
+    oldNode: ReactNode[],
+    newNode: ReactNode[],
+    parent: Element | null,
+    name: string
+) => {
+    for (let i = 0; i < Math.max(oldNode.length, newNode.length); i++) {
+        const newChild = newNode[i] as VNode;
+        const oldChild = oldNode[i] as VNode;
+        const childRef = oldChild?.ref || newChild?.ref || null;
 
-export function update(this: VDomManagerImpl, { oldNode, newVNode, ref, parent, index, name }: IUpdateProps) {
-    if (Array.isArray(oldNode) && Array.isArray(newVNode)) {
-        /* 
-            TODO: Key checking
-        */
-        for (let i = 0; i < Math.max(oldNode.length, newVNode.length); i++) {
-            const newChild = newVNode[i];
-            const oldChild = oldNode[i];
-            const childRef = oldChild?.ref || newChild?.ref || null;
-
-            // console.log("========================")
-            // console.log("newChild", newChild);
-            // console.log("oldChild", oldChild);
-            // console.log("parent", parent);
-            // console.log("========================")
-
-            this.update({
-                oldNode: oldChild,
-                newVNode: newChild,
-                ref: childRef,
-                parent,
-                index: i,
-                name,
-            });
-        }
-
-        // if(!parent){
-        //     console.warn("Cannot Create new now: Parent is null");
-        //     return;
-        // }
-
-        // // remove full array (not a good solution)
-        // parent.innerHTML = "";
-
-        // // create new array
-        // for (const child of newVNode as ReactElement[]) {
-        //     this.mount({ vnode: child, parent: parent!, name });
-        // }
-
-        return;
-    }
-
-    if (oldNode === null || typeof oldNode === "undefined") {
-        if (!parent) {
-            console.warn("Cannot Create new now: Parent is null");
-            return;
-        }
-
-        if (IS_DEVELOPMENT) console.log("[ Old node is null ]", oldNode, newVNode);
-        this.mount({ vnode: newVNode, parent: parent, mode: "append", name });
-        return;
-    }
-
-    if (newVNode === null || typeof newVNode === "undefined") {
-        if (IS_DEVELOPMENT) console.log("[ New node is null ]", oldNode, newVNode);
-
-        unMountFunctionChild(oldNode);
-        // if (
-        //     typeof oldNode === "object" &&
-        //     !Array.isArray(oldNode) &&
-        //     typeof oldNode.type === "function"
-        // ) {
-        //     this.components.get(oldNode.componentName!)?.onUnmount();
-        //     return;
-        // }
-
-        ref?.remove();
-        return;
-    }
-
-    if (typeof oldNode === "boolean" || typeof newVNode === "boolean") {
-        if (oldNode === newVNode) return;
-
-        if (IS_DEVELOPMENT) console.log("[ Boolean difference ]", oldNode, newVNode, ref);
-
-        if (newVNode === false) {
-            // if (typeof oldNode === "object" && oldNode.componentName) {
-            //     const component = this.components.get(oldNode.componentName);
-            //     console.log("Unmounting component:", oldNode.componentName, component);
-            //     if (component) {
-            //         component.onUnmount();
-            //     }
-            // }
-
-            unMountFunctionChild(oldNode);
-            if (typeof oldNode != "object" || (typeof oldNode === "object" && typeof oldNode.type !== "function")) {
-                // this.mount({ vnode: newVNode, parent: ref!, mode: "replace", name });
-                ref?.remove();
-            }
-            return;
-        }
-
-        if (!parent) {
-            console.warn("Cannot Create new now: Parent is null");
-            return;
-        }
-
-        if (index - 1 < 0) {
-            if (IS_DEVELOPMENT) console.log("Mounting first child", parent);
-            this.mount({ vnode: newVNode, parent: parent as HTMLElement, mode: "before", name });
-            addToIndex++;
-        } else {
-            const previousChild = (parent.childNodes[index - 1] as HTMLElement) || parent.lastChild;
-            if (IS_DEVELOPMENT) console.log("Mounting after previous child", previousChild);
-            this.mount({ vnode: newVNode, parent: previousChild, mode: "after", name });
-        }
-        return;
-    }
-
-    if ((typeof oldNode === "string" || typeof oldNode === "number") && (typeof newVNode === "string" || typeof newVNode === "number")) {
-        if (oldNode.toString() !== newVNode.toString()) {
-            ref!.textContent = newVNode.toString();
-        }
-        return;
-    }
-
-    if (typeof oldNode != typeof newVNode) {
-        if (IS_DEVELOPMENT) console.log("[ Type difference ]", oldNode, newVNode);
-        this.mount({ vnode: newVNode, parent: ref!, mode: "replace", name });
-        unMountFunctionChild(oldNode);
-        return;
-    }
-
-    oldNode = oldNode as ReactElement;
-    newVNode = newVNode as ReactElement;
-    if (oldNode.componentName) newVNode.componentName = oldNode.componentName;
-
-    if (typeof newVNode.type === "function" && typeof oldNode.type === "function") {
-        // Compare props to check if function needs an update;
-        const oldComponent = this.components.get(oldNode.componentName!);
-        if (!oldComponent) {
-            console.warn("Old component not found", oldNode, newVNode);
-            return;
-        }
-
-        if (areNodesDifferent(oldNode, newVNode)) {
-            oldComponent.isDirty = true;
-        }
-
-        const isDirty = oldNode.componentName && this.components.get(oldNode.componentName!)?.isDirty;
-        if (!isDirty) {
-            if (IS_DEVELOPMENT) {
-                console.log("[ Function component ], no update necessary");
-                console.log("Old node", oldNode);
-                console.log("New node", newVNode);
-                console.log("[ Component ]", this.components.get(oldNode.componentName!));
-            }
-            return;
-        }
-
-        const newComponent = newVNode.type(newVNode.props, ...newVNode.children);
-        newComponent.componentName = newVNode.componentName;
-
-        oldComponent.isDirty = false;
-        const componentName = typeof newComponent.type === "function" ? newComponent.type.name : "";
-
-        if (IS_DEVELOPMENT) console.log("[ Function component ]", newComponent, oldComponent);
-        this.currentComponent = oldComponent;
-
-        this.update({
-            oldNode: oldComponent?.vNode || oldNode,
-            newVNode: newComponent,
-            ref: ref,
-            parent: ref?.parentElement!,
-            index: 0,
-            name: componentName,
+        update({
+            oldNode: oldChild,
+            newNode: newChild,
+            ref: childRef,
+            parent,
+            index: i,
+            name,
         });
+    }
+};
 
-        // TODO: if something doesn't work correctly, probably because of it
-        if (oldComponent.vNode) {
-            oldComponent.vNode.children = newComponent.children;
-            oldComponent.vNode.componentName = componentName;
+const updateUndefined = (
+    oldNode: ReactNode,
+    newNode: ReactNode,
+    parent: Element | null,
+    name: string,
+    ref: Element | null
+) => {
+    if (oldNode === null || oldNode === undefined) {
+        if (!parent) {
+            console.warn("Cannot Create new now: Parent is null");
+            return true;
         }
 
-        return;
+        // if (IS_DEVELOPMENT) console.log("Node is null ]", oldNode, newNode);
+        mount({ vNode: newNode, parent: parent as HTMLElement, mode: "append", name });
+        return true;
     }
 
-    if (oldNode.type !== newVNode.type) {
-        if (IS_DEVELOPMENT) console.log("[ Element type difference ]", oldNode, newVNode);
+    if (newNode === null || newNode === undefined) {
+        // if (IS_DEVELOPMENT) console.log("[ New node is null ]", oldNode, newNode);
 
-        this.mount({ vnode: newVNode, parent: ref!, mode: "replace", name });
-        unMountFunctionChild(oldNode);
-        return;
+        unMountNode(oldNode);
+        ref?.remove();
+        return true;
     }
 
-    // Set props
+    return false;
+};
+
+const updateBoolean = (
+    oldNode: Exclude<ReactNode, undefined | null>,
+    newNode: Exclude<ReactNode, undefined | null>,
+    ref: Element | null,
+    parent: Element | null,
+    index: number,
+    name: string
+) => {
+    if (typeof oldNode != "boolean" && typeof newNode != "boolean") return false;
+    if (oldNode === newNode) return true;
+
+    if (IS_DEVELOPMENT) console.log("[ Boolean difference ]", oldNode, newNode, ref);
+
+    if (newNode === false) {
+        unMountNode(oldNode);
+        if (
+            typeof oldNode != "object" ||
+            (typeof oldNode === "object" && typeof oldNode.type !== "function")
+        ) {
+            ref?.remove();
+        }
+        return true;
+    }
+
+    if (!parent) {
+        console.warn("Cannot Create new now: Parent is null");
+        return true;
+    }
+
+    /*
+
+        TODO: Fix this, it doesn't work correctly, in case of multiple boolean nodes changes in one parent
+
+    */
+
+    if (index - 1 < 0) {
+        if (IS_DEVELOPMENT) console.log("Mounting first child", parent);
+        mount({ vNode: newNode, parent: parent as HTMLElement, mode: "before", name });
+        addToIndex++;
+    } else {
+        const previousChild = (parent.childNodes[index - 1] as HTMLElement) || parent.lastChild;
+        if (IS_DEVELOPMENT) console.log("Mounting after previous child", previousChild, parent);
+        mount({ vNode: newNode, parent: previousChild, mode: "after", name });
+    }
+
+    return true;
+};
+
+const updatePrimitive = (
+    oldNode: Exclude<ReactNode, undefined | null>,
+    newNode: Exclude<ReactNode, undefined | null>,
+    ref: Element | null
+) => {
+    if (
+        !(typeof oldNode === "string" || typeof oldNode === "number") ||
+        !(typeof newNode === "string" || typeof newNode === "number")
+    ) {
+        return false;
+    }
+
+    if (oldNode.toString() !== newNode.toString()) {
+        ref!.textContent = newNode.toString();
+    }
+
+    return true;
+};
+
+const updateDifferentTypes = (
+    oldNode: ReactElement,
+    newNode: ReactElement,
+    ref: Element | null,
+    name: string
+) => {
+    if (typeof oldNode === typeof newNode) return false;
+    if (IS_DEVELOPMENT) console.log("[ Type difference ]", typeof oldNode, typeof newNode);
+
+    mount({ vNode: newNode, parent: ref!, mode: "replace", name });
+    unMountNode(oldNode);
+    return true;
+};
+
+const updateFunctionComponent = (
+    oldNode: ReactElement,
+    newNode: ReactElement,
+    ref: Element | null
+) => {
+    if (typeof newNode.type != "function" || typeof oldNode.type != "function") return false;
+
+    // Compare props to check if function needs an update;
+    const oldComponent = React.components.get(oldNode.componentName!);
+    if (!oldComponent) {
+        console.warn("Old component not found", oldNode, newNode);
+        return true;
+    }
+
+    if (isDifferent(oldNode, newNode)) {
+        oldComponent.isDirty = true;
+    }
+
+    const isDirty = oldNode.componentName && React.components.get(oldNode.componentName!)?.isDirty;
+    if (!isDirty) {
+        if (IS_DEVELOPMENT) {
+            console.log("[ Function component ], no update necessary");
+            console.log("Old node", oldNode);
+            console.log("New node", newNode);
+            console.log("[ Component ]", React.components.get(oldNode.componentName!));
+        }
+        return true;
+    }
+
+    const newComponent = newNode.type(newNode.props, ...newNode.children);
+    newComponent.componentName = newNode.componentName;
+
+    oldComponent.isDirty = false;
+    const componentName = typeof newComponent.type === "function" ? newComponent.type.name : "";
+
+    if (IS_DEVELOPMENT) console.log("[ Function component ]", newComponent, oldComponent);
+    React.currentComponent = oldComponent;
+
+    update({
+        oldNode: oldComponent?.vNode || oldNode,
+        newNode: newComponent,
+        ref: ref,
+        parent: ref?.parentElement!,
+        index: 0,
+        name: componentName,
+    });
+
+    // TODO: if something doesn't work correctly, probably because of it
+    if (oldComponent.vNode) {
+        oldComponent.vNode.children = newComponent.children;
+        oldComponent.vNode.componentName = componentName;
+    }
+
+    return true;
+};
+
+const updateDifferentObjectTypes = (
+    oldNode: ReactElement,
+    newNode: ReactElement,
+    ref: Element | null,
+    name: string
+) => {
+    if (oldNode.type === newNode.type) return false;
+    if (IS_DEVELOPMENT) console.log("[ Element type difference ]", oldNode, newNode);
+
+    mount({ vNode: newNode, parent: ref!, mode: "replace", name });
+    unMountNode(oldNode);
+
+    return true;
+};
+
+const updateElement = (
+    oldNode: ReactElement,
+    newNode: ReactElement,
+    ref: Element | null,
+    name: string
+) => {
     const oldProps = oldNode.props || {};
-    const newProps = newVNode.props || {};
+    const newProps = newNode.props || {};
 
-    // Add or update props
     for (const [key, value] of Object.entries(newProps)) {
-        this.setProps({ ref: ref!, key, value });
+        setProps({ ref: ref!, key, value });
     }
 
-    // Remove props that no longer exist
     for (const key of Object.keys(oldProps)) {
         if (!(key in newProps)) {
-            this.removeProp({ ref: ref!, key });
+            removeProp({ ref: ref!, key });
         }
     }
 
-    newVNode.ref = ref;
+    newNode.ref = ref;
 
-    // Check for children
-    if (Array.isArray(oldNode.children) && Array.isArray(newVNode.children)) {
+    if (Array.isArray(oldNode.children) && Array.isArray(newNode.children)) {
         let realIndex = 0;
-        addToIndex = 0;
-        for (let i = 0; i < Math.max(oldNode.children.length, newVNode.children.length); i++) {
-            const newChild = newVNode.children[i];
+        for (let i = 0; i < Math.max(oldNode.children.length, newNode.children.length); i++) {
+            const newChild = newNode.children[i];
             const oldChild = oldNode.children[i];
-            const childRef = oldChild?.ref || newChild?.ref || (oldNode.ref!.childNodes[realIndex] as HTMLElement | null);
+            const childRef =
+                oldChild?.ref ||
+                newChild?.ref ||
+                (oldNode.ref!.childNodes[realIndex] as HTMLElement | null);
 
             if (newChild && oldChild) realIndex++;
 
-            // console.log("========================")
-            // console.log("newChild", newChild);
-            // console.log("oldChild", oldChild);
-            // console.log("childRef", childRef);
-            // console.log("index", i,oldNode.ref!.childNodes);
-            // console.log("realIndex", realIndex);
-            // console.log("addToIndex", addToIndex);
-
-            this.update({
+            update({
                 oldNode: oldChild,
-                newVNode: newChild,
+                newNode: newChild,
                 ref: childRef,
                 parent: ref,
-                index: realIndex + addToIndex,
+                index: realIndex,
                 name,
             });
-
-            // console.log("========================")
         }
     }
+
+    return true;
+};
+
+/*
+ * Updates a VNode and it's children in the DOM and components list.
+ * @param {UpdateProps} props - The properties for the update.
+ * @param {ReactNode} props.oldNode - The old VNode to update.
+ * @param {ReactNode} props.newNode - The new VNode to update to.
+ * @param {Element | null} props.ref - The reference to the DOM element.
+ * @param {Element | null} props.parent - The parent element to append to.
+ * @param {number} props.index - The index of the child in the parent.
+ * @param {string} props.name - The name of the component.
+ */
+
+export function update(props: UpdateProps) {
+    let { oldNode, newNode, ref, parent, index, name } = props;
+
+    // Step 1
+    if (Array.isArray(oldNode) && Array.isArray(newNode))
+        return updateArray(oldNode, newNode, parent, name);
+
+    // Step 2
+    if (updateUndefined(oldNode, newNode, parent, name, ref)) return;
+
+    oldNode = oldNode as Exclude<ReactElement, undefined | null>;
+    newNode = newNode as Exclude<ReactElement, undefined | null>;
+
+    // Step 3
+    if (updateBoolean(oldNode, newNode, ref, parent, index, name)) return;
+
+    oldNode = oldNode as Exclude<ReactElement, undefined | null | boolean>;
+    newNode = newNode as Exclude<ReactElement, undefined | null | boolean>;
+
+    // Step 4
+    if (updatePrimitive(oldNode, newNode, ref)) return;
+
+    // Step 5
+    if (updateDifferentTypes(oldNode, newNode, ref, name)) return;
+
+    oldNode = oldNode as ReactElement;
+    newNode = newNode as ReactElement;
+    if (oldNode.componentName) newNode.componentName = oldNode.componentName;
+
+    // Step 6
+    if (updateFunctionComponent(oldNode, newNode, ref)) return;
+
+    // Step 7
+    if (updateDifferentObjectTypes(oldNode, newNode, ref, name)) return;
+
+    // Step 8
+    updateElement(oldNode, newNode, ref, name);
 }

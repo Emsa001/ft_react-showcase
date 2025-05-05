@@ -1,5 +1,4 @@
-import { ReactComponentInstance, RouterProps } from "./types/types";
-import { VDomManagerImpl } from "./render/manager";
+import { Hook, ReactComponentInstance, RouterProps } from "./types";
 
 import { isValidElementMethod } from "./methods/isValidElement";
 import { cloneElementMethod } from "./methods/cloneElement";
@@ -20,11 +19,13 @@ import "./render/hot";
 import { useSyncExternalStoreMethod } from "./hooks/useSyncExternalStore";
 
 class FtReact {
-    public vDomManager: VDomManagerImpl;
+    isFirstRender: boolean = true;
+    rootDom: Element | null = null;
+    components: Map<string, ReactComponentInstance> = new Map();
+    currentComponent: ReactComponentInstance | null = null;
 
-    constructor() {
-        this.vDomManager = new VDomManagerImpl();
-    }
+    staticStates: Map<string, Hook> = new Map();
+    staticComponents: Map<string, string[]> = new Map();
 
     /*
      * Methods
@@ -101,6 +102,9 @@ export const useSyncExternalStore = React.useSyncExternalStore;
 export const setTitle = React.setTitle;
 /* ========================================================== */
 
-export * from "./types/types";
+export * from "./types";
 export const IS_DEVELOPMENT = true;
 export default React;
+
+console.log("public", process.env.REACT_PUBLIC_TEST);
+console.log("secret", process.env.SECRET_API_KEY)
