@@ -1,8 +1,8 @@
-import { UpdateProps } from "react/types/types";
+import { UpdateProps } from "../types";
+import { isEqual } from "lodash";
 import { mount, unMountNode } from "./mount";
 import React, { IS_DEVELOPMENT } from "react";
 import { removeProp, setProps } from "./props";
-import { isEqual } from "lodash";
 
 let addToIndex = 0;
 
@@ -111,7 +111,10 @@ const updateBoolean = (
 
     if (newNode === false) {
         unMountNode(oldNode);
-        if (typeof oldNode != "object" || (typeof oldNode === "object" && typeof oldNode.type !== "function")) {
+        if (
+            typeof oldNode != "object" ||
+            (typeof oldNode === "object" && typeof oldNode.type !== "function")
+        ) {
             ref?.remove();
         }
         return true;
@@ -291,6 +294,17 @@ const updateElement = (
 
     return true;
 };
+
+/*
+ * Updates a VNode and it's children in the DOM and components list.
+ * @param {UpdateProps} props - The properties for the update.
+ * @param {ReactNode} props.oldNode - The old VNode to update.
+ * @param {ReactNode} props.newNode - The new VNode to update to.
+ * @param {Element | null} props.ref - The reference to the DOM element.
+ * @param {Element | null} props.parent - The parent element to append to.
+ * @param {number} props.index - The index of the child in the parent.
+ * @param {string} props.name - The name of the component.
+ */
 
 export function update(props: UpdateProps) {
     let { oldNode, newNode, ref, parent, index, name } = props;

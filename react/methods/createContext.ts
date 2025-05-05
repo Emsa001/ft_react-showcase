@@ -1,4 +1,4 @@
-import { ReactComponentInstance } from "react/types/types";
+import { ReactComponentInstance } from "react/types";
 import { Context } from "vm";
 
 export function createContextMethod<T>(defaultValue: T) {

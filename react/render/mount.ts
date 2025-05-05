@@ -40,10 +40,10 @@ const mountComponentVNode = async (
     isSvg?: boolean
 ): Promise<Element | null> => {
     const component = React.createComponentInstance(vNode);
-    
+
     React.components.set(component.name, component);
     React.currentComponent = component;
-    
+
     component.vNode = (vNode.type as ComponentType)(vNode.props, ...vNode.children);
     if (component.vNode === null) return null;
     if (!component.vNode.type) component.vNode!.type = "div";
@@ -91,17 +91,16 @@ const mountElementVNode = (
     return dom;
 };
 
-
 /*
-    * Unmounts a VNode and it's children from the DOM and components list.
-    * @param {ReactNode} node - The VNode to unmount.
-*/
+ * Unmounts a VNode and it's children from the DOM and components list.
+ * @param {ReactNode} node - The VNode to unmount.
+ */
 
 export const unMountNode = (node: ReactNode) => {
     if (node === null || typeof node === "undefined") return;
     if (typeof node === "string" || typeof node === "number" || typeof node === "boolean") return;
 
-    if(Array.isArray(node)) {
+    if (Array.isArray(node)) {
         for (const child of node) {
             unMountNode(child);
         }
@@ -128,11 +127,10 @@ export const unMountNode = (node: ReactNode) => {
 };
 
 /*
-
-    * Mounts a VNode to the DOM.
-    * @param {MountProps} props - The properties for mounting.
-    * @returns {Promise<Element | null>} - The mounted DOM element or null.
-*/
+ * Mounts a VNode to the DOM.
+ * @param {MountProps} props - The properties for mounting.
+ * @returns {Promise<Element | null>} - The mounted DOM element or null.
+ */
 
 export async function mount(props: MountProps): Promise<Element | null> {
     const { vNode, parent, name, mode = "append", isSvg } = props;

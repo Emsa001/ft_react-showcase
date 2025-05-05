@@ -1,4 +1,4 @@
-import { ReactComponentInstance } from "react/types/types";
+import { ReactComponentInstance } from "react/types";
 import React, { IS_DEVELOPMENT } from "..";
 import { unMountNode } from "react/render/mount";
 

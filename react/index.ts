@@ -1,4 +1,4 @@
-import { Hook, ReactComponentInstance, RouterProps } from "./types/types";
+import { Hook, ReactComponentInstance, RouterProps } from "./types";
 
 import { isValidElementMethod } from "./methods/isValidElement";
 import { cloneElementMethod } from "./methods/cloneElement";
@@ -102,7 +102,7 @@ export const useSyncExternalStore = React.useSyncExternalStore;
 export const setTitle = React.setTitle;
 /* ========================================================== */
 
-export * from "./types/types";
+export * from "./types";
 export const IS_DEVELOPMENT = true;
 export default React;
 

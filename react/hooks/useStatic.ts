@@ -1,5 +1,5 @@
 import React, { IS_DEVELOPMENT } from "react";
-import { processQueue, scheduleUpdate, useStateHook } from "./useState";
+import { processQueue, updateSchedule } from "react/render/updateSchedule";
 
 export function useStaticHook<T>(name: string, initialState: T): [T, (value: T | ((prevState: T) => T)) => void] {
     const component = React.currentComponent;
@@ -51,7 +51,7 @@ export function useStaticHook<T>(name: string, initialState: T): [T, (value: T |
             }else{
                 if (!compInstance.isDirty) {
                     compInstance.isDirty = true;
-                    scheduleUpdate(compInstance, []);
+                    updateSchedule(compInstance, []);
                 }
             }
         })    

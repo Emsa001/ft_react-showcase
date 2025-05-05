@@ -1,62 +1,7 @@
-import React, { Hook, IS_DEVELOPMENT, ReactComponentInstance } from "react";
-import { update } from "react/render/update";
+import React, { IS_DEVELOPMENT } from "react";
+import { updateSchedule } from "react/render/updateSchedule";
 
-// Process all queued state updates for the hook
-export function processQueue(hook: Hook) {
-    let state = hook.memoizedState;
 
-    for (const update of hook.queue) {
-        state = update(state);
-    }
-
-    hook.memoizedState = state;
-    hook.queue = [];
-}
-
-// Schedule the component update asynchronously
-export async function scheduleUpdate(component: ReactComponentInstance, states: Hook[]) {    
-    await Promise.resolve().then(async () => {
-        states.forEach((hook) => {
-            processQueue(hook);
-        });
-        
-        component.isDirty = false;
-        
-        React.currentComponent = component;
-        component.hookIndex = 0;
-        
-        if (typeof component.jsx?.type !== "function") {
-            throw new Error("Invalid component type");
-        }
-        
-        const newNode = component.jsx?.type(component.jsx.props, ...component.jsx.children);
-        newNode.componentName = component.name;
-
-        if(IS_DEVELOPMENT){
-            console.log("New VNode:", newNode);
-            console.log("Old VNode:", component.vNode);
-        }
-
-        if(!component.vNode?.ref){
-            throw new Error("Component ref is null, something is very wrong here :|");
-        }
-        
-        if (newNode && component.vNode) {
-            update({
-                oldNode: component.vNode,
-                newNode,
-                ref: component.vNode.ref,
-                parent: component.vNode.ref!.parentElement,
-                index: 0,
-                name: component.name
-            });
-            component.vNode = newNode;
-            component.isDirty = false;
-        }
-        if(IS_DEVELOPMENT) console.log(React.components);
-    });
-    
-}
 
 // useState implementation
 export function useStateHook<T>(initialState: T): [T, (value: T | ((prevState: T) => T)) => void] {
@@ -93,7 +38,7 @@ export function useStateHook<T>(initialState: T): [T, (value: T | ((prevState: T
         if (!component.isDirty) {
             if(IS_DEVELOPMENT) console.log("Component is dirty:", component.name);
             component.isDirty = true;
-            scheduleUpdate(component, component.hooks);
+            updateSchedule(component, component.hooks);
         }
     };
     

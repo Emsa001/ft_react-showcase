@@ -1,4 +1,4 @@
-import { MountMode } from "react/types/types";
+import { MountMode } from "react/types";
 
 export function addToDom(dom: Element | Text, parent: Element | null, mode: MountMode){
     if(!parent){

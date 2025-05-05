@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { BooleanSimple, BooleanSimple2 } from "../../components/BooleanSimple";
+import { BooleanSimple, BooleanSimple2, BooleanSimple3 } from "../../components/BooleanSimple";
 import { BooleansMadnessLevels } from "../../components/BooleansMadness";
 import { StateChaosUltimate } from "../../components/StateChaosUltimate";
 import { StateApocalypse } from "../../components/StateApocalypse";
@@ -29,7 +29,7 @@ export default function Home() {
 
     return (
         <div>
-            <StateApocalypse />
+            <BooleanSimple3 />
         </div>
     );
 }
