@@ -7,7 +7,7 @@ import { removeProp, setProps } from "./props";
 
 // TODO: get rid of global variables
 let addToIndex = 0;
-let prevNodeRef: Element | null = null;
+// let prevNodeRef: Element | null = null;
 
 const isDifferent = (oldNode: ReactElement, newNode: ReactElement): boolean => {
     if (oldNode.type !== newNode.type) return true;
@@ -140,8 +140,8 @@ const updateBoolean = (
        addToIndex++;
     } else {
         const previousChild = (parent.childNodes[index - 1] as HTMLElement) || parent.lastChild;
-        if (IS_DEVELOPMENT) console.log("Mounting after previous child", index, ref, previousChild, prevNodeRef);
-        mount({ vNode: newNode, parent: prevNodeRef || previousChild, mode: "after", name });
+        if (IS_DEVELOPMENT) console.log("Mounting after previous child", index, ref, previousChild);
+        mount({ vNode: newNode, parent: previousChild, mode: "after", name });
     }
 
     return true;
@@ -347,6 +347,6 @@ export function update(props: UpdateProps) {
     if (updateDifferentObjectTypes(oldNode, newNode, ref, name)) return;
 
     // Step 8
-    prevNodeRef = oldNode.ref;
+    // prevNodeRef = oldNode.ref;
     updateElement(oldNode, newNode, ref, name);
 }
