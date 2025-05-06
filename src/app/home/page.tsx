@@ -28,8 +28,8 @@ export default function Home() {
     }, [state])
 
     return (
-        <div>
-            <StateApocalypse />
+        <div dangerouslySetInnerHTML={{ __html: "<h1>Hello World</h1>" }} className="flex flex-col items-center justify-center min-h-screen p-24">
+            <h1>Hello 2</h1>
         </div>
     );
 }

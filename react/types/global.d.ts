@@ -1,5 +1,6 @@
 // global.d.ts
 
+
 type ReactNode = ReactElement | string | number | boolean | null | undefined;
 type ReactElement = VNode;
 
@@ -30,7 +31,7 @@ declare namespace JSX {
         props: {};
     }
 
-    interface IntrinsicAttributes {
+    interface IntrinsicAttributes extends DOMAttributes {
         key?: string | number;
         className?: string;
     }
@@ -53,3 +54,4 @@ interface IEffectCallback {
 
 type TEffectCallback = IEffectCallback | (() => void);
 type TDependencyList = any[];
+
