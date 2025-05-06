@@ -1,9 +1,15 @@
-import React from "react";
+import React, { useEffect, useNavigate } from "react";
 import Header from "../../components/Header";
 import Card from "../../components/Card";
 import NavButton from "../../components/NavButton";
 
 export default function NotFound() {
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        navigate("/profile");
+    }, [])
+
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-900 px-4">
             <Card>
