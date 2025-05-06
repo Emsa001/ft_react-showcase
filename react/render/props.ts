@@ -11,8 +11,6 @@ export function setProps({ ref, key, value }: { ref: Element; key: string; value
         return;
     }
 
-    // TODO: Optimize event listeners by making only one for parent element in case of arrays
-
     if (key === "onChange" && ref instanceof HTMLInputElement) {
         ref.removeEventListener("input", (ref as any)._onChangeListener);
         ref.addEventListener("input", value);
@@ -28,12 +26,12 @@ export function setProps({ ref, key, value }: { ref: Element; key: string; value
         return;
     }
 
-    if(key === "className"){
+    if (key === "className") {
         ref.setAttribute("class", value);
         return;
     }
 
-    if(key === "dangerouslySetInnerHTML"){
+    if (key === "dangerouslySetInnerHTML") {
         const { __html } = value;
         if (typeof __html === "string") {
             (ref as HTMLElement).innerHTML = __html;
@@ -41,9 +39,23 @@ export function setProps({ ref, key, value }: { ref: Element; key: string; value
         return;
     }
 
-    // TODO: do we need both?
-    ref.setAttribute(key, value);
-    (ref as any)[key] = value;
+    if(key === "value" && ref instanceof HTMLInputElement) {
+        ref.value = value;
+        return;
+    }
+
+    if (key in ref && Object.getOwnPropertyDescriptor(ref, key)?.set === undefined) {
+        ref.setAttribute(key, value);
+        return;
+    }
+
+    try {
+        (ref as any)[key] = value;
+        ref.setAttribute(key, value);
+    } catch {
+        // Ignore errors when setting properties that are not valid attributes
+        // This is common for custom components or certain DOM properties
+    }
 }
 
 export function removeProp({ ref, key }: { ref: Element; key: string }): void {

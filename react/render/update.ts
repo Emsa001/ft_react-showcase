@@ -7,7 +7,7 @@ import { removeProp, setProps } from "./props";
 
 // TODO: get rid of global variables
 let addToIndex = 0;
-let prevElement: Element | null = null;
+// let prevNodeRef: Element | null = null;
 
 const isDifferent = (oldNode: ReactElement, newNode: ReactElement): boolean => {
     if (oldNode.type !== newNode.type) return true;
@@ -134,14 +134,14 @@ const updateBoolean = (
 
     */
 
-   if (index - 1 < 0) {
+    if (index - 1 < 0) {
        if (IS_DEVELOPMENT) console.log("Mounting first child", parent);
        mount({ vNode: newNode, parent: parent as HTMLElement, mode: "before", name });
        addToIndex++;
     } else {
-        // const previousChild = (parent.childNodes[index - 1] as HTMLElement) || parent.lastChild;
-        if (IS_DEVELOPMENT) console.log("Mounting after previous child", prevElement, parent);
-        mount({ vNode: newNode, parent: prevElement!, mode: "after", name });
+        const previousChild = (parent.childNodes[index - 1] as HTMLElement) || parent.lastChild;
+        if (IS_DEVELOPMENT) console.log("Mounting after previous child", index, ref, previousChild);
+        mount({ vNode: newNode, parent: previousChild, mode: "after", name });
     }
 
     return true;
@@ -272,8 +272,8 @@ const updateElement = (
 
     newNode.ref = ref;
 
+    let realIndex = 0;
     if (Array.isArray(oldNode.children) && Array.isArray(newNode.children)) {
-        let realIndex = 0;
         for (let i = 0; i < Math.max(oldNode.children.length, newNode.children.length); i++) {
             const newChild = newNode.children[i];
             const oldChild = oldNode.children[i];
@@ -284,7 +284,6 @@ const updateElement = (
 
             if (newChild && oldChild) {
                 realIndex++;
-                prevElement = childRef;
             }
 
             update({
@@ -348,5 +347,6 @@ export function update(props: UpdateProps) {
     if (updateDifferentObjectTypes(oldNode, newNode, ref, name)) return;
 
     // Step 8
+    // prevNodeRef = oldNode.ref;
     updateElement(oldNode, newNode, ref, name);
 }

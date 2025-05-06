@@ -1,57 +1,57 @@
-import React, { useEffect, useState, useRef, setTitle } from "react";
-import NavButton from "../../components/NavButton";
-import Header from "../../components/Header";
+import React from "react";
 
-export default function Home() {
-    const [count, setCount] = useState(0);
-    const [name, setName] = useState("");
-    const inputRef = useRef<HTMLInputElement | null>(null);
+import { ContextSection, DemoContext } from "../../components/ContextExample";
+import { NavigateSection } from "../../components/NavigateExample";
+import { NavMenu } from "../../components/NavMenu";
+import { RefSection } from "../../components/RefExample";
+import { StateEffectSection } from "../../components/StateEffectExample";
+import { StaticSection } from "../../components/StaticExample";
+import { SyncExternalStoreSection } from "../../components/SyncExternalStoreExample";
+import { Header } from "../../components/Header";
 
-    useEffect(() => {
-        setTitle("Home - Dark Custom React");
-        inputRef.current?.focus();
-    }, []);
-
+export default function Showcase() {
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-900 px-4">
-            <div className="w-full max-w-lg text-center">
-                <Header title="🌙 Welcome to ft_react" />
+        <div className="bg-white dark:bg-gray-950 text-gray-100 min-h-screen">
+            <NavMenu />
 
-                <p className="text-gray-400 mb-6">Dark theme, clean layout, working navigation & hooks.</p>
+            <main className="bg-gradient-to-br from-blue-100 via-white to-purple-100 dark:from-gray-800 dark:via-gray-900 dark:to-gray-800">
+                <div className="max-w-7xl mx-auto pt-64">
+                    <Header />
 
-                <div className="mb-6">
-                    <label className="block text-sm text-gray-300 mb-2">Enter your name:</label>
-                    <input
-                        ref={inputRef}
-                        type="text"
-                        value={name}
-                        onChange={(e: any) => setName(e.target.value)}
-                        placeholder="Jane Doe"
-                        className="w-full px-4 py-2 rounded bg-gray-800 text-white border border-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    />
-                    <p className="text-sm text-indigo-400 mt-2">
-                        Hello, <span className="font-semibold">{name || "stranger"}</span>!
-                    </p>
+                    <DemoContext.Provider value="Hello from Context (try changing this in the provider)!">
+                        <div className="flex flex-col items-center justify-between">
+                            <StaticSection />
+                            <StateEffectSection reverse />
+                            <RefSection />
+                            <ContextSection reverse/>
+                            <NavigateSection />
+                            <SyncExternalStoreSection reverse />
+                        </div>
+                    </DemoContext.Provider>
                 </div>
+            </main>
 
-                <div className="mb-6">
-                    <label className="block text-sm text-gray-300 mb-2">Click counter:</label>
-                    <div className="flex justify-center items-center gap-4">
-                        <button
-                            onClick={() => setCount(count + 1)}
-                            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 rounded text-white"
-                        >
-                            +1
-                        </button>
-                        <span className="text-lg">{count}</span>
+            <footer className="py-12 border-t border-gray-800 mt-12">
+                <div className="max-w-7xl mx-auto px-6 text-center">
+                    <p className="text-gray-500 mb-4">
+                        ft_react Hook Library · MIT Licensed · v1.0.0
+                    </p>
+                    <div className="flex justify-center gap-6">
+                        <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                            Documentation
+                        </a>
+                        <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                            Examples
+                        </a>
+                        <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                            GitHub
+                        </a>
+                        <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                            NPM
+                        </a>
                     </div>
                 </div>
-
-                <div className="flex justify-center gap-4">
-                    <NavButton to="/profile" label="Profile →" />
-                    <NavButton to="/404" label="404 Page" />
-                </div>
-            </div>
+            </footer>
         </div>
     );
 }

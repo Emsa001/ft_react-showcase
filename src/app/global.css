@@ -5,6 +5,8 @@
 @import "tailwindcss/preflight.css" layer(base);
 @import "tailwindcss/utilities.css" layer(utilities);
 
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+
 body {
     margin: 0;
     padding: 0;
@@ -17,4 +19,8 @@ body {
 
 code {
     font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
+}
+
+button{
+    cursor: pointer;
 }
