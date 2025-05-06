@@ -15,7 +15,7 @@ export const NavMenu = () => {
                 </div>
                 <div className="flex gap-4">
                     <a
-                        href="https://github.com/yourusername/ft_react"
+                        href="#"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-gray-300 hover:text-white transition-colors flex items-center gap-2"
@@ -24,7 +24,7 @@ export const NavMenu = () => {
                         GitHub
                     </a>
                     <a
-                        href="https://www.npmjs.com/package/ft_react"
+                        href="#"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-gray-300 hover:text-white transition-colors flex items-center gap-2"
@@ -33,7 +33,7 @@ export const NavMenu = () => {
                         NPM
                     </a>
                     <a
-                        href="https://buymeacoffee.com/yourusername"
+                        href="#"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg transition-colors flex items-center gap-2"
