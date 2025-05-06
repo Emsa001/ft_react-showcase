@@ -33,6 +33,14 @@ export function setProps({ ref, key, value }: { ref: Element; key: string; value
         return;
     }
 
+    if(key === "dangerouslySetInnerHTML"){
+        const { __html } = value;
+        if (typeof __html === "string") {
+            (ref as HTMLElement).innerHTML = __html;
+        }
+        return;
+    }
+
     // TODO: do we need both?
     ref.setAttribute(key, value);
     (ref as any)[key] = value;
