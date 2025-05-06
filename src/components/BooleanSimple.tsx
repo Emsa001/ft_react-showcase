@@ -44,11 +44,11 @@ export function BooleanSimple3() {
     const [isVisible3, setIsVisible3] = useState(false);
     const [isVisible4, setIsVisible4] = useState(false);
 
-    const setAllVisible = () => {
-        setIsVisible1(true);
-        setIsVisible2(true);
-        setIsVisible3(true);
-        setIsVisible4(true);
+    const toggle = () => {
+        setIsVisible1(!isVisible1);
+        setIsVisible2(!isVisible2);
+        setIsVisible3(!isVisible3);
+        setIsVisible4(!isVisible4);
     };
 
     return (
@@ -62,7 +62,7 @@ export function BooleanSimple3() {
             {isVisible4 && <p>This is the fourth paragraph.</p>}
             <hr />
 
-            <button onClick={setAllVisible}>Set All Visible</button>
+            <button onClick={toggle}>Set All Visible</button>
         </div>
     );
 }

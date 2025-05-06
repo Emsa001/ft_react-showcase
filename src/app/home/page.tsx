@@ -16,20 +16,8 @@ import { PropTest } from "../../components/PropTest";
 import { ThreejsTest } from "../../components/ThreeJsTest";
 
 export default function Home() {
-    const [toggle, setToggle] = useState(true);
-    const [state, setState] = useState(0);
-
-    useEffect(() => {
-        console.log("State changed", state);
-
-        return () => {
-            console.log("Cleanup");
-        }
-    }, [state])
 
     return (
-        <div dangerouslySetInnerHTML={{ __html: "<h1>Hello World</h1>" }} className="flex flex-col items-center justify-center min-h-screen p-24">
-            <h1>Hello 2</h1>
-        </div>
+        <PropTest name={"Emanuel"} age={22}  />
     );
 }
