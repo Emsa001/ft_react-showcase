@@ -17,7 +17,7 @@ function Component() {
 
 const NavigateExample = () => {
     const navigate = useNavigate();
-    const [route, setRoute] = useState("/dashboard");
+    const [route, setRoute] = useState("/memes");
 
     return (
         <div className="space-y-6 text-black dark:text-white">

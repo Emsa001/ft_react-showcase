@@ -1,33 +1,34 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useStatic } from "react";
 import { Section } from "./Section";
 
 const code = `// State declaration
 const [count, setCount] = useState(0);
 const [darkMode, setDarkMode] = useState(false);
 
-// Effect that runs when darkMode changes
+// Effect that runs when theme changes
 useEffect(() => {
-  document.body.classList.toggle('dark', darkMode);
-  return () => document.body.classList.remove('dark');
-}, [darkMode]);`;
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme) setTheme(savedTheme);
+}, []);
+
+useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem("theme", theme);
+}, [theme]);`;
 
 const StateEffectExample = () => {
     const [count, setCount] = useState(0);
-    const [isDark, setIsDark] = useState<boolean>(true);
+    const [theme, setTheme] = useStatic("theme", "dark");
 
     useEffect(() => {
-        const savedTheme = localStorage.getItem("isDark");
-        if (savedTheme) {
-            setIsDark(JSON.parse(savedTheme));
-        }
+        const savedTheme = localStorage.getItem("theme");
+        if (savedTheme) setTheme(savedTheme);
     }, []);
 
     useEffect(() => {
-        // Set attribute data-theme="dark" or "light"
-        document.documentElement.setAttribute("data-theme", isDark ? "dark" : "light");
-        // Save the current theme to localStorage
-        localStorage.setItem("isDark", JSON.stringify(isDark));
-    }, [isDark]);
+        document.documentElement.setAttribute("data-theme", theme);
+        localStorage.setItem("theme", theme);
+    }, [theme]);
 
     return (
         <div className="space-y-6 text-black dark:text-white">
@@ -55,17 +56,17 @@ const StateEffectExample = () => {
                         <input
                             type="checkbox"
                             className="sr-only"
-                            checked={isDark}
-                            onChange={() => setIsDark(!isDark)}
+                            checked={theme === "dark"}
+                            onChange={() => setTheme((prev) => (prev === "dark" ? "light" : "dark"))}
                         />
                         <div
                             className={`w-10 h-4 rounded-full shadow-inner transition-colors ${
-                                isDark ? "bg-gray-600" : "bg-gray-400"
+                                theme === "dark" ? "bg-gray-600" : "bg-gray-400"
                             }`}
                         ></div>
                         <div
                             className={`absolute w-6 h-6 rounded-full shadow -left-1 -top-1 transition-all ${
-                                isDark ? "bg-blue-500 transform translate-x-6" : "bg-gray-300"
+                                theme === "dark" ? "bg-blue-500 transform translate-x-6" : "bg-gray-300"
                             }`}
                         ></div>
                     </div>

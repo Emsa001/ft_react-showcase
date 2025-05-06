@@ -30,10 +30,10 @@ const RefExample = () => {
             </div>
             <div className="flex gap-4">
                 <button
-                    onClick={() => setValue((v) => v + 1)}
+                    onClick={() => inputRef.current?.focus()}
                     className="bg-green-300 hover:bg-green-400 dark:bg-green-600 hover:dark:bg-green-700 px-6 py-3 rounded-lg transition-colors flex-1"
                 >
-                    Increment
+                    Focus
                 </button>
                 <button
                     onClick={() => setValue("")}
@@ -57,7 +57,7 @@ export const RefSection = ({ reverse }: { reverse?: boolean }) => {
     return (
         <Section
             title="useRef"
-            description="Creates a mutable ref object that persists for the lifetime of the component. The .current property can hold any value. Commonly used to: (1) Access DOM elements directly, (2) Store mutable values that don't trigger re-renders when changed, (3) Keep track of previous values. The example shows DOM access and demonstrates that changing refs doesn't cause re-renders."
+            description="Creates a mutable ref object that persists for the lifetime of the component. The .current property can hold any value. Commonly used to:<br />1. Access DOM elements directly.<br />2. Store mutable values that don't trigger re-renders when changed.<br />3. Keep track of previous values. The example shows DOM access and demonstrates that changing refs doesn't cause re-renders."
             code={code}
             reverse={reverse}
         >
