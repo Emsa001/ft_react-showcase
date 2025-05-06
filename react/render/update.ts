@@ -261,6 +261,7 @@ const updateElement = (
     const newProps = newNode.props || {};
 
     for (const [key, value] of Object.entries(newProps)) {
+        if(oldProps[key] === value) continue;
         setProps({ ref: ref!, key, value });
     }
 

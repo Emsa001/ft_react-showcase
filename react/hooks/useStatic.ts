@@ -1,7 +1,7 @@
 import React, { IS_DEVELOPMENT } from "react";
 import { processQueue, updateSchedule } from "react/render/updateSchedule";
 
-export function useStaticHook<T>(name: string, initialState: T): [T, (value: T | ((prevState: T) => T)) => void] {
+export function useStaticHook<T>(name: string, initialState?: T): [T, (value: T | ((prevState: T) => T)) => void] {
     const component = React.currentComponent;
 
     if (!component) {
