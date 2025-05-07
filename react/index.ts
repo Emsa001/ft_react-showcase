@@ -6,7 +6,7 @@ import { createContextMethod } from "./methods/createContext";
 import { createComponentInstanceMethod } from "./methods/createComponentInstance";
 import { renderComponentMethod, renderMethod } from "./render/render";
 import { createElementMethod } from "./methods/createElement";
-import { BrowserRouterMethod, RouterMethod } from "./methods/BrowserRouter";
+import { BrowserRouterMethod, LinkMethod, RouterMethod } from "./methods/BrowserRouter";
 
 import { useStateHook } from "./hooks/useState";
 import { useEffectHook } from "./hooks/useEffect";
@@ -31,20 +31,30 @@ class FtReact {
      * Methods
      */
 
-    createElement = (type: string | ComponentType, props: Props = {}, ...children: VNode[]): VNode =>
-        createElementMethod(type, props, ...children);
-    cloneElement = (element: ReactElement, props: Record<string, unknown>, ...children: ReactElement[]) =>
-        cloneElementMethod(element, props, ...children);
+    createElement = (
+        type: string | ComponentType,
+        props: Props = {},
+        ...children: VNode[]
+    ): VNode => createElementMethod(type, props, ...children);
+    cloneElement = (
+        element: ReactElement,
+        props: Record<string, unknown>,
+        ...children: ReactElement[]
+    ) => cloneElementMethod(element, props, ...children);
     isValidElement = (object: unknown): object is ReactElement => isValidElementMethod(object);
 
     createContext = <T>(defaultValue: T) => createContextMethod(defaultValue);
-    createComponentInstance = (element: ReactElement): ReactComponentInstance => createComponentInstanceMethod(element);
+    createComponentInstance = (element: ReactElement): ReactComponentInstance =>
+        createComponentInstanceMethod(element);
 
-    renderComponent = (element: ReactElement): ReactComponentInstance => renderComponentMethod(element);
-    render = async (element: ReactElement, container: HTMLElement): Promise<void> => renderMethod(element, container);
+    renderComponent = (element: ReactElement): ReactComponentInstance =>
+        renderComponentMethod(element);
+    render = async (element: ReactElement, container: HTMLElement): Promise<void> =>
+        renderMethod(element, container);
 
     BrowserRouter = (props: { children?: ReactElement[] }) => BrowserRouterMethod(props);
-    RouterMethod = (props: RouterProps) => RouterMethod(props);
+    Router = (props: RouterProps) => RouterMethod(props);
+    Link = (props: { to: string; state?: any; children?: ReactElement[] }) => LinkMethod(props);
 
     /*
      * Hooks
@@ -58,7 +68,7 @@ class FtReact {
     useNavigate = () => useNavigateHook();
     useSyncExternalStore = <T>(
         subscribe: (onStoreChange: () => void) => () => void,
-        getSnapshot: () => T,
+        getSnapshot: () => T
     ) => useSyncExternalStoreMethod(subscribe, getSnapshot);
 
     /*
@@ -81,7 +91,8 @@ export const cloneElement = React.cloneElement;
 export const isValidElement = React.isValidElement;
 export const createContext = React.createContext;
 export const BrowserRouter = React.BrowserRouter;
-export const Router = React.RouterMethod;
+export const Router = React.Router;
+export const Link = React.Link;
 
 /*
  * Hooks

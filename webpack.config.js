@@ -45,7 +45,7 @@ export default {
     },
     plugins: [
         new HtmlWebpackPlugin({
-            template: "./react/index.html",
+            template: "./public/index.html",
             favicon: "./public/favicon.ico",
         }),
         new CopyWebpackPlugin({

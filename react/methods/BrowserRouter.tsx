@@ -1,4 +1,4 @@
-import React, { RouterProps } from "react";
+import React, { RouterProps, useNavigate } from "react";
 
 export function RouterMethod(props: RouterProps) {
     const { src, component } = props;
@@ -27,8 +27,29 @@ export function BrowserRouterMethod(props: { children?: ReactElement[] }) {
     }
 
     if (defaultRoute) {
-        return defaultRoute
+        return defaultRoute;
     }
 
     return null;
 }
+
+type LinkMethodProps = {
+    to: string;
+    state?: any;
+    children?: ReactElement | ReactElement[];
+};
+
+export const LinkMethod = ({ to, state, children }: LinkMethodProps) => {
+    const navigate = useNavigate();
+
+    const handleClick = (e: MouseEvent) => {
+        e.preventDefault();
+        navigate(to, { ...state });
+    };
+
+    return (
+        <a href={to} onClick={handleClick}>
+            {children}
+        </a>
+    );
+};

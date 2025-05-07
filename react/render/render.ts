@@ -6,14 +6,15 @@ export async function renderMethod(element: ReactElement, container: HTMLElement
     React.components.set(rootComponent.name, rootComponent);
     React.currentComponent = rootComponent;
 
+    container.innerHTML = "";
     React.rootDom = await mount({
         vNode: rootComponent.vNode!,
         parent: container,
         name: rootComponent.name,
     });
 
-    if(IS_DEVELOPMENT) console.log("[ components ]", React.components);
-    if(React.rootDom === null) return;
+    if (IS_DEVELOPMENT) console.log("[ components ]", React.components);
+    if (React.rootDom === null) return;
     container.appendChild(React.rootDom);
 }
 
@@ -26,10 +27,15 @@ export function renderComponentMethod(element: ReactElement): ReactComponentInst
     }
 
     if (typeof element.type === "string") {
-        component.vNode = React.createElement(element.type, element.props, ...element.children);
+        component.vNode = React.createElement(
+            element.type,
+            { ...element.props },
+            ...element.children
+        );
         return component;
     }
 
-    component.vNode = element.type(element.props, ...element.children);
+    component.vNode = element.type({ ...element.props }, ...element.children);
+    console.log(component.vNode);
     return component;
 }
