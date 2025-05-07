@@ -7,7 +7,7 @@ import { removeProp, setProps } from "./props";
 
 // TODO: get rid of global variables
 let addToIndex = 0;
-// let prevNodeRef: Element | null = null;
+let prevNodeRef: Element | null = null;
 
 const isDifferent = (oldNode: ReactElement, newNode: ReactElement): boolean => {
     if (oldNode.type !== newNode.type) return true;
@@ -99,7 +99,7 @@ const updateUndefined = (
     return false;
 };
 
-const updateBoolean = (
+const updateBoolean = async (
     oldNode: Exclude<ReactNode, undefined | null>,
     newNode: Exclude<ReactNode, undefined | null>,
     ref: Element | null,
@@ -128,20 +128,14 @@ const updateBoolean = (
         return true;
     }
 
-    /*
-
-        TODO: Fix this, it doesn't work correctly, in case of multiple boolean nodes changes in one parent
-
-    */
-
     if (index - 1 < 0) {
        if (IS_DEVELOPMENT) console.log("Mounting first child", parent);
        mount({ vNode: newNode, parent: parent as HTMLElement, mode: "before", name });
        addToIndex++;
     } else {
         const previousChild = (parent.childNodes[index - 1] as HTMLElement) || parent.lastChild;
-        if (IS_DEVELOPMENT) console.log("Mounting after previous child", index, ref, previousChild);
-        mount({ vNode: newNode, parent: previousChild, mode: "after", name });
+        if (IS_DEVELOPMENT) console.log("Mounting after previous child", index, prevNodeRef);
+        prevNodeRef = await mount({ vNode: newNode, parent: prevNodeRef || previousChild, mode: "after", name });
     }
 
     return true;
@@ -251,7 +245,7 @@ const updateDifferentObjectTypes = (
     return true;
 };
 
-const updateElement = (
+const updateElement = async (
     oldNode: ReactElement,
     newNode: ReactElement,
     ref: Element | null,
@@ -285,9 +279,10 @@ const updateElement = (
 
             if (newChild && oldChild) {
                 realIndex++;
+                prevNodeRef = childRef;
             }
 
-            update({
+            await update({
                 oldNode: oldChild,
                 newNode: newChild,
                 ref: childRef,
@@ -312,7 +307,7 @@ const updateElement = (
  * @param {string} props.name - The name of the component.
  */
 
-export function update(props: UpdateProps) {
+export async function update(props: UpdateProps) {
     let { oldNode, newNode, ref, parent, index, name } = props;
 
     // Step 1
@@ -326,7 +321,7 @@ export function update(props: UpdateProps) {
     newNode = newNode as Exclude<ReactElement, undefined | null>;
 
     // Step 3
-    if (updateBoolean(oldNode, newNode, ref, parent, index, name)) return;
+    if (await updateBoolean(oldNode, newNode, ref, parent, index, name)) return;
 
     oldNode = oldNode as Exclude<ReactElement, undefined | null | boolean>;
     newNode = newNode as Exclude<ReactElement, undefined | null | boolean>;
@@ -348,6 +343,7 @@ export function update(props: UpdateProps) {
     if (updateDifferentObjectTypes(oldNode, newNode, ref, name)) return;
 
     // Step 8
-    // prevNodeRef = oldNode.ref;
-    updateElement(oldNode, newNode, ref, name);
+    await updateElement(oldNode, newNode, ref, name);
+
+    prevNodeRef = ref;
 }
