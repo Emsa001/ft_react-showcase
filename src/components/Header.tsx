@@ -15,8 +15,8 @@ export const Header = () => {
                 visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
             }`}
         >
-            <div className="uppercase text-white flex flex-col items-center justify-center text-[clamp(2.5rem,5vw,5rem)] font-black">
-                <span>Welcome to</span>
+            <div className="uppercase flex flex-col items-center justify-center text-[clamp(2.5rem,5vw,5rem)] font-black">
+                <span className="text-black dark:text-white">Welcome to</span>
                 <GlowingText
                     text="ft react"
                     from="from-blue-500"
@@ -28,9 +28,9 @@ export const Header = () => {
             </div>
 
             <div className="my-8 h-[1px] max-w-2xl bg-indigo-500/20 mx-auto" />
-            <p className="text-gray-400 text-[18px] max-w-3xl mx-auto leading-relaxed font-light">
-                My very own implementation of the <span className="text-white ">React</span>{" "}
-                library, built with <span className="text-white">TypeScript</span>.
+            <p className="text-gray-600 dark:text-gray-400 text-[18px] max-w-3xl mx-auto leading-relaxed font-light">
+                My very own implementation of the <span className="text-black dark:text-white">React</span>{" "}
+                library, built with <span className="text-black dark:text-white">TypeScript</span>.
                 <br />
                 <span className="text-md">
                     The idea for this project came from my final project at{" "}
