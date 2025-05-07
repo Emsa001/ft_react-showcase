@@ -103,5 +103,5 @@ export const setTitle = React.setTitle;
 /* ========================================================== */
 
 export * from "./types";
-export const IS_DEVELOPMENT = true;
+export const IS_DEVELOPMENT = false;
 export default React;
