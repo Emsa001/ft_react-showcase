@@ -6,7 +6,6 @@ import Profile from "./profile/page";
 import NotFound from "./404";
 
 export default function Root() {
-
     return (
         <BrowserRouter>
             <Router src="/" component={<Home />} />

@@ -13,11 +13,28 @@ import { StaticStateNormalState, StaticStateSimple } from "../../components/Stat
 import { StaticStateTest, StaticStateTest2 } from "../../components/StaticStateTest";
 import { Icon } from "../../components/Icons";
 import { PropTest } from "../../components/PropTest";
-import { ThreejsTest } from "../../components/ThreeJsTest";
 
 export default function Home() {
+    const [showMore, setShowMore] = useState(false);
 
     return (
-        <PropTest name={"Emanuel"} age={22}  />
+        <div>
+            {showMore && (
+                <h1>Hello asd</h1>
+            )}
+            <button onClick={() => setShowMore(!showMore)}>
+                {showMore ? "Hide" : "Show"} more
+            </button>
+            {showMore && (
+                <h1>Hello World 1</h1>
+            )}
+            {showMore && (
+                <h1>Hello World 2</h1>
+            )}
+            {showMore && (
+                <h1>Hello World 3</h1>
+            )}
+
+        </div>
     );
 }

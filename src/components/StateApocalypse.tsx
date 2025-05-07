@@ -47,22 +47,20 @@ export function StateApocalypse() {
             <button onClick={addHiddenNumber}>Add Hidden Number</button>
 
             <p>isVisible: {`${isVisible}`}</p>
-            <div>
-                {isVisible ? (
+            {isVisible ? (
+                <div>
+                    <h3>✨ Messages ✨</h3>
                     <div>
-                        <h3>✨ Messages ✨</h3>
-                        <div>
-                            {messages.map((msg, idx) => (
-                                <div key={idx}>{msg}</div>
-                            ))}
-                        </div>
+                        {messages.map((msg, idx) => (
+                            <div key={idx}>{msg}</div>
+                        ))}
                     </div>
-                ) : (
-                    <div>
-                        <h3>🚫 Messages Hidden 🚫</h3>
-                    </div>
-                )}
-            </div>
+                </div>
+            ) : (
+                <div>
+                    <h3>🚫 Messages Hidden 🚫</h3>
+                </div>
+            )}
 
             <div>
                 <h3>🃏 Cards 🃏</h3>

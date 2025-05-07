@@ -28,8 +28,6 @@ export const Icon = ({ icon, width, height, size, color }: IconProps) => {
     const iconElement = icon() as unknown as ReactElement;
     const viewBox = iconElement.props.attr.viewBox;
 
-    console.log(iconElement);
-
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
