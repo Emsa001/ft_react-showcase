@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useStatic } from "react";
-import { Section } from "./Section";
+import { Section } from "../Section";
 
 const code = `// State declaration
 const [count, setCount] = useState(0);

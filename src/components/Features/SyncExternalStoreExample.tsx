@@ -1,5 +1,5 @@
 import React, { useState, useSyncExternalStore } from "react";
-import { Section } from "./Section";
+import { Section } from "../Section";
 
 const code = `import { useSyncExternalStore } from 'react';  
 // Subscribe function

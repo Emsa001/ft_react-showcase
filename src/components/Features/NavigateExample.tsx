@@ -1,5 +1,5 @@
 import React, { useNavigate, useState } from "react";
-import { Section } from "./Section";
+import { Section } from "../Section";
 
 const code = `import { useNavigate } from 'react';
 function Component() {

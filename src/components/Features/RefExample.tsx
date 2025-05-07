@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { Section } from "./Section";
+import { Section } from "../Section";
 
 const code = `// Create ref
 const inputRef = useRef<HTMLInputElement>(null);

@@ -1,5 +1,5 @@
 import React, { useState, useStatic } from "react";
-import { Section } from "./Section";
+import { Section } from "../Section";
 
 const code = `// In any component:
 const [value, setValue] = useStatic("shared-key", initialValue);

@@ -1,8 +1,9 @@
 import React, { useNavigate } from "react";
 
 import { Icon } from "./Icon";
-import { FaGithub, FaNpm } from "react-icons/fa";
+import { FaGithub } from "react-icons/fa";
 import { SiBuymeacoffee } from "react-icons/si";
+import { BUY_ME_A_COFFEE, GITHUB_FTREACT } from "../links";
 
 export const NavMenu = () => {
     const isMobile = window.innerWidth < 640;
@@ -19,23 +20,25 @@ export const NavMenu = () => {
                 </div>
                 <div className="flex gap-4">
                     <a
-                        href="#"
+                        href={GITHUB_FTREACT}
+                        target="_blank"
                         rel="noopener noreferrer"
                         className="text-gray-300 hover:text-white transition-colors flex items-center gap-2"
                     >
                         <Icon icon={FaGithub} size={isMobile ? 30 : 20} />
                         <span className="hidden sm:block">GitHub</span>
                     </a>
-                    <a
+                    {/* <a
                         href="#"
                         rel="noopener noreferrer"
                         className="text-gray-300 hover:text-white transition-colors flex items-center gap-2"
                     >
                         <Icon icon={FaNpm} size={isMobile ? 30 : 20} />
                         <span className="hidden sm:block">NPM</span>
-                    </a>
+                    </a> */}
                     <a
-                        href="#"
+                        href={BUY_ME_A_COFFEE}
+                        target="_blank"
                         rel="noopener noreferrer"
                         className="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg transition-colors flex items-center gap-2"
                     >

@@ -1,4 +1,5 @@
 import React from "react";
+import { GITHUB_FTREACT_SHOWCASE } from "../links";
 
 export const Footer = () => {
     return (
@@ -13,16 +14,13 @@ export const Footer = () => {
                 </p>
                 <div className="flex justify-center gap-6">
                     <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                        Documentation
+                        Documentation (soon)
                     </a>
                     <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                        Examples
+                        Examples (soon)
                     </a>
-                    <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                        GitHub
-                    </a>
-                    <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                        NPM
+                    <a target="_blank" href={GITHUB_FTREACT_SHOWCASE} className="text-gray-400 hover:text-white transition-colors">
+                        GitHub - This page
                     </a>
                 </div>
             </div>

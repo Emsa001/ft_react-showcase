@@ -4,10 +4,9 @@ export default function NotFound() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        // Optional: Redirect to the home page after a delay
         const timer = setTimeout(() => navigate("/"), 5000);
         return () => clearTimeout(timer);
-    }, [navigate]);
+    }, []);
 
     return (
         <div className="min-h-screen flex flex-col items-center justify-center bg-gray-900 text-white px-4">
