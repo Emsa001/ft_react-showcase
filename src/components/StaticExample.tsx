@@ -52,7 +52,7 @@ const StaticExample = () => {
                 This value persists across all components using the same key.
             </p>
 
-            <div className="flex gap-4">
+            <div className="flex flex-wrap gap-4">
                 <button
                     onClick={() => setValue((v) => v + 1)}
                     className="bg-blue-300 hover:bg-blue-400 dark:bg-blue-600 hover:dark:bg-blue-700 px-6 py-3 rounded-lg transition-colors flex-1"

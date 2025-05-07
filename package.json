@@ -32,6 +32,7 @@
         "highlight.js": "^11.11.1",
         "html-webpack-plugin": "^5.6.3",
         "lodash": "^4.17.21",
+        "react-icons": "^5.5.0",
         "ts-loader": "^9.5.2"
     }
 }

@@ -1,7 +1,11 @@
 import React, { useNavigate } from "react";
-import { BuyMeACoffeeIcon, GithubIcon, NPMIcon } from "./Icons";
+
+import { Icon } from "./Icon";
+import { FaGithub, FaNpm } from "react-icons/fa";
+import { SiBuymeacoffee } from "react-icons/si";
 
 export const NavMenu = () => {
+    const isMobile = window.innerWidth < 640;
     const navigate = useNavigate();
 
     return (
@@ -19,24 +23,24 @@ export const NavMenu = () => {
                         rel="noopener noreferrer"
                         className="text-gray-300 hover:text-white transition-colors flex items-center gap-2"
                     >
-                        <GithubIcon />
-                        GitHub
+                        <Icon icon={FaGithub} size={isMobile ? 30 : 20} />
+                        <span className="hidden sm:block">GitHub</span>
                     </a>
                     <a
                         href="#"
                         rel="noopener noreferrer"
                         className="text-gray-300 hover:text-white transition-colors flex items-center gap-2"
                     >
-                        <NPMIcon />
-                        NPM
+                        <Icon icon={FaNpm} size={isMobile ? 30 : 20} />
+                        <span className="hidden sm:block">NPM</span>
                     </a>
                     <a
                         href="#"
                         rel="noopener noreferrer"
                         className="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg transition-colors flex items-center gap-2"
                     >
-                        <BuyMeACoffeeIcon />
-                        Buy Me a Coffee
+                        <Icon icon={SiBuymeacoffee} size={isMobile ? 30 : 20} />
+                        <span className="hidden sm:block">Buy Me a Coffee</span>
                     </a>
                 </div>
             </div>

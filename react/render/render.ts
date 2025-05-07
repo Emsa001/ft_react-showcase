@@ -36,6 +36,5 @@ export function renderComponentMethod(element: ReactElement): ReactComponentInst
     }
 
     component.vNode = element.type({ ...element.props }, ...element.children);
-    console.log(component.vNode);
     return component;
 }

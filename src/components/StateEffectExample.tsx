@@ -20,16 +20,6 @@ const StateEffectExample = () => {
     const [count, setCount] = useState(0);
     const [theme, setTheme] = useStatic("theme", "dark");
 
-    useEffect(() => {
-        const savedTheme = localStorage.getItem("theme");
-        if (savedTheme) setTheme(savedTheme);
-    }, []);
-
-    useEffect(() => {
-        document.documentElement.setAttribute("data-theme", theme);
-        localStorage.setItem("theme", theme);
-    }, [theme]);
-
     return (
         <div className="space-y-6 text-black dark:text-white">
             <div className="bg-gray-300 dark:bg-gray-800/50 p-4 rounded-lg">
