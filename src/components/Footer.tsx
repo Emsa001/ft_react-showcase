@@ -19,7 +19,7 @@ export const Footer = () => {
                     <a href="#" className="text-gray-400 hover:text-white transition-colors">
                         Examples (soon)
                     </a>
-                    <a target="_blank" href={GITHUB_FTREACT_SHOWCASE} className="text-gray-400 hover:text-white transition-colors">
+                    <a href="https://github.com/Emsa001/ft_react" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-700 transition-colors">
                         GitHub - This page
                     </a>
                 </div>

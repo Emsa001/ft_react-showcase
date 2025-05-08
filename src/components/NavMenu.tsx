@@ -23,23 +23,17 @@ export const NavMenu = () => {
                         href={GITHUB_FTREACT}
                         target="_blank"
                         rel="noopener noreferrer"
+                        aria-label="GitHub repository for ft_react"
                         className="text-gray-300 hover:text-white transition-colors flex items-center gap-2"
                     >
                         <Icon icon={FaGithub} size={isMobile ? 30 : 20} />
                         <span className="hidden sm:block">GitHub</span>
                     </a>
-                    {/* <a
-                        href="#"
-                        rel="noopener noreferrer"
-                        className="text-gray-300 hover:text-white transition-colors flex items-center gap-2"
-                    >
-                        <Icon icon={FaNpm} size={isMobile ? 30 : 20} />
-                        <span className="hidden sm:block">NPM</span>
-                    </a> */}
                     <a
                         href={BUY_ME_A_COFFEE}
                         target="_blank"
                         rel="noopener noreferrer"
+                        aria-label="Support on Buy Me a Coffee"
                         className="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg transition-colors flex items-center gap-2"
                     >
                         <Icon icon={SiBuymeacoffee} size={isMobile ? 30 : 20} />
