@@ -23,14 +23,14 @@ const Modal = ({ imageUrl, onClose }: { imageUrl: string; onClose: () => void })
     const [isVisible, setIsVisible] = useState(false);
 
     useEffect(() => {
-        const timeout = setTimeout(() => setIsVisible(true), 10); // allow DOM render first
+        const timeout = setTimeout(() => setIsVisible(true), 10);
         return () => clearTimeout(timeout);
     }, []);
 
     const handleBackdropClick = (e: MouseEvent) => {
         if (e.target === e.currentTarget) {
             setIsVisible(false);
-            setTimeout(onClose, 200); // match animation duration
+            setTimeout(onClose, 200);
         }
     };
 
