@@ -3,7 +3,7 @@ import React from "react";
 import { ContextSection, DemoContext } from "./Features/ContextExample";
 import { NavigateSection } from "./Features/NavigateExample";
 import { RefSection } from "./Features/RefExample";
-import { StateEffectSection } from "./Features/StateEffectExample";
+import { StateEffectSection } from "./Features/StateEffectSection";
 import { StaticSection } from "./Features/StaticExample";
 import { SyncExternalStoreSection } from "./Features/SyncExternalStoreExample";
 

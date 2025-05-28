@@ -1,5 +1,5 @@
 import React, { useState, useStatic } from "react";
-import { Section } from "../Section";
+import { ShowSection } from "../Section/Showcase";
 
 const code = `// In any component:
 const [value, setValue] = useStatic("shared-key", initialValue);
@@ -78,7 +78,7 @@ const StaticExample = () => {
 
 export const StaticSection = ({ reverse }: { reverse?: boolean }) => {
     return (
-        <Section
+        <ShowSection
             title="useStatic"
             description="Provides a way to share state across components without context. The state persists between components and updates all instances when changed. Useful for global settings, feature flags, or any shared mutable state that doesn't need the overhead of context providers."
             code={code}
@@ -86,6 +86,6 @@ export const StaticSection = ({ reverse }: { reverse?: boolean }) => {
             footer="useStatic keeps the state in memory, it will persist across component unmounts and remounts."
         >
             <StaticExample />
-        </Section>
+        </ShowSection>
     );
 };

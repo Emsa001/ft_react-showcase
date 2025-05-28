@@ -1,24 +1,36 @@
-import React, { useEffect, useState, useStatic } from "react";
-import { Section } from "../Section";
+import React, { useLocalStorage, useState } from "react";
+import { ShowSection } from "../Section/Showcase";
 
-const code = `// State declaration
+const code = `
 const [count, setCount] = useState(0);
-const [darkMode, setDarkMode] = useState(false);
+const [theme, setTheme] = useLocalStorage("theme");
 
-// Effect that runs when theme changes
-useEffect(() => {
-    const savedTheme = localStorage.getItem("theme");
-    if (savedTheme) setTheme(savedTheme);
-}, []);
-
-useEffect(() => {
+// useTheme.ts hook
+export const useTheme = () => {
+  // Get theme from localStorage or default to "dark"
+  const [theme] = useLocalStorage("theme", "dark");
+    
+  useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
-    localStorage.setItem("theme", theme);
-}, [theme]);`;
+    // other theme-related logic
+  }, [theme]);
 
-const StateEffectExample = () => {
+  return null;
+};
+
+// use of counter
+const increment = () => setCount((c) => c + 1);
+const reset = () => setCount(0);
+
+// use of theme toggle
+const toggle = () => {
+    setTheme((prev) => (prev === "dark" ? "light" : "dark"));
+}
+`;
+
+const StatesExample = () => {
     const [count, setCount] = useState(0);
-    const [theme, setTheme] = useStatic("theme", "dark");
+    const [theme, setTheme] = useLocalStorage("theme");
 
     return (
         <div className="space-y-6 text-black dark:text-white">
@@ -47,24 +59,25 @@ const StateEffectExample = () => {
                             type="checkbox"
                             className="sr-only"
                             checked={theme === "dark"}
-                            onChange={() => setTheme((prev) => (prev === "dark" ? "light" : "dark"))}
+                            onChange={() =>
+                                setTheme((prev: string) => (prev === "dark" ? "light" : "dark"))
+                            }
                         />
                         <div
                             className={`w-10 h-4 rounded-full shadow-inner transition-colors ${
                                 theme === "dark" ? "bg-gray-600" : "bg-gray-400"
                             }`}
-                        ></div>
+                        />
                         <div
                             className={`absolute w-6 h-6 rounded-full shadow -left-1 -top-1 transition-all ${
-                                theme === "dark" ? "bg-blue-500 transform translate-x-6" : "bg-gray-300"
+                                theme === "dark"
+                                    ? "bg-blue-500 transform translate-x-6"
+                                    : "bg-gray-300"
                             }`}
                         ></div>
                     </div>
                     <span className="dark:text-gray-300">Toggle dark mode effect</span>
                 </label>
-                <p className="text-gray-500 text-sm mt-2">
-                    useEffect handles the side effect of changing document classes
-                </p>
             </div>
         </div>
     );
@@ -72,13 +85,26 @@ const StateEffectExample = () => {
 
 export const StateEffectSection = ({ reverse }: { reverse?: boolean }) => {
     return (
-        <Section
-            title="useState & useEffect"
+        <ShowSection
+            title="useState, useEffect & useLocalStorage"
             description="The most common hooks for managing state and side effects in React. useState allows you to declare state variables, while useEffect lets you perform side effects in function components."
             code={code}
             reverse={reverse}
         >
-            <StateEffectExample />
-        </Section>
+            <StatesExample />
+            <div className="flex flex-col gap-4 text-sm mt-2 text-gray-500 dark:text-gray-400 mt-6">
+                <p>
+                    <span className="text-purple-500">useEffect</span> handles the side effect of
+                    changing document classes
+                </p>
+                <p>
+                    <span className="text-blue-500">useLocalStorage</span> is a custom hook that
+                    simplifies working with localStorage, providing a way to persist state across
+                    sessions. <br />
+                    <span className="text-blue-500">useLocalStorage</span> works on top of{" "}
+                    <span className="text-green-700 dark:text-green-400">useStatic</span>.
+                </p>
+            </div>
+        </ShowSection>
     );
 };

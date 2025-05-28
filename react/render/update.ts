@@ -1,7 +1,7 @@
-import { UpdateProps } from "../types";
-import { isEqual } from "lodash";
-import { mount, unMountNode } from "./mount";
 import React, { IS_DEVELOPMENT } from "react";
+import { isEqual } from "lodash";
+import { UpdateProps } from "../types";
+import { mount, unMountNode } from "./mount";
 import { removeProp, setProps } from "./props";
 
 
@@ -27,7 +27,7 @@ const isDifferent = (oldNode: ReactElement, newNode: ReactElement): boolean => {
 
     for (const key of oldPropsKeys) {
         if (!isEqual(oldProps[key], newProps[key])) {
-            console.log("Props are different", oldProps[key], newProps[key]);
+            if(IS_DEVELOPMENT) console.log("Props are different", oldProps[key], newProps[key]);
             return true;
         }
     }
@@ -168,13 +168,13 @@ const updateDifferentTypes = (
 ) => {
     if (typeof oldNode === typeof newNode) return false;
     if (IS_DEVELOPMENT) console.log("[ Type difference ]", typeof oldNode, typeof newNode);
-
+    
     mount({ vNode: newNode, parent: ref!, mode: "replace", name });
     unMountNode(oldNode);
     return true;
 };
 
-const updateFunctionComponent = (
+const updateFunctionComponent = async (
     oldNode: ReactElement,
     newNode: ReactElement,
     ref: Element | null
@@ -184,7 +184,7 @@ const updateFunctionComponent = (
     // Compare props to check if function needs an update;
     const oldComponent = React.components.get(oldNode.componentName!);
     if (!oldComponent) {
-        console.warn("Old component not found", oldNode, newNode);
+        if (IS_DEVELOPMENT) console.warn("Old component not found", oldNode, newNode);
         return true;
     }
 
@@ -206,13 +206,14 @@ const updateFunctionComponent = (
     const newComponent = newNode.type(newNode.props, ...newNode.children);
     newComponent.componentName = newNode.componentName;
 
-    oldComponent.isDirty = false;
     const componentName = typeof newComponent.type === "function" ? newComponent.type.name : "";
 
     if (IS_DEVELOPMENT) console.log("[ Function component ]", newComponent, oldComponent);
+    
     React.currentComponent = oldComponent;
-
-    update({
+    React.currentComponent?.onUpdate();
+    
+    await update({
         oldNode: oldComponent?.vNode || oldNode,
         newNode: newComponent,
         ref: ref,
@@ -224,6 +225,7 @@ const updateFunctionComponent = (
     // TODO: if something doesn't work correctly, probably because of it
     if (oldComponent.vNode) {
         oldComponent.vNode.children = newComponent.children;
+        oldComponent.vNode.props = newComponent.props;
         oldComponent.vNode.componentName = componentName;
     }
 
@@ -272,10 +274,11 @@ const updateElement = async (
         for (let i = 0; i < Math.max(oldNode.children.length, newNode.children.length); i++) {
             const newChild = newNode.children[i];
             const oldChild = oldNode.children[i];
+            
             const childRef =
                 oldChild?.ref ||
                 newChild?.ref ||
-                (oldNode.ref!.childNodes[realIndex] as HTMLElement | null);
+                (oldNode.ref?.childNodes[realIndex] as HTMLElement | null);
 
             if (newChild && oldChild) {
                 realIndex++;
@@ -337,7 +340,7 @@ export async function update(props: UpdateProps) {
     if (oldNode.componentName) newNode.componentName = oldNode.componentName;
 
     // Step 6
-    if (updateFunctionComponent(oldNode, newNode, ref)) return;
+    if (await updateFunctionComponent(oldNode, newNode, ref)) return;
 
     // Step 7
     if (updateDifferentObjectTypes(oldNode, newNode, ref, name)) return;

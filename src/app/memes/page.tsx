@@ -65,14 +65,18 @@ export default function MemesPage() {
                     <Meme key={meme} url={meme} onClick={() => setSelectedMeme(meme)} />
                 ))}
             </div>
-            {selectedMeme && (
-                <Modal imageUrl={selectedMeme} onClose={() => setSelectedMeme(null)} />
-            )}
+            
+            <div>
+                {selectedMeme && (
+                    <Modal imageUrl={selectedMeme} onClose={() => setSelectedMeme(null)} />
+                )}
+            </div>
 
-            <Link to="/">
-                <button className="p-4 text-white duration-100 bg-gray-800 hover:bg-gray-800/50 rounded-xl">
-                    Go back
-                </button>
+            <Link
+                to="/"
+                className="p-4 text-white duration-100 bg-gray-800 hover:bg-gray-800/50 rounded-xl my-6"
+            >
+                Go back
             </Link>
         </div>
     );

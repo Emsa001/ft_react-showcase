@@ -1,21 +1,25 @@
-import React, { IS_DEVELOPMENT, ReactComponentInstance } from "..";
+import React, { ReactComponentInstance } from "..";
 import { mount } from "./mount";
 
 export async function renderMethod(element: ReactElement, container: HTMLElement) {
+    if(React.isFirstRender)
+        React.isFirstRender = false;
+
     const rootComponent = renderComponentMethod(element);
     React.components.set(rootComponent.name, rootComponent);
     React.currentComponent = rootComponent;
 
     container.innerHTML = "";
-    React.rootDom = await mount({
+    const dom = await mount({
         vNode: rootComponent.vNode!,
         parent: container,
         name: rootComponent.name,
     });
 
-    if (IS_DEVELOPMENT) console.log("[ components ]", React.components);
-    if (React.rootDom === null) return;
-    container.appendChild(React.rootDom);
+    if (dom === null){
+        throw new Error("Failed to mount component: " + rootComponent.name);
+    }
+    container.appendChild(dom);
 }
 
 export function renderComponentMethod(element: ReactElement): ReactComponentInstance {

@@ -1,5 +1,5 @@
 import React, { useState, useSyncExternalStore } from "react";
-import { Section } from "../Section";
+import { ShowSection } from "../Section/Showcase";
 
 const code = `import { useSyncExternalStore } from 'react';  
 // Subscribe function
@@ -71,13 +71,13 @@ const SyncExternalStoreExample = () => {
 
 export const SyncExternalStoreSection = ({ reverse }: { reverse?: boolean }) => {
     return (
-        <Section
+        <ShowSection
             title="useSyncExternalStore"
             description="A recommended way to read and subscribe from external data sources. It handles the edge cases of concurrent rendering and integrates with React's scheduling. Useful for:<br />1. Browser APIs (like geolocation).<br />2. Third-party state management.<br />3. Subscription-based data sources."
             code={code}
             reverse={reverse}
         >
             <SyncExternalStoreExample />
-        </Section>
+        </ShowSection>
     );
 }

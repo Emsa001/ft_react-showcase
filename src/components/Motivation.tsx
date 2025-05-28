@@ -21,7 +21,7 @@ const motivationData = [
 const MotivationCard = ({ title, text }: {title: string, text: string}) => {
     return (
         <div
-            className="bg-clip-padding backdrop-filter backdrop-blur-md w-full shadow-lg rounded-lg p-8 flex flex-col items-center justify-center hover:scale-105 transition-transform duration-300 ease-out cursor-pointer bg-gradient-to-br from-blue-200/20 to-indigo-300/20 dark:from-indigo-600/20 dark:to-gray-800/20"
+            className="bg-clip-padding backdrop-filter backdrop-blur-md w-full shadow-lg rounded-lg p-8 flex flex-col items-center justify-center hover:scale-105 transition-transform duration-300 ease-out select-none bg-gradient-to-br from-blue-200/20 to-indigo-300/20 dark:from-indigo-600/20 dark:to-gray-800/20"
         >
             <h1 className="text-2xl font-semibold text-gray-800 dark:text-white mb-4">{title}</h1>
             <p className="text-lg text-gray-500 dark:text-gray-100/80" dangerouslySetInnerHTML={{__html: text }}/>

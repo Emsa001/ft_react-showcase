@@ -1,4 +1,4 @@
-import { Hook, ReactComponentInstance, RouterProps } from "./types";
+import { Hook, LinkMethodProps, ReactComponentInstance, RouterProps } from "./types";
 
 import { isValidElementMethod } from "./methods/isValidElement";
 import { cloneElementMethod } from "./methods/cloneElement";
@@ -14,13 +14,13 @@ import { useStaticHook } from "./hooks/useStatic";
 import { useRefHook } from "./hooks/useRef";
 import { useContextHook } from "./hooks/useContext";
 import { useNavigateHook } from "./hooks/useNavigate";
+import { useSyncExternalStoreMethod } from "./hooks/useSyncExternalStore";
+import { useLocalStorageHook } from "./hooks/useLocalStorage";
 
 import "./render/hot";
-import { useSyncExternalStoreMethod } from "./hooks/useSyncExternalStore";
 
 class FtReact {
     isFirstRender: boolean = true;
-    rootDom: Element | null = null;
     components: Map<string, ReactComponentInstance> = new Map();
     currentComponent: ReactComponentInstance | null = null;
 
@@ -54,7 +54,7 @@ class FtReact {
 
     BrowserRouter = (props: { children?: ReactElement[] }) => BrowserRouterMethod(props);
     Router = (props: RouterProps) => RouterMethod(props);
-    Link = (props: { to: string; state?: any; children?: ReactElement[] }) => LinkMethod(props);
+    Link = (props: LinkMethodProps) => LinkMethod(props);
 
     /*
      * Hooks
@@ -70,6 +70,7 @@ class FtReact {
         subscribe: (onStoreChange: () => void) => () => void,
         getSnapshot: () => T
     ) => useSyncExternalStoreMethod(subscribe, getSnapshot);
+    useLocalStorage = (key: string, initialValue?: any) => useLocalStorageHook(key, initialValue);
 
     /*
      * Custom Methods
@@ -105,6 +106,7 @@ export const useRef = React.useRef;
 export const useContext = React.useContext;
 export const useNavigate = React.useNavigate;
 export const useSyncExternalStore = React.useSyncExternalStore;
+export const useLocalStorage = React.useLocalStorage;
 
 /*
  * Custom Methods

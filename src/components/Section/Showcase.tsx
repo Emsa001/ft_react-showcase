@@ -1,8 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
-import hljs from "highlight.js/lib/core";
-import typescript from "highlight.js/lib/languages/typescript";
+import { CodeBlock } from "../Code";
 
-hljs.registerLanguage("typescript", typescript);
 
 interface SectionProps {
     title: string;
@@ -13,18 +11,9 @@ interface SectionProps {
     footer?: string;
 }
 
-const glass = "bg-clip-padding backdrop-filter backdrop-blur-md";
-
-export const Section = ({ title, description, code, children, reverse, footer }: SectionProps) => {
-    const codeRef = useRef<HTMLElement | null>(null);
+export const ShowSection = ({ title, description, code, children, reverse, footer }: SectionProps) => {
     const sectionRef = useRef<HTMLElement | null>(null);
     const [isVisible, setIsVisible] = useState(false);
-
-    useEffect(() => {
-        if (codeRef.current) {
-            hljs.highlightElement(codeRef.current);
-        }
-    }, []);
 
     useEffect(() => {
         const observer = new IntersectionObserver(([entry]) => setIsVisible(entry.isIntersecting), {
@@ -46,7 +35,7 @@ export const Section = ({ title, description, code, children, reverse, footer }:
     const hiddenChild = reverse ? "opacity-0 -translate-x-30" : "opacity-0 translate-x-30";
 
     return (
-        <section ref={sectionRef} className={`w-full bg-gray-500/10 ${glass} shadow-lg`}>
+        <section ref={sectionRef} className={`w-full bg-gray-500/10 glass shadow-lg`}>
             <div
                 className={`max-w-[1700px] mx-auto min-h-[800px] flex flex-col lg:flex-row items-center justify-between gap-32 py-20 px-6 sm:px-10 lg:px-20 relative overflow-hidden ${
                     reverse ? "lg:flex-row-reverse" : ""
@@ -66,11 +55,9 @@ export const Section = ({ title, description, code, children, reverse, footer }:
                             className="text-gray-700 dark:text-gray-300 text-base sm:text-lg leading-relaxed mb-6"
                             dangerouslySetInnerHTML={{ __html: description }}
                         />
-                        <div className="text-sm rounded-lg overflow-x-auto text-gray-800 dark:text-gray-300 border border-gray-300 dark:border-gray-700 max-w-full">
-                            <pre className="whitespace-pre-wrap break-words">
-                                <code ref={codeRef}>{code}</code>
-                            </pre>
-                        </div>
+
+                        <CodeBlock code={code} />
+
                         {footer && (
                             <p className="text-gray-700 dark:text-gray-300 text-base sm:text-md leading-relaxed mt-6">
                                 {footer}
@@ -79,14 +66,14 @@ export const Section = ({ title, description, code, children, reverse, footer }:
                     </div>
                 </div>
 
-                {/* Optional Child Content */}
+                {/* Child Content */}
                 <div
                     className={`relative z-10 lg:w-1/2 w-full transform ${baseTransition} ${
                         isVisible ? visibleChild : hiddenChild
                     }`}
                 >
                     <div
-                        className={`${glass} bg-pink-200/10 dark:bg-gray-700/50 p-6 sm:p-10 rounded-2xl shadow-md border border-gray-200 dark:border-gray-700 w-full max-w-2xl mx-auto`}
+                        className={`glass bg-pink-200/10 dark:bg-gray-700/50 p-6 sm:p-10 rounded-2xl shadow-md border border-gray-200 dark:border-gray-700 w-full max-w-2xl mx-auto`}
                     >
                         {children}
                     </div>

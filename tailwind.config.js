@@ -1,8 +1,10 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-    content: ["./src/**/*.{ts,tsx,html}"],  // Add your file paths here
+    content: ["./src/**/*.{ts,tsx,html}"],
     theme: {
-        extend: {},
+        extend: {
+            glass: "bg-clip-padding backdrop-filter backdrop-blur-md",
+        },
     },
     plugins: [],
 };

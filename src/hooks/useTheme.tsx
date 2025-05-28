@@ -1,14 +1,11 @@
-import { useEffect, useStatic } from "react";
+import { useEffect, useLocalStorage } from "react";
 
 export const useTheme = () => {
-    const [theme, setTheme] = useStatic("theme", localStorage.getItem("theme") || "dark");
-
+    const [theme] = useLocalStorage("theme", "dark");
+    
     useEffect(() => {
         document.documentElement.setAttribute("data-theme", theme);
-        localStorage.setItem("theme", theme);
-    }, [theme]);
 
-    useEffect(() => {
         const themeLink = document.createElement("link");
         themeLink.rel = "stylesheet";
         themeLink.type = "text/css";
@@ -28,8 +25,5 @@ export const useTheme = () => {
         };
     }, [theme]);
 
-    return {
-        theme,
-        setTheme,
-    };
+    return null;
 };

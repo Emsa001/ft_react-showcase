@@ -1,5 +1,5 @@
 import React, { createContext, useContext } from "react";
-import { Section } from "../Section";
+import { ShowSection } from "../Section/Showcase";
 
 export const DemoContext = createContext("default value");
 
@@ -46,7 +46,7 @@ const ContextExample2 = () => {
 
 export const ContextSection = ({ reverse }: { reverse?: boolean }) => {
     return (
-        <Section
+        <ShowSection
             title="useContext"
             description="Provides access to context values without prop drilling. Context is designed to share data that can be considered 'global' for a tree of components. The example contrasts context (read-only shared value)."
             code={code}
@@ -55,6 +55,6 @@ export const ContextSection = ({ reverse }: { reverse?: boolean }) => {
             <ContextExample1 />
             <ContextExample2 />
             <p className="text-gray-400 mt-6 text-sm">Yes, I  did rewrite this project 3 times, each with new approach and hope.</p>
-        </Section>
+        </ShowSection>
     );
 }

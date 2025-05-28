@@ -1,5 +1,5 @@
 import React, { useNavigate, useState } from "react";
-import { Section } from "../Section";
+import { ShowSection } from "../Section/Showcase";
 
 const code = `import { useNavigate } from 'react';
 function Component() {
@@ -49,13 +49,13 @@ const NavigateExample = () => {
 
 export const NavigateSection = ({ reverse }: { reverse?: boolean }) => {
     return (
-        <Section
+        <ShowSection
             title="useNavigate"
             description="Enables programmatic navigation in React Router applications. Returns a function that lets you navigate programmatically, with support for relative navigation, state, and other routing features. The example lets you test different routes."
             code={code}
             reverse={reverse}
         >
             <NavigateExample />
-        </Section>
+        </ShowSection>
     );
 };

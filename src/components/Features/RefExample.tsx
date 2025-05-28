@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { Section } from "../Section";
+import { ShowSection } from "../Section/Showcase";
 
 const code = `// Create ref
 const inputRef = useRef<HTMLInputElement>(null);
@@ -55,13 +55,13 @@ const RefExample = () => {
 
 export const RefSection = ({ reverse }: { reverse?: boolean }) => {
     return (
-        <Section
+        <ShowSection
             title="useRef"
             description="Creates a mutable ref object that persists for the lifetime of the component. The .current property can hold any value. Commonly used to:<br />1. Access DOM elements directly.<br />2. Store mutable values that don't trigger re-renders when changed.<br />3. Keep track of previous values. The example shows DOM access and demonstrates that changing refs doesn't cause re-renders."
             code={code}
             reverse={reverse}
         >
             <RefExample />
-        </Section>
+        </ShowSection>
     );
 };

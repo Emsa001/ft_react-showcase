@@ -21,9 +21,10 @@ interface IconProps {
     height?: number;
     size?: number;
     color?: string;
+    className?: string;
 }
 
-export const Icon = ({ icon, width, height, size, color }: IconProps) => {
+export const Icon = ({ icon, width, height, size, color, className }: IconProps) => {
 
     const iconElement = icon() as unknown as ReactElement;
     const viewBox = iconElement.props.attr.viewBox;
@@ -35,6 +36,7 @@ export const Icon = ({ icon, width, height, size, color }: IconProps) => {
             height={height || size || 16}
             fill={color || "currentColor"}
             viewBox={viewBox}
+            className={className}
         >
             {iconElement.children.map((child: any) => {
                 return child;
