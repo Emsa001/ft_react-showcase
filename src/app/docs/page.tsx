@@ -59,7 +59,7 @@ export default function Docs({
             <SideBar items={sideBarItems} isOpen={isSideBarOpen} toggle={handleToggle} />
 
             <div
-                className={`w-[93vw] mx-auto flex flex-col items-center justify-center gap-8 min-h-[96vh] px-6 pt-6 transition-all duration-300 ease-in-out ${
+                className={`w-[93vw] md:w-[80vw] max-w-7xl mx-auto flex flex-col items-center justify-center gap-8 min-h-[96vh] px-6 pt-6 transition-all duration-300 ease-in-out ${
                     isSideBarOpen ? 'ml-64' : 'ml-12 px-0 mr-12'
                 } lg:ml-64`}
             >
