@@ -11,7 +11,7 @@ export const Header = () => {
 
     return (
         <header
-            className={`text-black text-center px-6 h-[90vh] pt-48 transition-all duration-1000 ease-out transform ${
+            className={`text-black text-center px-6 h-[90vh] pt-[20vh] transition-all duration-1000 ease-out transform ${
                 visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
             }`}
         >
